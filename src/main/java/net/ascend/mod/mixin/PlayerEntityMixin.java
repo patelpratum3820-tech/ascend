@@ -116,11 +116,43 @@ public class PlayerEntityMixin implements IPlayerDataAccessor {
                 data.setCurrentMana(Math.min(data.getMana(), data.getCurrentMana() + 0.1));
             }
 
+            // Accessory effects: Mana Bracelet (+3 MP/s)
+            if (ascend$hasItem(self, "mana_bracelet")) {
+                data.setCurrentMana(Math.min(data.getMana() + 50, data.getCurrentMana() + 0.15));
+            }
+
+            // Accessory effects: Stamina Ring (+6 STA/s)
+            if (ascend$hasItem(self, "stamina_ring")) {
+                data.setCurrentStamina(Math.min(100.0, data.getCurrentStamina() + 0.3));
+            }
+
+            // Accessory effects: Shadow Talisman (2x faster dash recovery)
+            if (ascend$hasItem(self, "shadow_talisman")) {
+                if (data.getDashCooldownTicks() > 0) {
+                    data.setDashCooldownTicks(data.getDashCooldownTicks() - 1);
+                }
+            }
+
             // Sync resources periodically to client (every 10 ticks = 0.5s)
             if (self.age % 10 == 0 && self instanceof ServerPlayerEntity serverPlayer) {
                 AscendPackets.syncPlayerData(serverPlayer);
             }
         }
+    }
+
+    @Unique
+    private boolean ascend$hasItem(PlayerEntity player, String name) {
+        if (player.getOffHandStack() != null && !player.getOffHandStack().isEmpty()) {
+            Identifier id = Registries.ITEM.getId(player.getOffHandStack().getItem());
+            if ("ascend".equals(id.getNamespace()) && id.getPath().equals(name)) return true;
+        }
+        for (ItemStack stack : player.getInventory().main) {
+            if (!stack.isEmpty()) {
+                Identifier id = Registries.ITEM.getId(stack.getItem());
+                if ("ascend".equals(id.getNamespace()) && id.getPath().equals(name)) return true;
+            }
+        }
+        return false;
     }
 
     @Unique

@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " O ",
+    "SMS",
+    " O "
+  ],
+  "key": {
+    "O": {
+      "item": "minecraft:obsidian"
+    },
+    "S": {
+      "item": "ascend:shadow_essence"
+    },
+    "M": {
+      "item": "ascend:mana_crystal"
+    }
+  },
+  "result": {
+    "item": "ascend:shadow_talisman",
+    "count": 1
+  }
+}

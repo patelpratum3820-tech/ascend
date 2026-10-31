@@ -40,6 +40,8 @@ public class PlayerData {
     private int invulnerableTicks = 0;
     private int skill1CooldownTicks = 0;
     private int skill2CooldownTicks = 0;
+    private int skill3CooldownTicks = 0;
+    private int skill4CooldownTicks = 0;
     private int signatureCooldownTicks = 0;
 
     private boolean initialized = false;
@@ -68,11 +70,15 @@ public class PlayerData {
         this.invulnerableTicks = 0;
         this.skill1CooldownTicks = 0;
         this.skill2CooldownTicks = 0;
+        this.skill3CooldownTicks = 0;
+        this.skill4CooldownTicks = 0;
         this.signatureCooldownTicks = 0;
         this.initialized = false;
         this.selectedSkills.clear();
         this.selectedSkills.add("shadow_step");
         this.selectedSkills.add("flame_slash");
+        this.selectedSkills.add("iron_skin");
+        this.selectedSkills.add("berserk");
     }
 
     public void initializeAwakening(String difficulty, String race, String playerClass, List<String> skills) {
@@ -131,6 +137,16 @@ public class PlayerData {
         this.initialized = true;
     }
 
+    public int getMaxUnlockedSkillSlots() {
+        String r = getRank();
+        return switch (r) {
+            case "S", "A" -> 4;
+            case "B", "C" -> 3;
+            case "D" -> 2;
+            default -> 1; // Rank E starts with 1 skill slot!
+        };
+    }
+
     public void tickResources() {
         AscendConfig cfg = AscendConfig.INSTANCE;
 
@@ -149,6 +165,8 @@ public class PlayerData {
         if (invulnerableTicks > 0) invulnerableTicks--;
         if (skill1CooldownTicks > 0) skill1CooldownTicks--;
         if (skill2CooldownTicks > 0) skill2CooldownTicks--;
+        if (skill3CooldownTicks > 0) skill3CooldownTicks--;
+        if (skill4CooldownTicks > 0) skill4CooldownTicks--;
         if (signatureCooldownTicks > 0) signatureCooldownTicks--;
     }
 
@@ -365,6 +383,8 @@ public class PlayerData {
         buf.writeInt(dashCooldownTicks);
         buf.writeInt(skill1CooldownTicks);
         buf.writeInt(skill2CooldownTicks);
+        buf.writeInt(skill3CooldownTicks);
+        buf.writeInt(skill4CooldownTicks);
         buf.writeInt(signatureCooldownTicks);
         buf.writeBoolean(initialized);
         buf.writeInt(selectedSkills.size());
@@ -390,6 +410,8 @@ public class PlayerData {
         dashCooldownTicks = buf.readInt();
         skill1CooldownTicks = buf.readInt();
         skill2CooldownTicks = buf.readInt();
+        skill3CooldownTicks = buf.readInt();
+        skill4CooldownTicks = buf.readInt();
         signatureCooldownTicks = buf.readInt();
         initialized = buf.readBoolean();
 
@@ -448,11 +470,36 @@ public class PlayerData {
     public int getInvulnerableTicks() { return invulnerableTicks; }
     public void setInvulnerableTicks(int ticks) { this.invulnerableTicks = ticks; }
 
+    public int getSkillCooldown(int slot) {
+        return switch (slot) {
+            case 0 -> skill1CooldownTicks;
+            case 1 -> skill2CooldownTicks;
+            case 2 -> skill3CooldownTicks;
+            case 3 -> skill4CooldownTicks;
+            default -> 0;
+        };
+    }
+
+    public void setSkillCooldown(int slot, int ticks) {
+        switch (slot) {
+            case 0 -> this.skill1CooldownTicks = ticks;
+            case 1 -> this.skill2CooldownTicks = ticks;
+            case 2 -> this.skill3CooldownTicks = ticks;
+            case 3 -> this.skill4CooldownTicks = ticks;
+        }
+    }
+
     public int getSkill1CooldownTicks() { return skill1CooldownTicks; }
     public void setSkill1CooldownTicks(int ticks) { this.skill1CooldownTicks = ticks; }
 
     public int getSkill2CooldownTicks() { return skill2CooldownTicks; }
     public void setSkill2CooldownTicks(int ticks) { this.skill2CooldownTicks = ticks; }
+
+    public int getSkill3CooldownTicks() { return skill3CooldownTicks; }
+    public void setSkill3CooldownTicks(int ticks) { this.skill3CooldownTicks = ticks; }
+
+    public int getSkill4CooldownTicks() { return skill4CooldownTicks; }
+    public void setSkill4CooldownTicks(int ticks) { this.skill4CooldownTicks = ticks; }
 
     public int getSignatureCooldownTicks() { return signatureCooldownTicks; }
     public void setSignatureCooldownTicks(int ticks) { this.signatureCooldownTicks = ticks; }

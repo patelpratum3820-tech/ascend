@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " I ",
+    "M M",
+    " I "
+  ],
+  "key": {
+    "I": {
+      "item": "minecraft:iron_ingot"
+    },
+    "M": {
+      "item": "ascend:mana_crystal"
+    }
+  },
+  "result": {
+    "item": "ascend:stamina_ring",
+    "count": 1
+  }
+}

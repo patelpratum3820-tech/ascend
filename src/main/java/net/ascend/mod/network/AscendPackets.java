@@ -88,18 +88,24 @@ public class AscendPackets {
 
         // 4. Cast Skill / Signature
         ServerPlayNetworking.registerGlobalReceiver(CAST_SKILL_ID, (server, player, handler, buf, responseSender) -> {
-            int slot = buf.readInt(); // 0 = Skill 1, 1 = Skill 2, 2 = Signature
+            int slot = buf.readInt(); // 0 = Skill 1, 1 = Skill 2, 2 = Skill 3, 3 = Skill 4, 4 = Signature
 
             server.execute(() -> {
                 PlayerData data = ((IPlayerDataAccessor) player).ascend$getPlayerData();
-                if (slot == 2) {
+                if (slot == 4) {
                     if (AscendSkills.executeSignatureMove(player, data)) {
                         syncPlayerData(player);
                     }
-                } else if (slot >= 0 && slot < data.getSelectedSkills().size()) {
-                    String skillId = data.getSelectedSkills().get(slot);
-                    if (AscendSkills.executeSkill(skillId, player, data)) {
-                        syncPlayerData(player);
+                } else if (slot >= 0 && slot < 4) {
+                    if (slot >= data.getMaxUnlockedSkillSlots()) {
+                        player.sendMessage(net.minecraft.text.Text.literal("§c[Ascend] Skill Slot " + (slot + 1) + " is locked! Increase your Rank to unlock."), true);
+                        return;
+                    }
+                    if (slot < data.getSelectedSkills().size()) {
+                        String skillId = data.getSelectedSkills().get(slot);
+                        if (AscendSkills.executeSkill(slot, skillId, player, data)) {
+                            syncPlayerData(player);
+                        }
                     }
                 }
             });

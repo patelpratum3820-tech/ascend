@@ -27,7 +27,8 @@ import java.util.List;
 
 public class AscendSkills {
 
-    public static boolean executeSkill(String skillId, ServerPlayerEntity player, PlayerData data) {
+    public static boolean executeSkill(int slotIndex, String skillId, ServerPlayerEntity player, PlayerData data) {
+        if (data.getSkillCooldown(slotIndex) > 0) return false;
         ServerWorld world = player.getServerWorld();
         Vec3d look = player.getRotationVector();
         Vec3d pos = player.getPos();
@@ -36,7 +37,7 @@ public class AscendSkills {
             case "shadow_step" -> {
                 // Mobility dash with afterimage particles
                 if (!data.consumeStamina(25.0)) return false;
-                data.setSkill1CooldownTicks(60); // 3 sec cooldown
+                data.setSkillCooldown(slotIndex, 60); // 3 sec cooldown
                 data.setInvulnerableTicks(10); // 0.5s i-frame
 
                 player.setVelocity(look.x * 1.8, 0.2, look.z * 1.8);
@@ -49,7 +50,7 @@ public class AscendSkills {
 
             case "flame_slash" -> {
                 if (!data.consumeStamina(20.0)) return false;
-                data.setSkill1CooldownTicks(80); // 4 sec cooldown
+                data.setSkillCooldown(slotIndex, 80); // 4 sec cooldown
 
                 // Fire wave in front
                 for (int i = 1; i <= 5; i++) {
@@ -70,7 +71,7 @@ public class AscendSkills {
 
             case "healing_aura" -> {
                 if (!data.consumeMana(30.0)) return false;
-                data.setSkill1CooldownTicks(160); // 8 sec cooldown
+                data.setSkillCooldown(slotIndex, 160); // 8 sec cooldown
 
                 player.heal(4.0f + (data.getVitality() * 0.1f));
                 player.addStatusEffect(new StatusEffectInstance(StatusEffects.REGENERATION, 100, 1));
@@ -81,7 +82,7 @@ public class AscendSkills {
 
             case "summon_soldier" -> {
                 if (!data.consumeMana(40.0)) return false;
-                data.setSkill1CooldownTicks(200); // 10 sec cooldown
+                data.setSkillCooldown(slotIndex, 200); // 10 sec cooldown
 
                 // Spawn Shadow Soldier (Wither Skeleton ally)
                 WitherSkeletonEntity minion = EntityType.WITHER_SKELETON.create(world);
@@ -101,7 +102,7 @@ public class AscendSkills {
 
             case "mana_bolt" -> {
                 if (!data.consumeMana(15.0)) return false;
-                data.setSkill1CooldownTicks(40); // 2 sec cooldown
+                data.setSkillCooldown(slotIndex, 40); // 2 sec cooldown
 
                 SmallFireballEntity bolt = new SmallFireballEntity(world, player, look.x * 2.0, look.y * 2.0, look.z * 2.0);
                 bolt.setPosition(pos.x, player.getEyeY() - 0.1, pos.z);
@@ -114,7 +115,7 @@ public class AscendSkills {
 
             case "arrow_rain" -> {
                 if (!data.consumeStamina(30.0)) return false;
-                data.setSkill1CooldownTicks(140); // 7 sec cooldown
+                data.setSkillCooldown(slotIndex, 140); // 7 sec cooldown
 
                 HitResult ray = player.raycast(30.0, 0, false);
                 Vec3d targetPos = ray.getType() != HitResult.Type.MISS ? ray.getPos() : pos.add(look.multiply(15));
@@ -134,7 +135,7 @@ public class AscendSkills {
 
             case "iron_skin" -> {
                 if (!data.consumeStamina(25.0)) return false;
-                data.setSkill1CooldownTicks(240); // 12 sec cooldown
+                data.setSkillCooldown(slotIndex, 240); // 12 sec cooldown
 
                 player.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 140, 2));
                 player.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 140, 0));
@@ -145,7 +146,7 @@ public class AscendSkills {
 
             case "lightning_strike" -> {
                 if (!data.consumeMana(35.0)) return false;
-                data.setSkill1CooldownTicks(160); // 8 sec cooldown
+                data.setSkillCooldown(slotIndex, 160); // 8 sec cooldown
 
                 HitResult ray = player.raycast(25.0, 0, false);
                 Vec3d targetPos = ray.getType() != HitResult.Type.MISS ? ray.getPos() : pos.add(look.multiply(10));
@@ -160,7 +161,7 @@ public class AscendSkills {
 
             case "berserk" -> {
                 if (!data.consumeStamina(30.0)) return false;
-                data.setSkill1CooldownTicks(300); // 15 sec cooldown
+                data.setSkillCooldown(slotIndex, 300); // 15 sec cooldown
 
                 player.addStatusEffect(new StatusEffectInstance(StatusEffects.STRENGTH, 200, 1));
                 player.addStatusEffect(new StatusEffectInstance(StatusEffects.SPEED, 200, 1));
@@ -172,7 +173,7 @@ public class AscendSkills {
 
             case "soul_bond" -> {
                 if (!data.consumeMana(25.0)) return false;
-                data.setSkill1CooldownTicks(240); // 12 sec cooldown
+                data.setSkillCooldown(slotIndex, 240); // 12 sec cooldown
 
                 player.addStatusEffect(new StatusEffectInstance(StatusEffects.ABSORPTION, 300, 2));
                 player.addStatusEffect(new StatusEffectInstance(StatusEffects.REGENERATION, 200, 0));

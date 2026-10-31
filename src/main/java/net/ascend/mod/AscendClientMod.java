@@ -24,7 +24,10 @@ public class AscendClientMod implements ClientModInitializer {
     public static KeyBinding dashKey;
     public static KeyBinding skill1Key;
     public static KeyBinding skill2Key;
+    public static KeyBinding skill3Key;
+    public static KeyBinding skill4Key;
     public static KeyBinding signatureKey;
+    public static KeyBinding rpgCameraKey;
 
     @Override
     public void onInitializeClient() {
@@ -65,6 +68,20 @@ public class AscendClientMod implements ClientModInitializer {
                 "category.ascend.general"
         ));
 
+        skill3Key = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+                "key.ascend.skill3",
+                InputUtil.Type.KEYSYM,
+                GLFW.GLFW_KEY_C,
+                "category.ascend.general"
+        ));
+
+        skill4Key = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+                "key.ascend.skill4",
+                InputUtil.Type.KEYSYM,
+                GLFW.GLFW_KEY_X,
+                "category.ascend.general"
+        ));
+
         signatureKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
                 "key.ascend.signature",
                 InputUtil.Type.KEYSYM,
@@ -72,9 +89,29 @@ public class AscendClientMod implements ClientModInitializer {
                 "category.ascend.general"
         ));
 
+        rpgCameraKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+                "key.ascend.rpg_camera",
+                InputUtil.Type.KEYSYM,
+                GLFW.GLFW_KEY_G,
+                "category.ascend.general"
+        ));
+
         // 4. Tick Listener for Key inputs
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             if (client.player == null) return;
+
+            // RPG Camera Toggle (1-click first-person <-> 3rd-person RPG view)
+            while (rpgCameraKey.wasPressed()) {
+                if (client.currentScreen == null) {
+                    if (client.options.getPerspective().isFirstPerson()) {
+                        client.options.setPerspective(net.minecraft.client.option.Perspective.THIRD_PERSON_BACK);
+                        client.player.sendMessage(net.minecraft.text.Text.literal("§6⚔ [Ascend] §eSwitched to RPG 3rd-Person Camera"), true);
+                    } else {
+                        client.options.setPerspective(net.minecraft.client.option.Perspective.FIRST_PERSON);
+                        client.player.sendMessage(net.minecraft.text.Text.literal("§6⚔ [Ascend] §eSwitched to First-Person View"), true);
+                    }
+                }
+            }
 
             // Status Window
             while (statusScreenKey.wasPressed()) {
@@ -83,7 +120,7 @@ public class AscendClientMod implements ClientModInitializer {
                 }
             }
 
-            // Directional Dash / Dodge
+            // Directional Dash / Dodge with Dynamic Visual Animation
             while (dashKey.wasPressed()) {
                 if (client.currentScreen == null) {
                     float forward = client.player.input.movementForward;
@@ -109,28 +146,53 @@ public class AscendClientMod implements ClientModInitializer {
                             dirZ /= len;
                         }
                     }
+
+                    // Client dash particles / anime speed lines
+                    if (client.world != null) {
+                        for (int i = 0; i < 12; i++) {
+                            double px = client.player.getX() + (client.world.random.nextDouble() - 0.5) * 1.2;
+                            double py = client.player.getY() + client.world.random.nextDouble() * 1.5;
+                            double pz = client.player.getZ() + (client.world.random.nextDouble() - 0.5) * 1.2;
+                            client.world.addParticle(net.minecraft.particle.ParticleTypes.CLOUD, px, py, pz, -dirX * 0.3, 0.05, -dirZ * 0.3);
+                        }
+                    }
+
                     AscendClientPackets.sendDash(dirX, dirZ);
                 }
             }
 
-            // Skill 1
+            // Skill 1 [R]
             while (skill1Key.wasPressed()) {
                 if (client.currentScreen == null) {
                     AscendClientPackets.sendCastSkill(0);
                 }
             }
 
-            // Skill 2
+            // Skill 2 [F]
             while (skill2Key.wasPressed()) {
                 if (client.currentScreen == null) {
                     AscendClientPackets.sendCastSkill(1);
                 }
             }
 
-            // Signature Move
-            while (signatureKey.wasPressed()) {
+            // Skill 3 [C]
+            while (skill3Key.wasPressed()) {
                 if (client.currentScreen == null) {
                     AscendClientPackets.sendCastSkill(2);
+                }
+            }
+
+            // Skill 4 [X]
+            while (skill4Key.wasPressed()) {
+                if (client.currentScreen == null) {
+                    AscendClientPackets.sendCastSkill(3);
+                }
+            }
+
+            // Signature Move [V]
+            while (signatureKey.wasPressed()) {
+                if (client.currentScreen == null) {
+                    AscendClientPackets.sendCastSkill(4);
                 }
             }
         });

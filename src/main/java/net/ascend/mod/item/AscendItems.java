@@ -18,13 +18,18 @@ import net.minecraft.util.Identifier;
 public class AscendItems {
     // 1. Materials
     public static final Item MYTHRIL_INGOT = register("mythril_ingot", new Item(new FabricItemSettings()));
-    public static final Item MANA_CRYSTAL = register("mana_crystal", new Item(new FabricItemSettings()));
+    public static final Item MANA_CRYSTAL = register("mana_crystal", new ManaCrystalItem(new FabricItemSettings()));
     public static final Item DRAGONITE_INGOT = register("dragonite_ingot", new Item(new FabricItemSettings()));
     public static final Item VOIDSTEEL_INGOT = register("voidsteel_ingot", new Item(new FabricItemSettings()));
     public static final Item SHADOW_ESSENCE = register("shadow_essence", new Item(new FabricItemSettings()));
     public static final Item DRAGON_SCALE = register("dragon_scale", new Item(new FabricItemSettings()));
     public static final Item DUNGEON_MAP = register("dungeon_map", new DungeonMapItem(new FabricItemSettings()));
     public static final Item RESET_STONE = register("reset_stone", new Item(new FabricItemSettings()));
+
+    // Accessories
+    public static final Item MANA_BRACELET = register("mana_bracelet", new AccessoryItem(new FabricItemSettings().maxCount(1), "§b✦ +50 Max Mana", "§b✦ +3 MP/s Passive Regen"));
+    public static final Item STAMINA_RING = register("stamina_ring", new AccessoryItem(new FabricItemSettings().maxCount(1), "§a✦ +50 Max Stamina", "§a✦ +6 STA/s Passive Regen"));
+    public static final Item SHADOW_TALISMAN = register("shadow_talisman", new AccessoryItem(new FabricItemSettings().maxCount(1), "§d✦ +20% Movement Speed", "§d✦ 2x Dash Cooldown Recovery"));
 
     // 2. Mythril Gear
     public static final Item MYTHRIL_SWORD = register("mythril_sword", new SwordItem(AscendToolMaterials.MYTHRIL, 3, -2.4f, new FabricItemSettings()));
@@ -89,6 +94,9 @@ public class AscendItems {
                 entries.add(DRAGON_SCALE);
                 entries.add(DUNGEON_MAP);
                 entries.add(RESET_STONE);
+                entries.add(MANA_BRACELET);
+                entries.add(STAMINA_RING);
+                entries.add(SHADOW_TALISMAN);
 
                 entries.add(MYTHRIL_SWORD);
                 entries.add(MYTHRIL_PICKAXE);

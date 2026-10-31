@@ -7,7 +7,10 @@
   "key.ascend.dash": "Dash / Dodge",
   "key.ascend.skill1": "Cast Skill 1",
   "key.ascend.skill2": "Cast Skill 2",
+  "key.ascend.skill3": "Cast Skill 3",
+  "key.ascend.skill4": "Cast Skill 4",
   "key.ascend.signature": "Cast Signature Move",
+  "key.ascend.rpg_camera": "Toggle RPG Camera (1st/3rd Person)",
 
   "text.ascend.status_title": "STATUS SYSTEM",
   "text.ascend.level": "Level",
@@ -29,6 +32,9 @@
   "item.ascend.dragon_scale": "Dragon Scale",
   "item.ascend.dungeon_map": "Dungeon Map",
   "item.ascend.reset_stone": "Reset Stone",
+  "item.ascend.mana_bracelet": "Mana Bracelet",
+  "item.ascend.stamina_ring": "Stamina Ring",
+  "item.ascend.shadow_talisman": "Shadow Talisman",
 
   "item.ascend.mythril_sword": "Mythril Sword",
   "item.ascend.mythril_pickaxe": "Mythril Pickaxe",
