@@ -68,3 +68,4 @@ public class OrcWarriorEntity extends HostileEntity {
         return SoundEvents.ENTITY_ZOMBIFIED_PIGLIN_DEATH;
     }
 }
+

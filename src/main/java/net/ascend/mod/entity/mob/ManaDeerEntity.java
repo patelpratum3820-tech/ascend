@@ -78,3 +78,4 @@ public class ManaDeerEntity extends AnimalEntity {
         return SoundEvents.ENTITY_COW_DEATH;
     }
 }
+

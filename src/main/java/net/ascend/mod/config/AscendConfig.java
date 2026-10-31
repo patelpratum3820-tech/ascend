@@ -170,6 +170,7 @@ public class AscendConfig {
                 AscendMod.LOGGER.error("Failed to load Ascend config, using defaults", e);
                 INSTANCE = new AscendConfig();
             }
+            save();
         } else {
             save();
         }

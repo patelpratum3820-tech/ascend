@@ -74,3 +74,4 @@ public class SkeletonKnightEntity extends HostileEntity {
         return SoundEvents.ENTITY_SKELETON_DEATH;
     }
 }
+

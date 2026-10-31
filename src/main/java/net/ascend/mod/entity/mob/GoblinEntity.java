@@ -105,3 +105,4 @@ public class GoblinEntity extends HostileEntity {
         return SoundEvents.ENTITY_PIGLIN_DEATH;
     }
 }
+

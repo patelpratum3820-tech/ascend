@@ -64,3 +64,4 @@ public class SlimePupEntity extends HostileEntity {
         return SoundEvents.ENTITY_SLIME_DEATH_SMALL;
     }
 }
+

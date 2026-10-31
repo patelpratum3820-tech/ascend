@@ -255,3 +255,4 @@ create_biped_mob("dark_mage", (25, 20, 35, 255), (10, 5, 15, 255), (35, 20, 55, 
 create_fire_drake()
 create_dungeon_golem()
 print("All 11 mob textures successfully generated!")
+

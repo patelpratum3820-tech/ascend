@@ -89,3 +89,4 @@ public class ShadowWraithEntity extends HostileEntity {
         return SoundEvents.ENTITY_PHANTOM_DEATH;
     }
 }
+
