@@ -3,10 +3,13 @@ package net.ascend.mod.mixin;
 import net.ascend.mod.config.AscendConfig;
 import net.ascend.mod.data.IPlayerDataAccessor;
 import net.ascend.mod.data.PlayerData;
+import net.ascend.mod.item.AscendItems;
 import net.ascend.mod.network.AscendPackets;
+import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.damage.DamageTypes;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
 import org.spongepowered.asm.mixin.Mixin;
@@ -71,14 +74,21 @@ public class PlayerEntityMixin implements IPlayerDataAccessor {
             }
         }
 
-        // 3. Slime Fall Immunity
+        // 3. Slime Fall Damage (Balanced: 75% reduction instead of infinite immunity)
         if ("Slime".equalsIgnoreCase(data.getRace())) {
             if (source.isOf(DamageTypes.FALL)) {
-                return 0.0f; // No fall damage
+                amount *= 0.25f; // 75% fall damage reduction with bouncy limit
             }
         }
 
-        // 4. Defense reduction
+        // 4. Armor Set Bonus (Dragonite full set fire immunity)
+        if (ascend$hasArmorSet(AscendItems.DRAGONITE_HELMET, AscendItems.DRAGONITE_CHESTPLATE, AscendItems.DRAGONITE_LEGGINGS, AscendItems.DRAGONITE_BOOTS)) {
+            if (source.isOf(DamageTypes.IN_FIRE) || source.isOf(DamageTypes.ON_FIRE) || source.isOf(DamageTypes.LAVA)) {
+                return 0.0f;
+            }
+        }
+
+        // 5. Defense reduction
         if (!source.isIn(net.minecraft.registry.tag.DamageTypeTags.BYPASSES_ARMOR)) {
             amount *= (float) data.getDamageReductionMultiplier();
         }
@@ -93,11 +103,16 @@ public class PlayerEntityMixin implements IPlayerDataAccessor {
         data.tickResources();
 
         if (!self.getWorld().isClient() && self.isAlive()) {
-            // Slime passive regeneration
+            // Slime passive regeneration (capped)
             if ("Slime".equalsIgnoreCase(data.getRace())) {
                 if (self.getHealth() < self.getMaxHealth() && self.getRandom().nextFloat() < AscendConfig.INSTANCE.slimeRegenChancePerTick) {
                     self.heal(1.0f);
                 }
+            }
+
+            // Mythril 4-piece set bonus: bonus mana regen
+            if (ascend$hasArmorSet(AscendItems.MYTHRIL_HELMET, AscendItems.MYTHRIL_CHESTPLATE, AscendItems.MYTHRIL_LEGGINGS, AscendItems.MYTHRIL_BOOTS)) {
+                data.setCurrentMana(Math.min(data.getMana(), data.getCurrentMana() + 0.1));
             }
 
             // Sync resources periodically to client (every 10 ticks = 0.5s)
@@ -105,5 +120,14 @@ public class PlayerEntityMixin implements IPlayerDataAccessor {
                 AscendPackets.syncPlayerData(serverPlayer);
             }
         }
+    }
+
+    @Unique
+    private boolean ascend$hasArmorSet(net.minecraft.item.Item helmet, net.minecraft.item.Item chest, net.minecraft.item.Item legs, net.minecraft.item.Item boots) {
+        PlayerEntity self = (PlayerEntity) (Object) this;
+        return self.getEquippedStack(EquipmentSlot.HEAD).isOf(helmet) &&
+               self.getEquippedStack(EquipmentSlot.CHEST).isOf(chest) &&
+               self.getEquippedStack(EquipmentSlot.LEGS).isOf(legs) &&
+               self.getEquippedStack(EquipmentSlot.FEET).isOf(boots);
     }
 }

@@ -5,7 +5,9 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import net.ascend.mod.data.IPlayerDataAccessor;
 import net.ascend.mod.data.PlayerData;
+import net.ascend.mod.dungeon.DungeonManager;
 import net.ascend.mod.network.AscendPackets;
+import net.ascend.mod.quest.QuestManager;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
@@ -23,6 +25,36 @@ public class AscendCommands {
                     ServerPlayerEntity player = ctx.getSource().getPlayerOrThrow();
                     AscendPackets.sendOpenCreationScreen(player);
                     ctx.getSource().sendFeedback(() -> Text.literal("§6[Ascend]§f Opening Character Awakening screen..."), false);
+                    return 1;
+                })
+            )
+            .then(literal("quest")
+                .executes(ctx -> {
+                    ServerPlayerEntity player = ctx.getSource().getPlayerOrThrow();
+                    QuestManager.displayQuestProgress(player);
+                    return 1;
+                })
+            )
+            .then(literal("completequest")
+                .executes(ctx -> {
+                    ServerPlayerEntity player = ctx.getSource().getPlayerOrThrow();
+                    QuestManager.completeCurrentQuest(player);
+                    return 1;
+                })
+            )
+            .then(literal("dungeon")
+                .executes(ctx -> {
+                    ServerPlayerEntity player = ctx.getSource().getPlayerOrThrow();
+                    PlayerData data = ((IPlayerDataAccessor) player).ascend$getPlayerData();
+                    DungeonManager.DungeonRank rank = switch (data.getRank()) {
+                        case "S" -> DungeonManager.DungeonRank.S;
+                        case "A" -> DungeonManager.DungeonRank.A;
+                        case "B" -> DungeonManager.DungeonRank.B;
+                        case "C" -> DungeonManager.DungeonRank.C;
+                        case "D" -> DungeonManager.DungeonRank.D;
+                        default -> DungeonManager.DungeonRank.E;
+                    };
+                    DungeonManager.generateDungeonAt(player.getServerWorld(), player.getBlockPos().add(20, 0, 20), rank, player);
                     return 1;
                 })
             )

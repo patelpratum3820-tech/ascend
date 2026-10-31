@@ -113,3 +113,4 @@ public class AscendHudRenderer implements HudRenderCallback {
         };
     }
 }
+
