@@ -43,3 +43,4 @@ public class QuestManager {
         player.sendMessage(Text.literal("§a§l[QUEST COMPLETE] §fYou received §b+" + q.essenceReward() + " Essence§f, §a+1 Stat Point§f, and a §eDungeon Map§f!"), false);
     }
 }
+

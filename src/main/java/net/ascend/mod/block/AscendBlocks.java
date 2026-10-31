@@ -46,3 +46,4 @@ public class AscendBlocks {
         AscendMod.LOGGER.info("[Ascend] Registering blocks...");
     }
 }
+

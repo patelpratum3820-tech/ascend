@@ -96,3 +96,4 @@ public class DungeonManager {
         world.setBlockState(pos.add(0, 1, 0), AscendBlocks.BOSS_ALTAR.getDefaultState());
     }
 }
+

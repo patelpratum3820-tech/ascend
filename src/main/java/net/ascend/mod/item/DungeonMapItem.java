@@ -47,3 +47,4 @@ public class DungeonMapItem extends Item {
         return TypedActionResult.consume(stack);
     }
 }
+

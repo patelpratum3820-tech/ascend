@@ -19,3 +19,4 @@ public class AscendWorldGen {
         // Ore features configured via datapack-style or biome modifications
     }
 }
+

@@ -107,3 +107,4 @@ public class MagicStaffItem extends Item {
         return TypedActionResult.success(stack);
     }
 }
+

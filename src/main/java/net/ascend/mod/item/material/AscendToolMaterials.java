@@ -32,3 +32,4 @@ public enum AscendToolMaterials implements ToolMaterial {
     @Override public int getEnchantability() { return this.enchantability; }
     @Override public Ingredient getRepairIngredient() { return this.repairIngredient.get(); }
 }
+

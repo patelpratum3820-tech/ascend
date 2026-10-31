@@ -99,3 +99,4 @@ public class AscendBossEntity extends HostileEntity {
         }
     }
 }
+
