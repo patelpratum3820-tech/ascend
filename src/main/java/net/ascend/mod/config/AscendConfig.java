@@ -14,6 +14,7 @@ public class AscendConfig {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static final File CONFIG_FILE = new File(FabricLoader.getInstance().getConfigDir().toFile(), "ascend.json");
 
+    // Base Stats
     public int baseVitality = 20;
     public double healthPerVitality = 1.0;
 
@@ -21,18 +22,65 @@ public class AscendConfig {
     public double damagePerTwoStrength = 1.0;
 
     public int baseSpeed = 5;
-    public double speedPercentPerPoint = 0.005; // +0.5% per point
+    public double speedPercentPerPoint = 0.005;
 
     public int baseMana = 50;
     public int manaPerPoint = 5;
 
     public int baseDefense = 0;
-    public double defenseReductionPerPoint = 0.01; // +1% per point
-    public double defenseReductionCap = 0.60;      // max 60%
+    public double defenseReductionPerPoint = 0.01;
+    public double defenseReductionCap = 0.60;
 
-    // Essence cost to upgrade stats if points are not used
+    // Stat Upgrades
     public int essencePerStatUpgradeBase = 50;
     public double essenceCostMultiplier = 1.15;
+
+    // Difficulty Multipliers (Health / Damage / Essence)
+    public double easyHealthMult = 0.75;
+    public double easyDamageMult = 0.75;
+    public double easyEssenceMult = 0.75;
+
+    public double normalHealthMult = 1.0;
+    public double normalDamageMult = 1.0;
+    public double normalEssenceMult = 1.0;
+
+    public double hardHealthMult = 1.5;
+    public double hardDamageMult = 1.25;
+    public double hardEssenceMult = 1.5;
+
+    public double nightmareHealthMult = 2.5;
+    public double nightmareDamageMult = 1.75;
+    public double nightmareEssenceMult = 2.5;
+
+    // Race Balance Numbers
+    public double humanEssenceBonus = 0.15; // +15% Essence gain
+
+    public int dragonoidStrengthBonus = 3;
+    public double dragonoidSpeedPenalty = -0.05; // -5% move speed
+    public double dragonoidColdWaterVulnerability = 1.5; // 50% more cold/drowning damage
+
+    public int slimeVitalityPenalty = -4; // -4 health
+    public int slimeDefensePenalty = -2;
+    public boolean slimeNoFallDamage = true;
+    public double slimeRegenChancePerTick = 0.02; // slow passive regen
+
+    // Class Base Adjustments
+    public int swordsmanStrengthBonus = 2;
+    public int swordsmanSpeedBonus = 1;
+
+    public int tankDefenseBonus = 4;
+    public int tankVitalityBonus = 4;
+    public int tankSpeedPenalty = -2;
+
+    public int mageManaBonus = 30;
+    public int mageDefensePenalty = -2;
+
+    public int summonerManaBonus = 20;
+    public int summonerVitalityPenalty = -2;
+
+    public int archerSpeedBonus = 2;
+    public int archerStrengthBonus = 1;
+    public int archerDefensePenalty = -2;
 
     public static AscendConfig INSTANCE = new AscendConfig();
 

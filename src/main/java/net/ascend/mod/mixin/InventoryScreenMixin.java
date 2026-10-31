@@ -31,3 +31,4 @@ public abstract class InventoryScreenMixin extends AbstractInventoryScreen<Playe
         }).dimensions(btnX, btnY, 44, 18).build());
     }
 }
+

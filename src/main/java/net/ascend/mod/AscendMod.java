@@ -19,7 +19,7 @@ public class AscendMod implements ModInitializer {
 
     @Override
     public void onInitialize() {
-        LOGGER.info("[Ascend] Initializing Ascend Anime RPG Mod (Phase 1)...");
+        LOGGER.info("[Ascend] Initializing Ascend Anime RPG Mod (Phase 2: Character Creation)...");
 
         // 1. Config
         AscendConfig.load();
@@ -35,6 +35,11 @@ public class AscendMod implements ModInitializer {
             PlayerData data = ((IPlayerDataAccessor) handler.player).ascend$getPlayerData();
             data.applyModifiers(handler.player);
             AscendPackets.syncPlayerData(handler.player);
+
+            // If player has not awakened yet, open character creation wizard
+            if (!data.isInitialized()) {
+                AscendPackets.sendOpenCreationScreen(handler.player);
+            }
         });
 
         // 5. Player Lifecycle: On Respawn (copy data from original player)
@@ -58,6 +63,6 @@ public class AscendMod implements ModInitializer {
             AscendPackets.syncPlayerData(player);
         });
 
-        LOGGER.info("[Ascend] Phase 1 systems loaded. Ready to ascend!");
+        LOGGER.info("[Ascend] Phase 2 systems loaded. Ready for adventurer awakening!");
     }
 }
