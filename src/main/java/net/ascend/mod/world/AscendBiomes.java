@@ -21,3 +21,4 @@ public class AscendBiomes {
         AscendMod.LOGGER.info("[Ascend] Custom RPG biomes registered.");
     }
 }
+

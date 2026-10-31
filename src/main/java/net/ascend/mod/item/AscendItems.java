@@ -150,6 +150,7 @@ public class AscendItems {
                 entries.add(AscendBlocks.MANA_CRYSTAL_ORE);
                 entries.add(AscendBlocks.DEEPSLATE_MANA_CRYSTAL_ORE);
                 entries.add(AscendBlocks.DRAGONITE_ORE);
+                entries.add(AscendBlocks.DEEPSLATE_DRAGONITE_ORE);
                 entries.add(AscendBlocks.MYSTIC_LOG);
                 entries.add(AscendBlocks.STRIPPED_MYSTIC_LOG);
                 entries.add(AscendBlocks.MYSTIC_PLANKS);

@@ -18,6 +18,7 @@ public class AscendBlocks {
     public static final Block MANA_CRYSTAL_ORE = register("mana_crystal_ore", new ExperienceDroppingBlock(FabricBlockSettings.create().strength(3.0f, 3.0f).sounds(BlockSoundGroup.AMETHYST_BLOCK).luminance(8).requiresTool()));
     public static final Block DEEPSLATE_MANA_CRYSTAL_ORE = register("deepslate_mana_crystal_ore", new ExperienceDroppingBlock(FabricBlockSettings.create().strength(4.5f, 3.5f).sounds(BlockSoundGroup.DEEPSLATE).luminance(8).requiresTool()));
     public static final Block DRAGONITE_ORE = register("dragonite_ore", new ExperienceDroppingBlock(FabricBlockSettings.create().strength(4.0f, 4.0f).sounds(BlockSoundGroup.NETHER_ORE).luminance(4).requiresTool()));
+    public static final Block DEEPSLATE_DRAGONITE_ORE = register("deepslate_dragonite_ore", new ExperienceDroppingBlock(FabricBlockSettings.create().strength(5.5f, 4.5f).sounds(BlockSoundGroup.DEEPSLATE).luminance(4).requiresTool()));
 
     // Mystic Wood Set
     public static final Block MYSTIC_LOG = register("mystic_log", new PillarBlock(FabricBlockSettings.copyOf(Blocks.OAK_LOG).sounds(BlockSoundGroup.WOOD)));

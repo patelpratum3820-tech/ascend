@@ -63,6 +63,13 @@ public class AscendConfig {
     public double nightmareDamageMult = 1.75;
     public double nightmareEssenceMult = 2.5;
 
+    // World Generation & Feature Frequencies (Tunable via config)
+    public int mythrilOreVeinsPerChunk = 5;
+    public int manaCrystalOreVeinsPerChunk = 7;
+    public int dragoniteOreVeinsPerChunk = 6;
+    public int mysticTreeCountPerChunk = 10;
+    public int emberwoodTreeCountPerChunk = 6;
+
     // Race Balance Numbers
     public double humanEssenceBonus = 0.15;
 
