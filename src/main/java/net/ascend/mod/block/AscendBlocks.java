@@ -33,7 +33,7 @@ public class AscendBlocks {
     public static final Block EMBERWOOD_LEAVES = register("emberwood_leaves", new LeavesBlock(FabricBlockSettings.copyOf(Blocks.NETHER_WART_BLOCK).luminance(4).nonOpaque().sounds(BlockSoundGroup.WART_BLOCK)));
 
     // Dungeon & Boss Blocks
-    public static final Block DUNGEON_GATE_BLOCK = register("dungeon_gate_block", new Block(FabricBlockSettings.create().strength(10.0f, 1200.0f).sounds(BlockSoundGroup.ANVIL).luminance(10)));
+    public static final Block DUNGEON_GATE_BLOCK = register("dungeon_gate_block", new DungeonGateBlock(FabricBlockSettings.create().strength(10.0f, 1200.0f).sounds(BlockSoundGroup.ANVIL).luminance(10)));
     public static final Block BOSS_ALTAR = register("boss_altar", new BossAltarBlock(FabricBlockSettings.create().strength(8.0f, 1200.0f).sounds(BlockSoundGroup.LODESTONE).luminance(12)));
 
     private static Block register(String name, Block block) {

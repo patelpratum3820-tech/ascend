@@ -57,6 +57,15 @@ STRUCTURES_META = {
         "salt": 700707,
         "adapt": "beard_thin",
         "height_type": "surface"
+    },
+    "dungeon": {
+        "biomes": ["#minecraft:is_overworld"],
+        "spacing": 24,
+        "separation": 8,
+        "salt": 888888,
+        "adapt": "beard_thin",
+        "height_type": "surface",
+        "structure_file": "dungeon_gate"
     }
 }
 
@@ -67,6 +76,7 @@ def main():
         # 1. Template Pool
         pool_dir = os.path.join(base_data, "worldgen", "template_pool", name)
         os.makedirs(pool_dir, exist_ok=True)
+        struct_location = f"ascend:{meta.get('structure_file', name)}"
         pool_json = {
             "name": f"ascend:{name}/start_pool",
             "fallback": "minecraft:empty",
@@ -75,7 +85,7 @@ def main():
                     "weight": 1,
                     "element": {
                         "element_type": "minecraft:single_pool_element",
-                        "location": f"ascend:{name}",
+                        "location": struct_location,
                         "processors": "minecraft:empty",
                         "projection": "rigid"
                     }
@@ -148,3 +158,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

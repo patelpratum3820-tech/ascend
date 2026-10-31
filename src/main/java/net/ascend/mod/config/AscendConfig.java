@@ -79,6 +79,13 @@ public class AscendConfig {
     public int floatingTempleSpacing = 36;
     public int demonGateSpacing = 32;
 
+    // Dungeon Rank Distance from Spawn (Tunable)
+    public int rankEDistance = 500;
+    public int rankDDistance = 1000;
+    public int rankCDistance = 2000;
+    public int rankBDistance = 3500;
+    public int rankADistance = 5000;
+
     // Race Balance Numbers
     public double humanEssenceBonus = 0.15;
 

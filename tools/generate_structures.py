@@ -373,6 +373,39 @@ def build_demon_gate():
 
     return create_structure_nbt((9, 10, 9), palette, blocks)
 
+# 8. Dungeon Surface Gate (7x6x7: Ruined stone portal with dungeon gate block)
+def build_dungeon_gate():
+    palette = [
+        "minecraft:deepslate_bricks",
+        "minecraft:cracked_deepslate_bricks",
+        "ascend:dungeon_gate_block",
+        "minecraft:soul_torch",
+        "minecraft:iron_bars"
+    ]
+    blocks = []
+    # Base
+    for x in range(7):
+        for z in range(7):
+            blocks.append((x, 0, z, 0 if (x+z)%2==0 else 1))
+
+    # Arch pillars
+    for y in range(1, 5):
+        blocks.append((1, y, 3, 0))
+        blocks.append((5, y, 3, 0))
+
+    # Top arch
+    for x in range(1, 6):
+        blocks.append((x, 5, 3, 0))
+
+    # Center Dungeon Gate Block!
+    blocks.append((3, 1, 3, 2))
+
+    # Soul Torches on pillars
+    blocks.append((1, 5, 2, 3))
+    blocks.append((5, 5, 2, 3))
+
+    return create_structure_nbt((7, 6, 7), palette, blocks)
+
 def main():
     struct_dir = "src/main/resources/data/ascend/structures"
     os.makedirs(struct_dir, exist_ok=True)
@@ -384,7 +417,8 @@ def main():
         "mage_tower": build_mage_tower(),
         "boss_arena": build_boss_arena(),
         "floating_temple": build_floating_temple(),
-        "demon_gate": build_demon_gate()
+        "demon_gate": build_demon_gate(),
+        "dungeon_gate": build_dungeon_gate()
     }
 
     for name, nbt_bytes in structures.items():
@@ -395,3 +429,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
