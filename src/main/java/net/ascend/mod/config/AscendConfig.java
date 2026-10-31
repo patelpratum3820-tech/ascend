@@ -70,6 +70,15 @@ public class AscendConfig {
     public int mysticTreeCountPerChunk = 10;
     public int emberwoodTreeCountPerChunk = 6;
 
+    // Surface Structure Spacings (Tunable)
+    public int guildHallSpacing = 30;
+    public int forgeRuinsSpacing = 26;
+    public int ruinedShrineSpacing = 22;
+    public int mageTowerSpacing = 28;
+    public int bossArenaSpacing = 42;
+    public int floatingTempleSpacing = 36;
+    public int demonGateSpacing = 32;
+
     // Race Balance Numbers
     public double humanEssenceBonus = 0.15;
 

@@ -1,0 +1,14 @@
+{
+  "structures": [
+    {
+      "structure": "ascend:boss_arena",
+      "weight": 1
+    }
+  ],
+  "placement": {
+    "type": "minecraft:random_spread",
+    "spacing": 42,
+    "separation": 14,
+    "salt": 500505
+  }
+}

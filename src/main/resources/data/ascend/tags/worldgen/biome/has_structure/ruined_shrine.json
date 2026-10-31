@@ -1,0 +1,8 @@
+{
+  "replace": false,
+  "values": [
+    "#minecraft:is_forest",
+    "ascend:shadow_marsh",
+    "#minecraft:is_mountain"
+  ]
+}
