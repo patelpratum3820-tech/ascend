@@ -3,7 +3,6 @@ package net.ascend.mod.mixin;
 import net.ascend.mod.config.AscendConfig;
 import net.ascend.mod.data.IPlayerDataAccessor;
 import net.ascend.mod.data.PlayerData;
-import net.ascend.mod.item.AscendItems;
 import net.ascend.mod.network.AscendPackets;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.damage.DamageSource;
@@ -11,7 +10,9 @@ import net.minecraft.entity.damage.DamageTypes;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.registry.Registries;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.Identifier;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -77,12 +78,12 @@ public class PlayerEntityMixin implements IPlayerDataAccessor {
         // 3. Slime Fall Damage (Balanced: 75% reduction instead of infinite immunity)
         if ("Slime".equalsIgnoreCase(data.getRace())) {
             if (source.isOf(DamageTypes.FALL)) {
-                amount *= 0.25f; // 75% fall damage reduction with bouncy limit
+                amount *= 0.25f; // 75% fall damage reduction
             }
         }
 
         // 4. Armor Set Bonus (Dragonite full set fire immunity)
-        if (ascend$hasArmorSet(AscendItems.DRAGONITE_HELMET, AscendItems.DRAGONITE_CHESTPLATE, AscendItems.DRAGONITE_LEGGINGS, AscendItems.DRAGONITE_BOOTS)) {
+        if (ascend$hasArmorSet("dragonite_")) {
             if (source.isOf(DamageTypes.IN_FIRE) || source.isOf(DamageTypes.ON_FIRE) || source.isOf(DamageTypes.LAVA)) {
                 return 0.0f;
             }
@@ -111,7 +112,7 @@ public class PlayerEntityMixin implements IPlayerDataAccessor {
             }
 
             // Mythril 4-piece set bonus: bonus mana regen
-            if (ascend$hasArmorSet(AscendItems.MYTHRIL_HELMET, AscendItems.MYTHRIL_CHESTPLATE, AscendItems.MYTHRIL_LEGGINGS, AscendItems.MYTHRIL_BOOTS)) {
+            if (ascend$hasArmorSet("mythril_")) {
                 data.setCurrentMana(Math.min(data.getMana(), data.getCurrentMana() + 0.1));
             }
 
@@ -123,11 +124,18 @@ public class PlayerEntityMixin implements IPlayerDataAccessor {
     }
 
     @Unique
-    private boolean ascend$hasArmorSet(net.minecraft.item.Item helmet, net.minecraft.item.Item chest, net.minecraft.item.Item legs, net.minecraft.item.Item boots) {
+    private boolean ascend$hasArmorSet(String prefix) {
         PlayerEntity self = (PlayerEntity) (Object) this;
-        return self.getEquippedStack(EquipmentSlot.HEAD).isOf(helmet) &&
-               self.getEquippedStack(EquipmentSlot.CHEST).isOf(chest) &&
-               self.getEquippedStack(EquipmentSlot.LEGS).isOf(legs) &&
-               self.getEquippedStack(EquipmentSlot.FEET).isOf(boots);
+        return ascend$isPiece(self.getEquippedStack(EquipmentSlot.HEAD), prefix) &&
+               ascend$isPiece(self.getEquippedStack(EquipmentSlot.CHEST), prefix) &&
+               ascend$isPiece(self.getEquippedStack(EquipmentSlot.LEGS), prefix) &&
+               ascend$isPiece(self.getEquippedStack(EquipmentSlot.FEET), prefix);
+    }
+
+    @Unique
+    private boolean ascend$isPiece(ItemStack stack, String prefix) {
+        if (stack == null || stack.isEmpty()) return false;
+        Identifier id = Registries.ITEM.getId(stack.getItem());
+        return id.getNamespace().equals("ascend") && id.getPath().startsWith(prefix);
     }
 }
