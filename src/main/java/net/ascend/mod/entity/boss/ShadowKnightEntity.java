@@ -54,3 +54,4 @@ public class ShadowKnightEntity extends AscendBossEntity {
         }
     }
 }
+

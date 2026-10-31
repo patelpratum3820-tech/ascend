@@ -1,0 +1,10 @@
+{
+  "replace": false,
+  "values": [
+    "ascend:enchanted_forest",
+    "ascend:emberlands",
+    "ascend:crystal_caverns",
+    "ascend:shadow_marsh",
+    "ascend:dragon_peaks"
+  ]
+}

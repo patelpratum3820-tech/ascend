@@ -25,3 +25,4 @@ public class GoblinKingEntity extends AscendBossEntity {
         this.targetSelector.add(2, new ActiveTargetGoal<>(this, PlayerEntity.class, true));
     }
 }
+
