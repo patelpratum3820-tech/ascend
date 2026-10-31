@@ -37,3 +37,4 @@ The compiled jar will be available in `build/libs/`.
 
 ## 📜 License
 Source code and mod assets are licensed under the standard project license (see repository).
+

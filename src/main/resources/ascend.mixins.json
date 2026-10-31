@@ -4,8 +4,10 @@
   "package": "net.ascend.mod.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
+    "PlayerEntityMixin"
   ],
   "client": [
+    "InventoryScreenMixin"
   ],
   "injectors": {
     "defaultRequire": 1
