@@ -56,3 +56,4 @@ public class ManaCrystalItem extends Item {
         return TypedActionResult.success(stack, world.isClient());
     }
 }
+

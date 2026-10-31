@@ -31,3 +31,4 @@ public class AccessoryItem extends Item {
         tooltip.add(Text.literal("§8Active while carried in inventory or offhand"));
     }
 }
+
