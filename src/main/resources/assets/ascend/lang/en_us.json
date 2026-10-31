@@ -35,6 +35,9 @@
   "item.ascend.mana_bracelet": "Mana Bracelet",
   "item.ascend.stamina_ring": "Stamina Ring",
   "item.ascend.shadow_talisman": "Shadow Talisman",
+  "item.ascend.mana_necklace": "Mana Necklace",
+  "item.ascend.dragon_pendant": "Dragon Pendant",
+  "item.ascend.void_amulet": "Void Amulet",
 
   "item.ascend.mythril_sword": "Mythril Sword",
   "item.ascend.mythril_pickaxe": "Mythril Pickaxe",
@@ -91,5 +94,10 @@
   "block.ascend.emberwood_planks": "Emberwood Planks",
   "block.ascend.emberwood_leaves": "Emberwood Leaves",
   "block.ascend.dungeon_gate_block": "Dungeon Gate Block",
-  "block.ascend.boss_altar": "Boss Altar"
+  "block.ascend.boss_altar": "Boss Altar",
+
+  "entity.ascend.goblin_king": "Goblin King",
+  "entity.ascend.shadow_knight": "Shadow Knight",
+  "entity.ascend.crystal_golem": "Crystal Golem",
+  "entity.ascend.void_lich": "Void Lich"
 }

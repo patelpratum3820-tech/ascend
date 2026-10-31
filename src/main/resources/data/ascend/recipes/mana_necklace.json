@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " G ",
+    "M M",
+    " D "
+  ],
+  "key": {
+    "G": { "item": "minecraft:gold_ingot" },
+    "M": { "item": "ascend:mana_crystal" },
+    "D": { "item": "minecraft:diamond" }
+  },
+  "result": {
+    "item": "ascend:mana_necklace",
+    "count": 1
+  }
+}

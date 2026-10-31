@@ -82,8 +82,8 @@ public class PlayerEntityMixin implements IPlayerDataAccessor {
             }
         }
 
-        // 4. Armor Set Bonus (Dragonite full set fire immunity)
-        if (ascend$hasArmorSet("dragonite_")) {
+        // 4. Armor Set Bonus (Dragonite full set fire immunity) or Dragon Pendant
+        if (ascend$hasArmorSet("dragonite_") || ascend$hasItem((PlayerEntity) (Object) this, "dragon_pendant")) {
             if (source.isOf(DamageTypes.IN_FIRE) || source.isOf(DamageTypes.ON_FIRE) || source.isOf(DamageTypes.LAVA)) {
                 return 0.0f;
             }
@@ -121,6 +121,11 @@ public class PlayerEntityMixin implements IPlayerDataAccessor {
                 data.setCurrentMana(Math.min(data.getMana() + 50, data.getCurrentMana() + 0.15));
             }
 
+            // Accessory effects: Mana Necklace (+5 MP/s)
+            if (ascend$hasItem(self, "mana_necklace")) {
+                data.setCurrentMana(Math.min(data.getMana() + 100, data.getCurrentMana() + 0.25));
+            }
+
             // Accessory effects: Stamina Ring (+6 STA/s)
             if (ascend$hasItem(self, "stamina_ring")) {
                 data.setCurrentStamina(Math.min(100.0, data.getCurrentStamina() + 0.3));
@@ -130,6 +135,13 @@ public class PlayerEntityMixin implements IPlayerDataAccessor {
             if (ascend$hasItem(self, "shadow_talisman")) {
                 if (data.getDashCooldownTicks() > 0) {
                     data.setDashCooldownTicks(data.getDashCooldownTicks() - 1);
+                }
+            }
+
+            // Accessory effects: Void Amulet (3x faster dash recovery)
+            if (ascend$hasItem(self, "void_amulet")) {
+                if (data.getDashCooldownTicks() > 0) {
+                    data.setDashCooldownTicks(Math.max(0, data.getDashCooldownTicks() - 2));
                 }
             }
 

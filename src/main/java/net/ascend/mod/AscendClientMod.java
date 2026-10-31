@@ -39,6 +39,24 @@ public class AscendClientMod implements ClientModInitializer {
         // 2. HUD Renderer
         HudRenderCallback.EVENT.register(new AscendHudRenderer());
 
+        // Boss Entity Renderers
+        net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry.register(
+                net.ascend.mod.entity.AscendEntities.GOBLIN_KING,
+                net.ascend.mod.client.render.boss.AscendBossRenderers.GoblinKingRenderer::new
+        );
+        net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry.register(
+                net.ascend.mod.entity.AscendEntities.SHADOW_KNIGHT,
+                net.ascend.mod.client.render.boss.AscendBossRenderers.ShadowKnightRenderer::new
+        );
+        net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry.register(
+                net.ascend.mod.entity.AscendEntities.CRYSTAL_GOLEM,
+                net.ascend.mod.client.render.boss.AscendBossRenderers.CrystalGolemRenderer::new
+        );
+        net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry.register(
+                net.ascend.mod.entity.AscendEntities.VOID_LICH,
+                net.ascend.mod.client.render.boss.AscendBossRenderers.VoidLichRenderer::new
+        );
+
         // 3. Keybindings
         statusScreenKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
                 "key.ascend.status_screen",

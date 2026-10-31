@@ -27,9 +27,10 @@ public class AscendMod implements ModInitializer {
         // 1. Config
         AscendConfig.load();
 
-        // 2. Blocks, Items & WorldGen
+        // 2. Blocks, Items, Entities & WorldGen
         AscendBlocks.register();
         AscendItems.register();
+        net.ascend.mod.entity.AscendEntities.registerEntities();
         AscendWorldGen.registerWorldGen();
 
         // 3. Networking

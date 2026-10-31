@@ -30,6 +30,9 @@ public class AscendItems {
     public static final Item MANA_BRACELET = register("mana_bracelet", new AccessoryItem(new FabricItemSettings().maxCount(1), "§b✦ +50 Max Mana", "§b✦ +3 MP/s Passive Regen"));
     public static final Item STAMINA_RING = register("stamina_ring", new AccessoryItem(new FabricItemSettings().maxCount(1), "§a✦ +50 Max Stamina", "§a✦ +6 STA/s Passive Regen"));
     public static final Item SHADOW_TALISMAN = register("shadow_talisman", new AccessoryItem(new FabricItemSettings().maxCount(1), "§d✦ +20% Movement Speed", "§d✦ 2x Dash Cooldown Recovery"));
+    public static final Item MANA_NECKLACE = register("mana_necklace", new AccessoryItem(new FabricItemSettings().maxCount(1), "§b✦ +100 Max Mana", "§b✦ +5 MP/s Passive Regen"));
+    public static final Item DRAGON_PENDANT = register("dragon_pendant", new AccessoryItem(new FabricItemSettings().maxCount(1), "§c✦ +15% Attack Damage", "§6✦ Fire & Lava Immunity"));
+    public static final Item VOID_AMULET = register("void_amulet", new AccessoryItem(new FabricItemSettings().maxCount(1), "§d✦ 3x Faster Dash Recovery", "§d✦ +50% Dash i-Frames"));
 
     // 2. Mythril Gear
     public static final Item MYTHRIL_SWORD = register("mythril_sword", new SwordItem(AscendToolMaterials.MYTHRIL, 3, -2.4f, new FabricItemSettings()));
@@ -97,6 +100,9 @@ public class AscendItems {
                 entries.add(MANA_BRACELET);
                 entries.add(STAMINA_RING);
                 entries.add(SHADOW_TALISMAN);
+                entries.add(MANA_NECKLACE);
+                entries.add(DRAGON_PENDANT);
+                entries.add(VOID_AMULET);
 
                 entries.add(MYTHRIL_SWORD);
                 entries.add(MYTHRIL_PICKAXE);

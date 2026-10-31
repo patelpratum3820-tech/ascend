@@ -351,3 +351,4 @@ Make-SkillIcon "sig_piercing_volley" ([System.Drawing.Color]::Gold) "arrow"
 Make-SkillIcon "sig_guardian_slam" ([System.Drawing.Color]::LightBlue) "shield"
 
 Write-Host "PRO ASSETS GENERATED SUCCESSFULLY!"
+

@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " G ",
+    "S S",
+    " D "
+  ],
+  "key": {
+    "G": { "item": "minecraft:gold_ingot" },
+    "S": { "item": "ascend:dragon_scale" },
+    "D": { "item": "ascend:dragonite_ingot" }
+  },
+  "result": {
+    "item": "ascend:dragon_pendant",
+    "count": 1
+  }
+}

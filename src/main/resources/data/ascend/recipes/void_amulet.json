@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " O ",
+    "V V",
+    " S "
+  ],
+  "key": {
+    "O": { "item": "minecraft:obsidian" },
+    "V": { "item": "ascend:voidsteel_ingot" },
+    "S": { "item": "ascend:shadow_essence" }
+  },
+  "result": {
+    "item": "ascend:void_amulet",
+    "count": 1
+  }
+}

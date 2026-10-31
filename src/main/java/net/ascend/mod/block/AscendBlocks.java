@@ -33,7 +33,7 @@ public class AscendBlocks {
 
     // Dungeon & Boss Blocks
     public static final Block DUNGEON_GATE_BLOCK = register("dungeon_gate_block", new Block(FabricBlockSettings.create().strength(10.0f, 1200.0f).sounds(BlockSoundGroup.ANVIL).luminance(10)));
-    public static final Block BOSS_ALTAR = register("boss_altar", new Block(FabricBlockSettings.create().strength(8.0f, 1200.0f).sounds(BlockSoundGroup.LODESTONE).luminance(12)));
+    public static final Block BOSS_ALTAR = register("boss_altar", new BossAltarBlock(FabricBlockSettings.create().strength(8.0f, 1200.0f).sounds(BlockSoundGroup.LODESTONE).luminance(12)));
 
     private static Block register(String name, Block block) {
         Identifier id = new Identifier(AscendMod.MOD_ID, name);
