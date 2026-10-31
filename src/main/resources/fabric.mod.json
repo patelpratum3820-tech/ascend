@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "id": "ascend",
+  "version": "${version}",
+  "name": "Ascend",
+  "description": "An anime/isekai RPG mod featuring races, classes, skills, Solo Leveling status system, dungeons, and epic bosses.",
+  "authors": [
+    "Vibe Coder"
+  ],
+  "contact": {
+    "homepage": "https://fabricmc.net/",
+    "sources": "https://github.com/FabricMC/fabric-example-mod"
+  },
+  "license": "CC0-1.0",
+  "icon": "assets/ascend/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "net.ascend.mod.AscendMod"
+    ],
+    "client": [
+      "net.ascend.mod.AscendClientMod"
+    ]
+  },
+  "mixins": [
+    "ascend.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.15.11",
+    "minecraft": "~1.20.1",
+    "java": ">=17",
+    "fabric-api": "*"
+  },
+  "suggests": {
+    "another-mod": "*"
+  }
+}
+

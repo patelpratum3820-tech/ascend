@@ -1,0 +1,18 @@
+{
+  "mod.ascend.name": "Ascend",
+  "category.ascend.general": "Ascend RPG",
+  "key.ascend.status_screen": "Open Status Screen",
+  "key.ascend.dash": "Dash / Dodge",
+  "text.ascend.status_title": "STATUS SYSTEM",
+  "text.ascend.level": "Level",
+  "text.ascend.rank": "Rank",
+  "text.ascend.essence": "Essence",
+  "text.ascend.race": "Race",
+  "text.ascend.class": "Class",
+  "text.ascend.stat_strength": "Strength",
+  "text.ascend.stat_speed": "Speed",
+  "text.ascend.stat_vitality": "Vitality",
+  "text.ascend.stat_mana": "Mana",
+  "text.ascend.stat_defense": "Defense"
+}
+

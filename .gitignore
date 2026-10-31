@@ -1,0 +1,32 @@
+# Gradle
+.gradle/
+build/
+bin/
+out/
+
+# IDE
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+.settings/
+.classpath
+.project
+
+# Minecraft Run directory logs / caches
+run/
+runClient/
+runServer/
+
+# Fabric Loom caches
+.fabric/
+
+# Archives
+*.zip
+temp_extracted/
+
+# Private Reference materials
+art_reference/
+
+
