@@ -36,3 +36,4 @@ public class DungeonGateBlock extends Block {
         return ActionResult.SUCCESS;
     }
 }
+

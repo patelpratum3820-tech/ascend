@@ -57,6 +57,52 @@ public class AscendClientMod implements ClientModInitializer {
                 net.ascend.mod.client.render.boss.AscendBossRenderers.VoidLichRenderer::new
         );
 
+        // Step W5 Mob Renderers
+        net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry.register(
+                net.ascend.mod.entity.AscendEntities.SPIRIT_FOX,
+                net.ascend.mod.client.render.mob.AscendMobRenderers.SpiritFoxRenderer::new
+        );
+        net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry.register(
+                net.ascend.mod.entity.AscendEntities.MANA_DEER,
+                net.ascend.mod.client.render.mob.AscendMobRenderers.ManaDeerRenderer::new
+        );
+        net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry.register(
+                net.ascend.mod.entity.AscendEntities.SLIME_PUP,
+                net.ascend.mod.client.render.mob.AscendMobRenderers.SlimePupRenderer::new
+        );
+        net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry.register(
+                net.ascend.mod.entity.AscendEntities.MOON_MOTH,
+                net.ascend.mod.client.render.mob.AscendMobRenderers.MoonMothRenderer::new
+        );
+        net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry.register(
+                net.ascend.mod.entity.AscendEntities.GOBLIN,
+                net.ascend.mod.client.render.mob.AscendMobRenderers.GoblinRenderer::new
+        );
+        net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry.register(
+                net.ascend.mod.entity.AscendEntities.ORC_WARRIOR,
+                net.ascend.mod.client.render.mob.AscendMobRenderers.OrcWarriorRenderer::new
+        );
+        net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry.register(
+                net.ascend.mod.entity.AscendEntities.SHADOW_WRAITH,
+                net.ascend.mod.client.render.mob.AscendMobRenderers.ShadowWraithRenderer::new
+        );
+        net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry.register(
+                net.ascend.mod.entity.AscendEntities.SKELETON_KNIGHT,
+                net.ascend.mod.client.render.mob.AscendMobRenderers.SkeletonKnightRenderer::new
+        );
+        net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry.register(
+                net.ascend.mod.entity.AscendEntities.DARK_MAGE,
+                net.ascend.mod.client.render.mob.AscendMobRenderers.DarkMageRenderer::new
+        );
+        net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry.register(
+                net.ascend.mod.entity.AscendEntities.FIRE_DRAKE,
+                net.ascend.mod.client.render.mob.AscendMobRenderers.FireDrakeRenderer::new
+        );
+        net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry.register(
+                net.ascend.mod.entity.AscendEntities.DUNGEON_GOLEM,
+                net.ascend.mod.client.render.mob.AscendMobRenderers.DungeonGolemRenderer::new
+        );
+
         // 3. Keybindings
         statusScreenKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
                 "key.ascend.status_screen",

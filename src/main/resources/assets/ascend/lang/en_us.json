@@ -100,5 +100,29 @@
   "entity.ascend.goblin_king": "Goblin King",
   "entity.ascend.shadow_knight": "Shadow Knight",
   "entity.ascend.crystal_golem": "Crystal Golem",
-  "entity.ascend.void_lich": "Void Lich"
+  "entity.ascend.void_lich": "Void Lich",
+
+  "entity.ascend.spirit_fox": "Spirit Fox",
+  "entity.ascend.mana_deer": "Mana Deer",
+  "entity.ascend.slime_pup": "Slime Pup",
+  "entity.ascend.moon_moth": "Moon Moth",
+  "entity.ascend.goblin": "Goblin",
+  "entity.ascend.orc_warrior": "Orc Warrior",
+  "entity.ascend.shadow_wraith": "Shadow Wraith",
+  "entity.ascend.skeleton_knight": "Skeleton Knight",
+  "entity.ascend.dark_mage": "Dark Mage",
+  "entity.ascend.fire_drake": "Fire Drake",
+  "entity.ascend.dungeon_golem": "Dungeon Golem",
+
+  "item.ascend.spirit_fox_spawn_egg": "Spirit Fox Spawn Egg",
+  "item.ascend.mana_deer_spawn_egg": "Mana Deer Spawn Egg",
+  "item.ascend.slime_pup_spawn_egg": "Slime Pup Spawn Egg",
+  "item.ascend.moon_moth_spawn_egg": "Moon Moth Spawn Egg",
+  "item.ascend.goblin_spawn_egg": "Goblin Spawn Egg",
+  "item.ascend.orc_warrior_spawn_egg": "Orc Warrior Spawn Egg",
+  "item.ascend.shadow_wraith_spawn_egg": "Shadow Wraith Spawn Egg",
+  "item.ascend.skeleton_knight_spawn_egg": "Skeleton Knight Spawn Egg",
+  "item.ascend.dark_mage_spawn_egg": "Dark Mage Spawn Egg",
+  "item.ascend.fire_drake_spawn_egg": "Fire Drake Spawn Egg",
+  "item.ascend.dungeon_golem_spawn_egg": "Dungeon Golem Spawn Egg"
 }

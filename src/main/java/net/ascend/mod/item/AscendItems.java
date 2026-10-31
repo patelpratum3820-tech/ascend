@@ -2,6 +2,7 @@ package net.ascend.mod.item;
 
 import net.ascend.mod.AscendMod;
 import net.ascend.mod.block.AscendBlocks;
+import net.ascend.mod.entity.AscendEntities;
 import net.ascend.mod.item.material.AscendArmorMaterials;
 import net.ascend.mod.item.material.AscendToolMaterials;
 import net.ascend.mod.item.staff.MagicStaffItem;
@@ -33,6 +34,19 @@ public class AscendItems {
     public static final Item MANA_NECKLACE = register("mana_necklace", new AccessoryItem(new FabricItemSettings().maxCount(1), "§b✦ +100 Max Mana", "§b✦ +5 MP/s Passive Regen"));
     public static final Item DRAGON_PENDANT = register("dragon_pendant", new AccessoryItem(new FabricItemSettings().maxCount(1), "§c✦ +15% Attack Damage", "§6✦ Fire & Lava Immunity"));
     public static final Item VOID_AMULET = register("void_amulet", new AccessoryItem(new FabricItemSettings().maxCount(1), "§d✦ 3x Faster Dash Recovery", "§d✦ +50% Dash i-Frames"));
+
+    // Spawn Eggs
+    public static final Item SPIRIT_FOX_SPAWN_EGG = register("spirit_fox_spawn_egg", new SpawnEggItem(AscendEntities.SPIRIT_FOX, 0xebf5ff, 0x4dd8ff, new FabricItemSettings()));
+    public static final Item MANA_DEER_SPAWN_EGG = register("mana_deer_spawn_egg", new SpawnEggItem(AscendEntities.MANA_DEER, 0x23375f, 0x3fc8e8, new FabricItemSettings()));
+    public static final Item SLIME_PUP_SPAWN_EGG = register("slime_pup_spawn_egg", new SpawnEggItem(AscendEntities.SLIME_PUP, 0x3fc8e8, 0x0b3a4a, new FabricItemSettings()));
+    public static final Item MOON_MOTH_SPAWN_EGG = register("moon_moth_spawn_egg", new SpawnEggItem(AscendEntities.MOON_MOTH, 0x230f3c, 0x8a4fd0, new FabricItemSettings()));
+    public static final Item GOBLIN_SPAWN_EGG = register("goblin_spawn_egg", new SpawnEggItem(AscendEntities.GOBLIN, 0x3e7b2b, 0xf2c14e, new FabricItemSettings()));
+    public static final Item ORC_WARRIOR_SPAWN_EGG = register("orc_warrior_spawn_egg", new SpawnEggItem(AscendEntities.ORC_WARRIOR, 0x7a3a2b, 0xb83a3a, new FabricItemSettings()));
+    public static final Item SHADOW_WRAITH_SPAWN_EGG = register("shadow_wraith_spawn_egg", new SpawnEggItem(AscendEntities.SHADOW_WRAITH, 0x120a1f, 0xd9a8ff, new FabricItemSettings()));
+    public static final Item SKELETON_KNIGHT_SPAWN_EGG = register("skeleton_knight_spawn_egg", new SpawnEggItem(AscendEntities.SKELETON_KNIGHT, 0xc4bfa5, 0x4dd8ff, new FabricItemSettings()));
+    public static final Item DARK_MAGE_SPAWN_EGG = register("dark_mage_spawn_egg", new SpawnEggItem(AscendEntities.DARK_MAGE, 0x191423, 0x3fc8e8, new FabricItemSettings()));
+    public static final Item FIRE_DRAKE_SPAWN_EGG = register("fire_drake_spawn_egg", new SpawnEggItem(AscendEntities.FIRE_DRAKE, 0xb83a3a, 0xf2c14e, new FabricItemSettings()));
+    public static final Item DUNGEON_GOLEM_SPAWN_EGG = register("dungeon_golem_spawn_egg", new SpawnEggItem(AscendEntities.DUNGEON_GOLEM, 0x464b55, 0x4dd8ff, new FabricItemSettings()));
 
     // 2. Mythril Gear
     public static final Item MYTHRIL_SWORD = register("mythril_sword", new SwordItem(AscendToolMaterials.MYTHRIL, 3, -2.4f, new FabricItemSettings()));
@@ -161,6 +175,19 @@ public class AscendItems {
                 entries.add(AscendBlocks.EMBERWOOD_LEAVES);
                 entries.add(AscendBlocks.DUNGEON_GATE_BLOCK);
                 entries.add(AscendBlocks.BOSS_ALTAR);
+
+                // Spawn Eggs
+                entries.add(SPIRIT_FOX_SPAWN_EGG);
+                entries.add(MANA_DEER_SPAWN_EGG);
+                entries.add(SLIME_PUP_SPAWN_EGG);
+                entries.add(MOON_MOTH_SPAWN_EGG);
+                entries.add(GOBLIN_SPAWN_EGG);
+                entries.add(ORC_WARRIOR_SPAWN_EGG);
+                entries.add(SHADOW_WRAITH_SPAWN_EGG);
+                entries.add(SKELETON_KNIGHT_SPAWN_EGG);
+                entries.add(DARK_MAGE_SPAWN_EGG);
+                entries.add(FIRE_DRAKE_SPAWN_EGG);
+                entries.add(DUNGEON_GOLEM_SPAWN_EGG);
             })
             .build();
 

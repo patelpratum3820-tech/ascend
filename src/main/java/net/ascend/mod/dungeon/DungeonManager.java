@@ -163,7 +163,7 @@ public class DungeonManager {
             case 4 -> { // 5. Mini-boss Room
                 buildRoom(world, center, 13, 8, 13, theme);
                 world.setBlockState(center.add(0, 1, 0), Blocks.CHISELED_DEEPSLATE.getDefaultState());
-                spawnDungeonMob(world, center.add(0, 2, 0));
+                spawnMiniBossMob(world, center.add(0, 2, 0));
             }
             case 5 -> { // 6. Dark Hall
                 buildRoom(world, center, 9, 6, 15, theme);
@@ -269,10 +269,18 @@ public class DungeonManager {
     }
 
     private static void spawnDungeonMob(ServerWorld world, BlockPos pos) {
-        ZombieEntity mob = EntityType.ZOMBIE.create(world);
+        net.ascend.mod.entity.mob.SkeletonKnightEntity mob = net.ascend.mod.entity.AscendEntities.SKELETON_KNIGHT.create(world);
         if (mob != null) {
             mob.refreshPositionAndAngles(pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5, 0, 0);
             world.spawnEntity(mob);
+        }
+    }
+
+    private static void spawnMiniBossMob(ServerWorld world, BlockPos pos) {
+        net.ascend.mod.entity.mob.DungeonGolemEntity golem = net.ascend.mod.entity.AscendEntities.DUNGEON_GOLEM.create(world);
+        if (golem != null) {
+            golem.refreshPositionAndAngles(pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5, 0, 0);
+            world.spawnEntity(golem);
         }
     }
 }

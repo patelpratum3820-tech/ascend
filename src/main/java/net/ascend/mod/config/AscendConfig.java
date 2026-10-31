@@ -70,6 +70,47 @@ public class AscendConfig {
     public int mysticTreeCountPerChunk = 10;
     public int emberwoodTreeCountPerChunk = 6;
 
+    // Mob Spawning Weights & Group Sizes
+    public int spiritFoxWeight = 8;
+    public int spiritFoxMinGroup = 1;
+    public int spiritFoxMaxGroup = 2;
+
+    public int manaDeerWeight = 10;
+    public int manaDeerMinGroup = 2;
+    public int manaDeerMaxGroup = 4;
+
+    public int slimePupWeight = 6;
+    public int slimePupMinGroup = 1;
+    public int slimePupMaxGroup = 3;
+
+    public int moonMothWeight = 10;
+    public int moonMothMinGroup = 2;
+    public int moonMothMaxGroup = 5;
+
+    public int goblinWeight = 30;
+    public int goblinMinGroup = 3;
+    public int goblinMaxGroup = 5;
+
+    public int orcWarriorWeight = 12;
+    public int orcWarriorMinGroup = 1;
+    public int orcWarriorMaxGroup = 2;
+
+    public int shadowWraithWeight = 20;
+    public int shadowWraithMinGroup = 1;
+    public int shadowWraithMaxGroup = 2;
+
+    public int skeletonKnightWeight = 10;
+    public int skeletonKnightMinGroup = 1;
+    public int skeletonKnightMaxGroup = 2;
+
+    public int darkMageWeight = 6;
+    public int darkMageMinGroup = 1;
+    public int darkMageMaxGroup = 1;
+
+    public int fireDrakeWeight = 6;
+    public int fireDrakeMinGroup = 1;
+    public int fireDrakeMaxGroup = 1;
+
     // Surface Structure Spacings (Tunable)
     public int guildHallSpacing = 30;
     public int forgeRuinsSpacing = 26;
