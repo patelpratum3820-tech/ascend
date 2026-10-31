@@ -3,6 +3,9 @@
   "category.ascend.general": "Ascend RPG",
   "key.ascend.status_screen": "Open Status Screen",
   "key.ascend.dash": "Dash / Dodge",
+  "key.ascend.skill1": "Cast Skill 1",
+  "key.ascend.skill2": "Cast Skill 2",
+  "key.ascend.signature": "Cast Signature Move",
   "text.ascend.status_title": "STATUS SYSTEM",
   "text.ascend.level": "Level",
   "text.ascend.rank": "Rank",
@@ -15,4 +18,3 @@
   "text.ascend.stat_mana": "Mana",
   "text.ascend.stat_defense": "Defense"
 }
-

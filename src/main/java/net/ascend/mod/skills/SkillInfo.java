@@ -53,3 +53,4 @@ public record SkillInfo(String id, String displayName, String tag, String descri
         };
     }
 }
+

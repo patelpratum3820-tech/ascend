@@ -31,6 +31,17 @@ public class AscendConfig {
     public double defenseReductionPerPoint = 0.01;
     public double defenseReductionCap = 0.60;
 
+    // Resources
+    public double maxStamina = 100.0;
+    public double staminaRegenPerSecond = 10.0;
+    public double manaRegenPerSecond = 3.0;
+
+    // Dash / Dodge
+    public double dashImpulse = 1.25;
+    public double dashStaminaCost = 20.0;
+    public int dashCooldownTicks = 50; // 2.5 seconds
+    public int dashInvulnerabilityTicks = 7; // ~0.35s i-frames
+
     // Stat Upgrades
     public int essencePerStatUpgradeBase = 50;
     public double essenceCostMultiplier = 1.15;
@@ -53,16 +64,16 @@ public class AscendConfig {
     public double nightmareEssenceMult = 2.5;
 
     // Race Balance Numbers
-    public double humanEssenceBonus = 0.15; // +15% Essence gain
+    public double humanEssenceBonus = 0.15;
 
     public int dragonoidStrengthBonus = 3;
-    public double dragonoidSpeedPenalty = -0.05; // -5% move speed
-    public double dragonoidColdWaterVulnerability = 1.5; // 50% more cold/drowning damage
+    public double dragonoidSpeedPenalty = -0.05;
+    public double dragonoidColdWaterVulnerability = 1.5;
 
-    public int slimeVitalityPenalty = -4; // -4 health
+    public int slimeVitalityPenalty = -4;
     public int slimeDefensePenalty = -2;
     public boolean slimeNoFallDamage = true;
-    public double slimeRegenChancePerTick = 0.02; // slow passive regen
+    public double slimeRegenChancePerTick = 0.02;
 
     // Class Base Adjustments
     public int swordsmanStrengthBonus = 2;

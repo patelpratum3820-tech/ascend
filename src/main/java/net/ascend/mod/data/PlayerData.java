@@ -33,6 +33,15 @@ public class PlayerData {
     private int mana = 50;
     private int defense = 0;
 
+    // Real-time Resources & Combat State
+    private double currentMana = 50.0;
+    private double currentStamina = 100.0;
+    private int dashCooldownTicks = 0;
+    private int invulnerableTicks = 0;
+    private int skill1CooldownTicks = 0;
+    private int skill2CooldownTicks = 0;
+    private int signatureCooldownTicks = 0;
+
     private boolean initialized = false;
     private final List<String> selectedSkills = new ArrayList<>();
 
@@ -53,6 +62,13 @@ public class PlayerData {
         this.vitality = config.baseVitality;
         this.mana = config.baseMana;
         this.defense = config.baseDefense;
+        this.currentMana = this.mana;
+        this.currentStamina = config.maxStamina;
+        this.dashCooldownTicks = 0;
+        this.invulnerableTicks = 0;
+        this.skill1CooldownTicks = 0;
+        this.skill2CooldownTicks = 0;
+        this.signatureCooldownTicks = 0;
         this.initialized = false;
         this.selectedSkills.clear();
         this.selectedSkills.add("shadow_step");
@@ -67,14 +83,12 @@ public class PlayerData {
         this.selectedSkills.clear();
         this.selectedSkills.addAll(skills);
 
-        // Apply starting race + class base modifiers
         int baseStr = cfg.baseStrength;
         int baseSpd = cfg.baseSpeed;
         int baseVit = cfg.baseVitality;
         int baseMan = cfg.baseMana;
         int baseDef = cfg.baseDefense;
 
-        // Race perks / weaknesses
         if ("Dragonoid".equalsIgnoreCase(race)) {
             baseStr += cfg.dragonoidStrengthBonus;
         } else if ("Slime".equalsIgnoreCase(race)) {
@@ -82,7 +96,6 @@ public class PlayerData {
             baseDef += cfg.slimeDefensePenalty;
         }
 
-        // Class perks / weaknesses
         switch (playerClass.toLowerCase()) {
             case "swordsman" -> {
                 baseStr += cfg.swordsmanStrengthBonus;
@@ -113,7 +126,65 @@ public class PlayerData {
         this.vitality = Math.max(5, baseVit);
         this.mana = Math.max(0, baseMan);
         this.defense = Math.max(0, baseDef);
+        this.currentMana = this.mana;
+        this.currentStamina = cfg.maxStamina;
         this.initialized = true;
+    }
+
+    public void tickResources() {
+        AscendConfig cfg = AscendConfig.INSTANCE;
+
+        // Mana regen
+        if (currentMana < mana) {
+            currentMana = Math.min(mana, currentMana + (cfg.manaRegenPerSecond / 20.0));
+        }
+
+        // Stamina regen
+        if (currentStamina < cfg.maxStamina) {
+            currentStamina = Math.min(cfg.maxStamina, currentStamina + (cfg.staminaRegenPerSecond / 20.0));
+        }
+
+        // Cooldowns
+        if (dashCooldownTicks > 0) dashCooldownTicks--;
+        if (invulnerableTicks > 0) invulnerableTicks--;
+        if (skill1CooldownTicks > 0) skill1CooldownTicks--;
+        if (skill2CooldownTicks > 0) skill2CooldownTicks--;
+        if (signatureCooldownTicks > 0) signatureCooldownTicks--;
+    }
+
+    public boolean canDash() {
+        return dashCooldownTicks <= 0 && currentStamina >= AscendConfig.INSTANCE.dashStaminaCost;
+    }
+
+    public void triggerDash() {
+        AscendConfig cfg = AscendConfig.INSTANCE;
+        currentStamina = Math.max(0, currentStamina - cfg.dashStaminaCost);
+        dashCooldownTicks = cfg.dashCooldownTicks;
+        invulnerableTicks = cfg.dashInvulnerabilityTicks;
+    }
+
+    public boolean hasStamina(double amount) {
+        return currentStamina >= amount;
+    }
+
+    public boolean consumeStamina(double amount) {
+        if (hasStamina(amount)) {
+            currentStamina -= amount;
+            return true;
+        }
+        return false;
+    }
+
+    public boolean hasMana(double amount) {
+        return currentMana >= amount;
+    }
+
+    public boolean consumeMana(double amount) {
+        if (hasMana(amount)) {
+            currentMana -= amount;
+            return true;
+        }
+        return false;
     }
 
     public String getRank() {
@@ -163,7 +234,10 @@ public class PlayerData {
             case "strength" -> strength++;
             case "speed" -> speed++;
             case "vitality" -> vitality++;
-            case "mana" -> mana += AscendConfig.INSTANCE.manaPerPoint;
+            case "mana" -> {
+                mana += AscendConfig.INSTANCE.manaPerPoint;
+                currentMana += AscendConfig.INSTANCE.manaPerPoint;
+            }
             case "defense" -> defense++;
         }
     }
@@ -186,7 +260,7 @@ public class PlayerData {
             }
         }
 
-        // Speed -> Movement Speed (with Dragonoid penalty if applicable)
+        // Speed -> Movement Speed
         EntityAttributeInstance speedAttr = player.getAttributeInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED);
         if (speedAttr != null) {
             speedAttr.removeModifier(SPEED_MODIFIER_UUID);
@@ -238,6 +312,8 @@ public class PlayerData {
         nbt.putInt("Vitality", vitality);
         nbt.putInt("Mana", mana);
         nbt.putInt("Defense", defense);
+        nbt.putDouble("CurrentMana", currentMana);
+        nbt.putDouble("CurrentStamina", currentStamina);
         nbt.putBoolean("Initialized", initialized);
 
         NbtList skillsList = new NbtList();
@@ -259,6 +335,8 @@ public class PlayerData {
         if (nbt.contains("Vitality")) vitality = nbt.getInt("Vitality");
         if (nbt.contains("Mana")) mana = nbt.getInt("Mana");
         if (nbt.contains("Defense")) defense = nbt.getInt("Defense");
+        if (nbt.contains("CurrentMana")) currentMana = nbt.getDouble("CurrentMana");
+        if (nbt.contains("CurrentStamina")) currentStamina = nbt.getDouble("CurrentStamina");
         if (nbt.contains("Initialized")) initialized = nbt.getBoolean("Initialized");
 
         selectedSkills.clear();
@@ -282,6 +360,12 @@ public class PlayerData {
         buf.writeInt(vitality);
         buf.writeInt(mana);
         buf.writeInt(defense);
+        buf.writeDouble(currentMana);
+        buf.writeDouble(currentStamina);
+        buf.writeInt(dashCooldownTicks);
+        buf.writeInt(skill1CooldownTicks);
+        buf.writeInt(skill2CooldownTicks);
+        buf.writeInt(signatureCooldownTicks);
         buf.writeBoolean(initialized);
         buf.writeInt(selectedSkills.size());
         for (String s : selectedSkills) {
@@ -301,6 +385,12 @@ public class PlayerData {
         vitality = buf.readInt();
         mana = buf.readInt();
         defense = buf.readInt();
+        currentMana = buf.readDouble();
+        currentStamina = buf.readDouble();
+        dashCooldownTicks = buf.readInt();
+        skill1CooldownTicks = buf.readInt();
+        skill2CooldownTicks = buf.readInt();
+        signatureCooldownTicks = buf.readInt();
         initialized = buf.readBoolean();
 
         selectedSkills.clear();
@@ -345,6 +435,27 @@ public class PlayerData {
 
     public int getDefense() { return defense; }
     public void setDefense(int defense) { this.defense = defense; }
+
+    public double getCurrentMana() { return currentMana; }
+    public void setCurrentMana(double currentMana) { this.currentMana = currentMana; }
+
+    public double getCurrentStamina() { return currentStamina; }
+    public void setCurrentStamina(double currentStamina) { this.currentStamina = currentStamina; }
+
+    public int getDashCooldownTicks() { return dashCooldownTicks; }
+    public void setDashCooldownTicks(int ticks) { this.dashCooldownTicks = ticks; }
+
+    public int getInvulnerableTicks() { return invulnerableTicks; }
+    public void setInvulnerableTicks(int ticks) { this.invulnerableTicks = ticks; }
+
+    public int getSkill1CooldownTicks() { return skill1CooldownTicks; }
+    public void setSkill1CooldownTicks(int ticks) { this.skill1CooldownTicks = ticks; }
+
+    public int getSkill2CooldownTicks() { return skill2CooldownTicks; }
+    public void setSkill2CooldownTicks(int ticks) { this.skill2CooldownTicks = ticks; }
+
+    public int getSignatureCooldownTicks() { return signatureCooldownTicks; }
+    public void setSignatureCooldownTicks(int ticks) { this.signatureCooldownTicks = ticks; }
 
     public boolean isInitialized() { return initialized; }
     public void setInitialized(boolean initialized) { this.initialized = initialized; }

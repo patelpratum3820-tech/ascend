@@ -7,7 +7,6 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.network.PacketByteBuf;
 
 import java.util.List;
@@ -50,5 +49,18 @@ public class AscendClientPackets {
             buf.writeString(s);
         }
         ClientPlayNetworking.send(AscendPackets.COMPLETE_CREATION_ID, buf);
+    }
+
+    public static void sendDash(double dirX, double dirZ) {
+        PacketByteBuf buf = PacketByteBufs.create();
+        buf.writeDouble(dirX);
+        buf.writeDouble(dirZ);
+        ClientPlayNetworking.send(AscendPackets.DASH_ID, buf);
+    }
+
+    public static void sendCastSkill(int slot) {
+        PacketByteBuf buf = PacketByteBufs.create();
+        buf.writeInt(slot);
+        ClientPlayNetworking.send(AscendPackets.CAST_SKILL_ID, buf);
     }
 }

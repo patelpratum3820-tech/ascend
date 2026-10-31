@@ -279,3 +279,4 @@ public class CharacterCreationScreen extends Screen {
         return false; // must complete character creation
     }
 }
+
