@@ -27,6 +27,27 @@ public record SkillInfo(
 ) {
     public static final List<SkillInfo> ALL_SKILLS = new ArrayList<>();
 
+    // Explicit accessors for compatibility and IDE Language Server symbol resolution
+    @Override
+    public SkillRank rank() { return rank; }
+    public SkillRank getRank() { return rank; }
+
+    @Override
+    public String id() { return id; }
+    public String getId() { return id; }
+
+    @Override
+    public String displayName() { return displayName; }
+    public String getDisplayName() { return displayName; }
+
+    @Override
+    public String tag() { return tag; }
+    public String getTag() { return tag; }
+
+    @Override
+    public String description() { return description; }
+    public String getDescription() { return description; }
+
     // Static fallback initialization (will be enriched/replaced by JSON loader)
     static {
         loadSkillsFromJson();

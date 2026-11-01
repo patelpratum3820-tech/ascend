@@ -3,6 +3,8 @@ package net.ascend.mod.client.hud;
 import net.ascend.mod.AscendMod;
 import net.ascend.mod.data.IPlayerDataAccessor;
 import net.ascend.mod.data.PlayerData;
+import net.ascend.mod.skills.SkillInfo;
+import net.ascend.mod.skills.SkillRank;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
@@ -121,11 +123,13 @@ public class AscendHudRenderer implements HudRenderCallback {
 
         // Rank badge (top-right)
         if (iconId != null && !iconId.isEmpty() && !isSignature) {
-            net.ascend.mod.skills.SkillInfo sk = net.ascend.mod.skills.SkillInfo.getById(iconId);
-            String rStr = sk.rank().getLabel();
-            int rCol = sk.rank().getHexColor();
-            int rw = tr.getWidth(rStr);
-            context.drawText(tr, Text.literal(sk.rank().getColorCode() + rStr), x + size - rw - 3, y + 2, rCol, true);
+            SkillInfo sk = SkillInfo.getById(iconId);
+            if (sk != null && sk.rank() != null) {
+                String rStr = sk.rank().getLabel();
+                int rCol = sk.rank().getHexColor();
+                int rw = tr.getWidth(rStr);
+                context.drawText(tr, Text.literal(sk.rank().getColorCode() + rStr), x + size - rw - 3, y + 2, rCol, true);
+            }
         }
 
         // Cooldown overlay
