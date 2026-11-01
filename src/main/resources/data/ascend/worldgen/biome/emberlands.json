@@ -1,22 +1,44 @@
 {
   "has_precipitation": false,
-  "temperature": 2.0,
+  "temperature": 1.8,
   "downfall": 0.0,
   "effects": {
-    "fog_color": 4725013,
-    "sky_color": 7023390,
-    "water_color": 9051156,
-    "water_fog_color": 3804426,
-    "foliage_color": 5840920,
-    "grass_color": 6695198,
+    "fog_color": 3280655,
+    "sky_color": 7216670,
+    "water_color": 9180180,
+    "water_fog_color": 4589834,
+    "foliage_color": 5903380,
+    "grass_color": 4597800,
+    "particle": {
+      "options": {
+        "type": "minecraft:ash"
+      },
+      "probability": 0.04
+    },
+    "ambient_sound": "minecraft:ambient.basalt_deltas.loop",
     "mood_sound": {
-      "sound": "minecraft:ambient.basalt_deltas.mood",
+      "sound": "minecraft:ambient.nether_wastes.mood",
       "tick_delay": 6000,
       "block_search_extent": 8,
       "offset": 2.0
     }
   },
-  "spawners": {},
+  "spawners": {
+    "monster": [
+      {
+        "type": "ascend:orc_warrior",
+        "weight": 12,
+        "minCount": 1,
+        "maxCount": 2
+      },
+      {
+        "type": "ascend:fire_drake",
+        "weight": 6,
+        "minCount": 1,
+        "maxCount": 1
+      }
+    ]
+  },
   "spawn_costs": {},
   "carvers": {
     "air": [
@@ -25,6 +47,37 @@
       "minecraft:canyon"
     ]
   },
-  "features": []
+  "features": [
+    [],
+    [
+      "minecraft:lake_lava_underground",
+      "minecraft:lake_lava_surface"
+    ],
+    [],
+    [],
+    [],
+    [],
+    [
+      "minecraft:ore_dirt",
+      "minecraft:ore_gravel",
+      "minecraft:ore_coal_upper",
+      "minecraft:ore_coal_lower",
+      "minecraft:ore_iron_upper",
+      "minecraft:ore_gold",
+      "minecraft:ore_redstone",
+      "minecraft:ore_diamond_small",
+      "ascend:ore_dragonite_placed"
+    ],
+    [],
+    [
+      "minecraft:spring_lava",
+      "minecraft:spring_lava_frozen"
+    ],
+    [
+      "ascend:emberwood_tree_placed",
+      "minecraft:patch_dead_bush",
+      "minecraft:patch_fire"
+    ],
+    []
+  ]
 }
-

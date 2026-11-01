@@ -1,14 +1,21 @@
 {
-  "has_precipitation": false,
+  "has_precipitation": true,
   "temperature": 0.5,
-  "downfall": 0.5,
+  "downfall": 0.8,
   "effects": {
-    "fog_color": 857383,
-    "sky_color": 1186611,
-    "water_color": 5398271,
-    "water_fog_color": 26265,
-    "foliage_color": 4180200,
-    "grass_color": 2865384,
+    "fog_color": 730418,
+    "sky_color": 1330030,
+    "water_color": 2672870,
+    "water_fog_color": 675940,
+    "foliage_color": 3317960,
+    "grass_color": 1991800,
+    "particle": {
+      "options": {
+        "type": "minecraft:glow"
+      },
+      "probability": 0.05
+    },
+    "ambient_sound": "minecraft:ambient.underwater.loop",
     "mood_sound": {
       "sound": "minecraft:ambient.cave",
       "tick_delay": 6000,
@@ -16,7 +23,22 @@
       "offset": 2.0
     }
   },
-  "spawners": {},
+  "spawners": {
+    "monster": [
+      {
+        "type": "ascend:slime_pup",
+        "weight": 8,
+        "minCount": 1,
+        "maxCount": 3
+      },
+      {
+        "type": "ascend:skeleton_knight",
+        "weight": 10,
+        "minCount": 1,
+        "maxCount": 2
+      }
+    ]
+  },
   "spawn_costs": {},
   "carvers": {
     "air": [
@@ -25,6 +47,37 @@
       "minecraft:canyon"
     ]
   },
-  "features": []
+  "features": [
+    [],
+    [
+      "minecraft:lake_lava_underground"
+    ],
+    [],
+    [],
+    [],
+    [],
+    [
+      "minecraft:ore_dirt",
+      "minecraft:ore_gravel",
+      "minecraft:ore_coal_upper",
+      "minecraft:ore_iron_middle",
+      "minecraft:ore_gold",
+      "minecraft:ore_redstone",
+      "minecraft:ore_lapis",
+      "minecraft:ore_diamond_large",
+      "ascend:ore_mana_crystal_placed",
+      "ascend:ore_mythril_placed"
+    ],
+    [
+      "minecraft:glow_lichen"
+    ],
+    [
+      "minecraft:spring_water"
+    ],
+    [
+      "minecraft:spore_blossom",
+      "minecraft:patch_berry_bush"
+    ],
+    []
+  ]
 }
-

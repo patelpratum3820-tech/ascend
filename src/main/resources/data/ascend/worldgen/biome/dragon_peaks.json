@@ -1,14 +1,21 @@
 {
   "has_precipitation": true,
-  "temperature": -0.5,
-  "downfall": 0.4,
+  "temperature": -0.2,
+  "downfall": 0.6,
   "effects": {
-    "fog_color": 8888772,
-    "sky_color": 7904972,
-    "water_color": 4485798,
-    "water_fog_color": 2574707,
-    "foliage_color": 6981496,
-    "grass_color": 7378048,
+    "fog_color": 7895170,
+    "sky_color": 9213610,
+    "water_color": 3957910,
+    "water_fog_color": 1978960,
+    "foliage_color": 5268580,
+    "grass_color": 5926510,
+    "particle": {
+      "options": {
+        "type": "minecraft:snowflake"
+      },
+      "probability": 0.03
+    },
+    "ambient_sound": "minecraft:ambient.cave",
     "mood_sound": {
       "sound": "minecraft:ambient.cave",
       "tick_delay": 6000,
@@ -16,7 +23,16 @@
       "offset": 2.0
     }
   },
-  "spawners": {},
+  "spawners": {
+    "monster": [
+      {
+        "type": "ascend:fire_drake",
+        "weight": 8,
+        "minCount": 1,
+        "maxCount": 2
+      }
+    ]
+  },
   "spawn_costs": {},
   "carvers": {
     "air": [
@@ -25,6 +41,30 @@
       "minecraft:canyon"
     ]
   },
-  "features": []
+  "features": [
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    [
+      "minecraft:ore_dirt",
+      "minecraft:ore_gravel",
+      "minecraft:ore_coal_upper",
+      "minecraft:ore_iron_upper",
+      "minecraft:ore_emerald",
+      "ascend:ore_dragonite_placed"
+    ],
+    [],
+    [
+      "minecraft:spring_water"
+    ],
+    [
+      "minecraft:patch_powder_snow"
+    ],
+    [
+      "minecraft:freeze_top_layer"
+    ]
+  ]
 }
-
