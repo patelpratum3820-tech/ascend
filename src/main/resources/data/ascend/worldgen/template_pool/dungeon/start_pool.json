@@ -6,6 +6,15 @@
       "weight": 1,
       "element": {
         "element_type": "minecraft:single_pool_element",
+        "location": "ascend:ruined_castle",
+        "processors": "minecraft:empty",
+        "projection": "rigid"
+      }
+    },
+    {
+      "weight": 1,
+      "element": {
+        "element_type": "minecraft:single_pool_element",
         "location": "ascend:dungeon_gate",
         "processors": "minecraft:empty",
         "projection": "rigid"

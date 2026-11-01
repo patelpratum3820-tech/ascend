@@ -136,7 +136,7 @@ public class AscendHudRenderer implements HudRenderCallback {
         if (cdTicks > 0) {
             context.fill(x + 1, y + 1, x + size - 1, y + size - 1, 0xCC000000);
             int sec = (cdTicks / 20) + 1;
-            String cdStr = sec + "s";
+            String cdStr = sec >= 60 ? (sec / 60) + "m" : sec + "s";
             int cdW = tr.getWidth(cdStr);
             context.drawText(tr, Text.literal("§c§l" + cdStr), x + (size - cdW) / 2, y + 9, 0xFFFF5555, true);
         }

@@ -56,6 +56,7 @@ public class AscendPackets {
                 data.initializeAwakening(difficulty, race, playerClass, skills);
                 data.applyModifiers(player);
                 syncPlayerData(player);
+                net.ascend.mod.story.DivineAwakening.completeAwakening(player, data);
             });
         });
 

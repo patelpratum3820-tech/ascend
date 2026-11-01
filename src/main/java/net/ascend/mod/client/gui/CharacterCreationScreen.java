@@ -2,6 +2,7 @@ package net.ascend.mod.client.gui;
 
 import net.ascend.mod.network.AscendClientPackets;
 import net.ascend.mod.skills.SkillInfo;
+import net.ascend.mod.skills.SkillRank;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.DrawContext;
@@ -18,6 +19,7 @@ public class CharacterCreationScreen extends Screen {
     private static final int WIDGET_HEIGHT = 240;
 
     private int currentStep = 0; // 0: Difficulty, 1: Race, 2: Class, 3: Skills, 4: Confirm
+    private int skillsPage = 0;
 
     private String selectedDifficulty = "Normal";
     private String selectedRace = "Human";
@@ -76,7 +78,7 @@ public class CharacterCreationScreen extends Screen {
     }
 
     private void validateSelectedSkills() {
-        List<SkillInfo> allowed = SkillInfo.getSkillsForClass(selectedClass);
+        List<SkillInfo> allowed = getStarterSkillsForClass(selectedClass);
         List<String> validSelected = new ArrayList<>();
         for (String id : selectedSkills) {
             for (SkillInfo skill : allowed) {
@@ -96,6 +98,17 @@ public class CharacterCreationScreen extends Screen {
         }
         selectedSkills.clear();
         selectedSkills.addAll(validSelected);
+    }
+
+    private List<SkillInfo> getStarterSkillsForClass(String pClass) {
+        List<SkillInfo> classSkills = SkillInfo.getSkillsForClass(pClass);
+        List<SkillInfo> starters = new ArrayList<>();
+        for (SkillInfo s : classSkills) {
+            if (s.rank() == SkillRank.E || s.rank() == SkillRank.D) {
+                starters.add(s);
+            }
+        }
+        return starters.isEmpty() ? classSkills : starters;
     }
 
     private void initDifficultyStep(int left, int contentY) {
@@ -142,16 +155,25 @@ public class CharacterCreationScreen extends Screen {
     }
 
     private void initSkillsStep(int left, int contentY) {
-        List<SkillInfo> allowed = SkillInfo.getSkillsForClass(selectedClass);
-        for (int i = 0; i < allowed.size(); i++) {
+        List<SkillInfo> allowed = getStarterSkillsForClass(selectedClass);
+        int pageSize = 6;
+        int maxPages = Math.max(1, (int) Math.ceil((double) allowed.size() / pageSize));
+        if (skillsPage >= maxPages) skillsPage = maxPages - 1;
+        if (skillsPage < 0) skillsPage = 0;
+
+        int startIndex = skillsPage * pageSize;
+        int endIndex = Math.min(startIndex + pageSize, allowed.size());
+
+        for (int i = startIndex; i < endIndex; i++) {
+            int localIdx = i - startIndex;
             SkillInfo skill = allowed.get(i);
             boolean isSel = selectedSkills.contains(skill.id());
             Text label = Text.literal((isSel ? "§a[✔] §l" : "§7[ ] ") + skill.displayName());
 
-            int col = i % 2;
-            int row = i / 2;
+            int col = localIdx % 2;
+            int row = localIdx / 2;
             int btnX = left + 16 + (col * 144);
-            int btnY = contentY + (row * 28);
+            int btnY = contentY + 6 + (row * 30);
 
             ButtonWidget btn = ButtonWidget.builder(label, button -> {
                 if (selectedSkills.contains(skill.id())) {
@@ -163,10 +185,28 @@ public class CharacterCreationScreen extends Screen {
                     selectedSkills.add(skill.id());
                 }
                 rebuildStepUI();
-            }).dimensions(btnX, btnY, 138, 24).build();
+            }).dimensions(btnX, btnY, 140, 24).build();
 
-            btn.setTooltip(net.minecraft.client.gui.tooltip.Tooltip.of(Text.literal("§e[" + skill.tag() + "] §f" + skill.description())));
+            btn.setTooltip(net.minecraft.client.gui.tooltip.Tooltip.of(Text.literal("§e[" + skill.tag() + " | Rank " + skill.rank().getLabel() + "] §f" + skill.description())));
             addDrawableChild(btn);
+        }
+
+        // Pagination row if multiple pages
+        if (maxPages > 1) {
+            int pageY = contentY + 104;
+            ButtonWidget prevBtn = ButtonWidget.builder(Text.literal("◀ Prev"), b -> {
+                skillsPage--;
+                rebuildStepUI();
+            }).dimensions(left + 70, pageY, 55, 20).build();
+            prevBtn.active = skillsPage > 0;
+            addDrawableChild(prevBtn);
+
+            ButtonWidget nextBtn = ButtonWidget.builder(Text.literal("Next ▶"), b -> {
+                skillsPage++;
+                rebuildStepUI();
+            }).dimensions(left + 195, pageY, 55, 20).build();
+            nextBtn.active = skillsPage < maxPages - 1;
+            addDrawableChild(nextBtn);
         }
     }
 
@@ -211,7 +251,14 @@ public class CharacterCreationScreen extends Screen {
             case 1 -> renderRaceDesc(context, descX, descY);
             case 2 -> renderClassDesc(context, descX, descY);
             case 3 -> {
-                context.drawText(textRenderer, Text.literal("§7Selected: §a" + selectedSkills.size() + "/2 §7skills"), left + 18, top + WIDGET_HEIGHT - 42, 0xFFFFFFFF, false);
+                context.drawText(textRenderer, Text.literal("§7Selected: §a" + selectedSkills.size() + "/2 §7starter arts"), left + 18, top + WIDGET_HEIGHT - 44, 0xFFFFFFFF, false);
+                List<SkillInfo> allowed = getStarterSkillsForClass(selectedClass);
+                int maxPages = Math.max(1, (int) Math.ceil((double) allowed.size() / 6));
+                if (maxPages > 1) {
+                    String pStr = (skillsPage + 1) + " / " + maxPages;
+                    int pw = textRenderer.getWidth(pStr);
+                    context.drawText(textRenderer, Text.literal("§e" + pStr), left + (WIDGET_WIDTH - pw) / 2, top + 152, 0xFFFFFFFF, true);
+                }
             }
             case 4 -> renderSummary(context, left, top + 40);
         }

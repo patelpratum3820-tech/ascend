@@ -5,7 +5,7 @@
   "spawn_overrides": {},
   "terrain_adaptation": "beard_thin",
   "start_pool": "ascend:dungeon/start_pool",
-  "size": 1,
+  "size": 2,
   "start_height": {
     "type": "minecraft:constant",
     "value": {

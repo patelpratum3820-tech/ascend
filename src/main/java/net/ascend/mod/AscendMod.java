@@ -46,7 +46,7 @@ public class AscendMod implements ModInitializer {
             AscendPackets.syncPlayerData(handler.player);
 
             if (!data.isInitialized()) {
-                AscendPackets.sendOpenCreationScreen(handler.player);
+                net.ascend.mod.story.DivineAwakening.initiateAwakening(handler.player);
             }
         });
 
