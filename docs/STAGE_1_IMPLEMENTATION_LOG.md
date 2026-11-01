@@ -59,3 +59,44 @@
   * Phase 5: Story Progression & Difficulty Integration.
   * Phase 6: Polish, Testing & Documentation.
 
+---
+
+## Phase 4: RPG Interfaces Suite
+* **Completed:** November 1, 2026
+* **Files Created:**
+  * `src/main/java/net/ascend/mod/client/gui/QuestJournalScreen.java`: Tabbed RPG quest log (`[Main Story]`, `[Bounties]`, `[Daily Trials]`, `[Completed]`), objective tracking bars, and reward claim buttons.
+  * `src/main/java/net/ascend/mod/client/gui/DungeonRankScreen.java`: Hunter rank progression ladder (`E` -> `S`), dungeon clear tallies, best times, dungeon lore, and boss summaries.
+  * `src/main/java/net/ascend/mod/client/gui/ArtifactProgressionScreen.java`: Visual showcase of all 7 cosmic story artifacts, acquisition tracking, and lore.
+  * `src/main/java/net/ascend/mod/client/gui/RpgEquipmentScreen.java`: Equipment screen displaying weapons, armor, bound accessories (rings, necklaces, bracelets, amulets), and active 4-piece set resonance detection (Dragonite, Mythril).
+* **Files Modified:**
+  * `src/main/java/net/ascend/mod/quest/QuestManager.java`: Full registry of 13 structured RPG quests across Main, Side, and Daily categories, with server reward claiming.
+  * `src/main/java/net/ascend/mod/network/AscendPackets.java`: Added `CLAIM_QUEST_ID` packet for server-authoritative quest reward processing.
+  * `src/main/java/net/ascend/mod/network/AscendClientPackets.java`: Added `sendClaimQuestPacket`.
+  * `src/main/java/net/ascend/mod/AscendClientMod.java`: Registered keybindings for Quest Journal (`J`) and Dungeon/Ranks (`U`).
+  * `src/main/java/net/ascend/mod/mixin/InventoryScreenMixin.java`: Added `✦ Status` and `✦ Gear` quick-access buttons directly beside the vanilla recipe book.
+  * `src/main/java/net/ascend/mod/client/gui/CharacterProfileScreen.java`: Added unified bottom navigation pills to quickly jump between Grimoire, Quest Journal, Dungeon Ranks, and Equipment.
+
+---
+
+## Phase 5: Story Progression & Difficulty Integration
+* **Completed:** November 1, 2026
+* **Files Created:**
+  * `docs/CORE_SYSTEMS.md`: Comprehensive specification for server-authoritative character data schemas, dual-class combinations, leveling curve, stat formulas, difficulty multipliers, and Stage 2 moral path branching hooks.
+  * `tools/generate_sleek_weapons.py`: Python script establishing authentic 16x16 Minecraft sword silhouettes with 2-pixel wide blades, wings, pommels, and curved single-edge katanas.
+  * `tools/generate_goblin_hd.py`: High-detail textured goblin mob generator with mottled olive skin shading, amber eyes, tusks, leather vest stitches, and arm/leg wraps.
+* **Files Modified:**
+  * `src/main/java/net/ascend/mod/data/PlayerData.java`: Added difficulty multipliers (`getDifficultyDamageMultiplier()`, `getStaminaConsumptionMultiplier()`) and integrated difficulty into stamina consumption.
+  * `src/main/java/net/ascend/mod/mixin/PlayerEntityMixin.java`: Integrated difficulty damage scaling into `damage()` method.
+  * `src/main/java/net/ascend/mod/client/gui/CharacterCreationScreen.java`: Cleared tutorial/recipe toast popups on awakening screen; refined text margins and vertical spacing to permanently eliminate overlap between text fields and proceed button.
+  * All 12 custom weapon textures (`mythril_sword`, `dragonite_sword`, `voidsteel_sword`, `mythril_katana`, `dragonite_katana`, `voidsteel_katana`, daggers, greatswords) regenerated with authentic Minecraft proportions.
+  * `src/main/resources/assets/ascend/textures/entity/mob/goblin.png`: Replaced flat solid block mob with shaded, textured goblin sprite.
+* **Tests Performed:**
+  * Weapon textures verified via pixel matrix analysis.
+  * Clean compilation verified (`gradlew compileJava` - 0 errors).
+  * Production JAR built at `ascend-0.1.0-alpha.jar`.
+
+---
+
+## Remaining Stage 1 Work:
+* Phase 6: Polish, Testing & Documentation (Master Audit validation, known issues review, and Stage 2 preparation).
+

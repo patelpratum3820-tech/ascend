@@ -47,6 +47,9 @@ public class CharacterCreationScreen extends Screen {
     @Override
     protected void init() {
         super.init();
+        if (client != null && client.getToastManager() != null) {
+            client.getToastManager().clear();
+        }
         if (client != null && client.player != null && "Chosen Soul".equals(characterName)) {
             characterName = client.player.getName().getString();
         }
@@ -100,10 +103,10 @@ public class CharacterCreationScreen extends Screen {
     }
 
     private void initPrologueStep(int left, int top) {
-        int fieldX = left + 140;
-        int fieldY = top + 172;
+        int fieldX = left + 130;
+        int fieldY = top + 146;
 
-        nameField = new TextFieldWidget(textRenderer, fieldX, fieldY, 160, 20, Text.literal("Character Name"));
+        nameField = new TextFieldWidget(textRenderer, fieldX, fieldY, 170, 18, Text.literal("Character Name"));
         nameField.setText(characterName);
         nameField.setChangedListener(text -> characterName = text.trim().isEmpty() ? "Chosen Soul" : text.trim());
         addDrawableChild(nameField);
@@ -113,7 +116,7 @@ public class CharacterCreationScreen extends Screen {
             if (characterName.isEmpty()) characterName = "Chosen Soul";
             currentStep = 1;
             rebuildStepUI();
-        }).dimensions(left + (WIDGET_WIDTH - 240) / 2, top + WIDGET_HEIGHT - 32, 240, 24).build();
+        }).dimensions(left + (WIDGET_WIDTH - 240) / 2, top + WIDGET_HEIGHT - 32, 240, 22).build();
         addDrawableChild(proceedBtn);
     }
 
@@ -344,21 +347,21 @@ public class CharacterCreationScreen extends Screen {
     }
 
     private void renderPrologueText(DrawContext context, int left, int y) {
-        int cx = left + 20;
+        int cx = left + 18;
         context.drawText(textRenderer, Text.literal("§6§l[Goddess of Rebirth]"), cx, y, 0xFFFFD700, true);
-        context.drawText(textRenderer, Text.literal("§f\"Awaken, chosen soul... You have been summoned from another world.\""), cx, y + 15, 0xFFFFFFFF, false);
-        context.drawText(textRenderer, Text.literal("§7Before you take physical form and descend to the mortal lands,"), cx, y + 30, 0xFFAAAAAA, false);
-        context.drawText(textRenderer, Text.literal("§7I grant you the sacred gifts of rebirth:"), cx, y + 42, 0xFFAAAAAA, false);
+        context.drawText(textRenderer, Text.literal("§f\"Awaken, chosen soul... You have been summoned from another world.\""), cx, y + 13, 0xFFFFFFFF, false);
+        context.drawText(textRenderer, Text.literal("§7Before you take physical form and descend to the mortal lands,"), cx, y + 25, 0xFFAAAAAA, false);
+        context.drawText(textRenderer, Text.literal("§7I grant you the sacred gifts of rebirth:"), cx, y + 36, 0xFFAAAAAA, false);
 
-        context.drawText(textRenderer, Text.literal("§b✦ One Species §7— Choose from 6 unique fantasy races"), cx + 8, y + 58, 0xFFFFFFFF, false);
-        context.drawText(textRenderer, Text.literal("§e✦ Two Combat Classes §7— Combine martial & magical paths"), cx + 8, y + 72, 0xFFFFFFFF, false);
-        context.drawText(textRenderer, Text.literal("§a✦ Two Starting Arts §7— Initial combat & magical skills"), cx + 8, y + 86, 0xFFFFFFFF, false);
-        context.drawText(textRenderer, Text.literal("§6✦ World Fate §7— Set the difficulty of your journey"), cx + 8, y + 100, 0xFFFFFFFF, false);
+        context.drawText(textRenderer, Text.literal("§b✦ Six Fantasy Species §7— Choose from 6 unique heritages"), cx + 6, y + 49, 0xFFFFFFFF, false);
+        context.drawText(textRenderer, Text.literal("§e✦ Dual Combat Classes §7— Dictate your Primary & Secondary path"), cx + 6, y + 61, 0xFFFFFFFF, false);
+        context.drawText(textRenderer, Text.literal("§a✦ Two Starting Arts §7— Initial martial & magical combat arts"), cx + 6, y + 73, 0xFFFFFFFF, false);
+        context.drawText(textRenderer, Text.literal("§6✦ World Fate & Attributes §7— Difficulty & stat allocation preset"), cx + 6, y + 85, 0xFFFFFFFF, false);
 
-        context.drawText(textRenderer, Text.literal("§d\"Embrace your calling, and carve your legend into eternity!\""), cx, y + 118, 0xFFFFB6C1, true);
+        context.drawText(textRenderer, Text.literal("§d\"Embrace your calling, and carve your legend into eternity!\""), cx, y + 101, 0xFFFFB6C1, true);
 
         // Name Prompt
-        context.drawText(textRenderer, Text.literal("§eCharacter Name:"), cx, y + 142, 0xFFFFD700, true);
+        context.drawText(textRenderer, Text.literal("§eCharacter Name:"), cx, y + 116, 0xFFFFD700, true);
     }
 
     private void renderRaceDesc(DrawContext context, int x, int y) {

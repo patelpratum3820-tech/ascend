@@ -72,11 +72,26 @@ public class CharacterProfileScreen extends Screen {
         // 3. Bottom Utility Bar
         ButtonWidget grimoireBtn = ButtonWidget.builder(Text.literal("§b✦ Grimoire"), button -> {
             if (client != null) client.setScreen(new SkillManagerScreen());
-        }).dimensions(left + 16, top + CARD_HEIGHT - 24, 88, 18).build();
+        }).dimensions(left + 16, top + CARD_HEIGHT - 24, 72, 18).build();
         addDrawableChild(grimoireBtn);
 
+        ButtonWidget journalBtn = ButtonWidget.builder(Text.literal("§e✦ Journal"), button -> {
+            if (client != null) client.setScreen(new QuestJournalScreen());
+        }).dimensions(left + 92, top + CARD_HEIGHT - 24, 68, 18).build();
+        addDrawableChild(journalBtn);
+
+        ButtonWidget dungeonBtn = ButtonWidget.builder(Text.literal("§6✦ Ranks"), button -> {
+            if (client != null) client.setScreen(new DungeonRankScreen());
+        }).dimensions(left + 164, top + CARD_HEIGHT - 24, 64, 18).build();
+        addDrawableChild(dungeonBtn);
+
+        ButtonWidget gearBtn = ButtonWidget.builder(Text.literal("§a✦ Gear"), button -> {
+            if (client != null) client.setScreen(new RpgEquipmentScreen());
+        }).dimensions(left + 232, top + CARD_HEIGHT - 24, 58, 18).build();
+        addDrawableChild(gearBtn);
+
         ButtonWidget closeBtn = ButtonWidget.builder(Text.literal("Close"), button -> close())
-                .dimensions(left + CARD_WIDTH - 74, top + CARD_HEIGHT - 24, 58, 18)
+                .dimensions(left + CARD_WIDTH - 68, top + CARD_HEIGHT - 24, 52, 18)
                 .build();
         addDrawableChild(closeBtn);
     }
@@ -275,3 +290,4 @@ public class CharacterProfileScreen extends Screen {
         }
     }
 }
+

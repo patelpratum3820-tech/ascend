@@ -76,3 +76,4 @@ The ASCEND visual language combines the sleek, dark cyberpunk energy of *Solo Le
 * **Top-Left Player Banner:** Name, race, dual-class title, level, rank, and XP bar.
 * **Bottom-Left Combat Meters:** Emerald Stamina Bar (`STA`), Cyan Mana Bar (`MP`), and Dash status indicator.
 * **Bottom-Right Skill Slots:** 4 action slots (`R`, `F`, `C`, `X`) + 1 signature ultimate slot (`V`) with radial cooldown sweeps, rank badges, and mana insufficiency dimming.
+

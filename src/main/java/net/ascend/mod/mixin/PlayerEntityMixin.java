@@ -96,10 +96,11 @@ public class PlayerEntityMixin implements IPlayerDataAccessor {
             }
         }
 
-        // 5. Defense reduction
+        // 5. Defense reduction & Difficulty scaling
         if (!source.isIn(net.minecraft.registry.tag.DamageTypeTags.BYPASSES_ARMOR)) {
             amount *= (float) data.getDamageReductionMultiplier();
         }
+        amount *= data.getDifficultyDamageMultiplier();
 
         return amount;
     }

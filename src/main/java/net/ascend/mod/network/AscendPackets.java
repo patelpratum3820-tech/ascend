@@ -32,6 +32,7 @@ public class AscendPackets {
     public static final Identifier EQUIP_SKILL_ID = new Identifier(AscendMod.MOD_ID, "equip_skill");
     public static final Identifier SET_ALLOCATION_MODE_ID = new Identifier(AscendMod.MOD_ID, "set_allocation_mode");
     public static final Identifier SET_ACTIVE_TITLE_ID = new Identifier(AscendMod.MOD_ID, "set_active_title");
+    public static final Identifier CLAIM_QUEST_ID = new Identifier(AscendMod.MOD_ID, "claim_quest");
 
     public static void registerServerReceivers() {
         // 1. Upgrade Stat
@@ -88,6 +89,14 @@ public class AscendPackets {
                 PlayerData data = ((IPlayerDataAccessor) player).ascend$getPlayerData();
                 data.getStoryProgress().setActiveTitle(title);
                 syncPlayerData(player);
+            });
+        });
+
+        // 2d. Claim Quest Reward
+        ServerPlayNetworking.registerGlobalReceiver(CLAIM_QUEST_ID, (server, player, handler, buf, responseSender) -> {
+            String questId = buf.readString();
+            server.execute(() -> {
+                net.ascend.mod.quest.QuestManager.claimQuestReward(player, questId);
             });
         });
 

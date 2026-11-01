@@ -86,3 +86,4 @@ public class RpgTheme {
         context.drawText(tr, Text.literal(text), x + 3, y + 1, badgeColor, false);
     }
 }
+

@@ -29,6 +29,8 @@ public class AscendClientMod implements ClientModInitializer {
     public static KeyBinding signatureKey;
     public static KeyBinding rpgCameraKey;
     public static KeyBinding grimoireKey;
+    public static KeyBinding questJournalKey;
+    public static KeyBinding dungeonRankKey;
 
     @Override
     public void onInitializeClient() {
@@ -186,11 +188,39 @@ public class AscendClientMod implements ClientModInitializer {
                 "category.ascend.general"
         ));
 
+        questJournalKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+                "key.ascend.quest_journal",
+                InputUtil.Type.KEYSYM,
+                GLFW.GLFW_KEY_J,
+                "category.ascend.general"
+        ));
+
+        dungeonRankKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+                "key.ascend.dungeon_rank",
+                InputUtil.Type.KEYSYM,
+                GLFW.GLFW_KEY_U,
+                "category.ascend.general"
+        ));
+
         // 4. Tick Listener for Key inputs
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             if (client.player == null) return;
 
-            // Grimoire / Skills Window
+            // Quest Journal Window [J]
+            while (questJournalKey.wasPressed()) {
+                if (client.currentScreen == null) {
+                    client.setScreen(new net.ascend.mod.client.gui.QuestJournalScreen());
+                }
+            }
+
+            // Dungeon & Rank Ladder Window [U]
+            while (dungeonRankKey.wasPressed()) {
+                if (client.currentScreen == null) {
+                    client.setScreen(new net.ascend.mod.client.gui.DungeonRankScreen());
+                }
+            }
+
+            // Grimoire / Skills Window [H]
             while (grimoireKey.wasPressed()) {
                 if (client.currentScreen == null) {
                     client.setScreen(new net.ascend.mod.client.gui.SkillManagerScreen());

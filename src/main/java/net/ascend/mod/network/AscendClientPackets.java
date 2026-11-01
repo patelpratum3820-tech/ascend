@@ -94,6 +94,12 @@ public class AscendClientPackets {
         ClientPlayNetworking.send(AscendPackets.SET_ACTIVE_TITLE_ID, buf);
     }
 
+    public static void sendClaimQuest(String questId) {
+        PacketByteBuf buf = PacketByteBufs.create();
+        buf.writeString(questId);
+        ClientPlayNetworking.send(AscendPackets.CLAIM_QUEST_ID, buf);
+    }
+
     public static void sendDash(double dirX, double dirZ) {
         PacketByteBuf buf = PacketByteBufs.create();
         buf.writeDouble(dirX);

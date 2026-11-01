@@ -307,9 +307,24 @@ public class PlayerData {
         return currentStamina >= amount;
     }
 
+    public float getDifficultyDamageMultiplier() {
+        if ("Easy".equalsIgnoreCase(difficulty)) return 0.75f;
+        if ("Hard".equalsIgnoreCase(difficulty)) return 1.35f;
+        if ("Nightmare".equalsIgnoreCase(difficulty)) return 1.75f;
+        return 1.0f; // Normal
+    }
+
+    public double getStaminaConsumptionMultiplier() {
+        if ("Easy".equalsIgnoreCase(difficulty)) return 0.85;
+        if ("Hard".equalsIgnoreCase(difficulty)) return 1.20;
+        if ("Nightmare".equalsIgnoreCase(difficulty)) return 1.50;
+        return 1.0;
+    }
+
     public boolean consumeStamina(double amount) {
-        if (hasStamina(amount)) {
-            currentStamina -= amount;
+        double cost = amount * getStaminaConsumptionMultiplier();
+        if (hasStamina(cost)) {
+            currentStamina -= cost;
             return true;
         }
         return false;

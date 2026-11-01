@@ -20,15 +20,21 @@ public abstract class InventoryScreenMixin extends AbstractInventoryScreen<Playe
 
     @Inject(method = "init", at = @At("RETURN"))
     private void ascend$addStatusButton(CallbackInfo ci) {
-        // Place button right above or beside the crafting recipe book button
-        int btnX = this.x + 128;
+        // Place RPG Status & Gear buttons right beside the crafting recipe book
+        int btnX = this.x + 122;
         int btnY = this.height / 2 - 22;
 
         this.addDrawableChild(ButtonWidget.builder(Text.literal("✦ Status"), button -> {
             if (this.client != null) {
                 this.client.setScreen(new StatusScreen());
             }
-        }).dimensions(btnX, btnY, 44, 18).build());
+        }).dimensions(btnX, btnY, 48, 18).build());
+
+        this.addDrawableChild(ButtonWidget.builder(Text.literal("✦ Gear"), button -> {
+            if (this.client != null) {
+                this.client.setScreen(new net.ascend.mod.client.gui.RpgEquipmentScreen());
+            }
+        }).dimensions(btnX, btnY + 20, 48, 18).build());
     }
 }
 
