@@ -6,14 +6,22 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import net.ascend.mod.data.IPlayerDataAccessor;
 import net.ascend.mod.data.PlayerData;
 import net.ascend.mod.dungeon.DungeonManager;
+import net.ascend.mod.entity.AscendEntities;
+import net.ascend.mod.entity.mob.base.AscendRankedMob;
+import net.ascend.mod.entity.mob.base.MobRank;
+import net.ascend.mod.entity.mob.zombie.*;
+import net.ascend.mod.entity.mob.skeleton.*;
 import net.ascend.mod.network.AscendPackets;
 import net.ascend.mod.quest.QuestManager;
 import net.ascend.mod.skills.SkillInfo;
 import net.minecraft.command.CommandRegistryAccess;
+import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
+import net.minecraft.util.math.Vec3d;
 
 import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
@@ -38,6 +46,7 @@ public class AscendCommands {
                     src.sendFeedback(() -> Text.literal("§e/ascend dungeon §7- Manifest a Ranked Dungeon"), false);
                     src.sendFeedback(() -> Text.literal("§e/ascend quest §7- View active guild quest"), false);
                     src.sendFeedback(() -> Text.literal("§e/ascend completequest §7- Complete active quest"), false);
+                    src.sendFeedback(() -> Text.literal("§e/ascend mob <type> [rank] §7- Spawn ranked RPG mob"), false);
                     src.sendFeedback(() -> Text.literal("§e/ascend reset §7- Reset character to defaults"), false);
                     src.sendFeedback(() -> Text.literal("§6§l========================================="), false);
                     return 1;
@@ -381,6 +390,93 @@ public class AscendCommands {
                     )
                 )
             )
+
+            // 10. Spawn Ranked Mob
+            .then(literal("mob")
+                .then(argument("type", StringArgumentType.word())
+                    .suggests((c, b) -> {
+                        b.suggest("zombie_soldier");
+                        b.suggest("zombie_brute");
+                        b.suggest("zombie_berserker");
+                        b.suggest("zombie_spearman");
+                        b.suggest("plague_zombie");
+                        b.suggest("zombie_necromancer");
+                        b.suggest("zombie_lord");
+                        b.suggest("skeleton_archer");
+                        b.suggest("skeleton_crossbowman");
+                        b.suggest("skeleton_swordsman");
+                        b.suggest("bone_knight");
+                        b.suggest("skeleton_mage");
+                        b.suggest("bone_reaper");
+                        b.suggest("skeleton_commander");
+                        return b.buildFuture();
+                    })
+                    .executes(ctx -> {
+                        String type = StringArgumentType.getString(ctx, "type");
+                        return spawnRankedMob(ctx.getSource(), type, "E");
+                    })
+                    .then(argument("rank", StringArgumentType.word())
+                        .suggests((c, b) -> {
+                            b.suggest("E");
+                            b.suggest("D");
+                            b.suggest("C");
+                            b.suggest("B");
+                            b.suggest("A");
+                            b.suggest("S");
+                            return b.buildFuture();
+                        })
+                        .executes(ctx -> {
+                            String type = StringArgumentType.getString(ctx, "type");
+                            String rank = StringArgumentType.getString(ctx, "rank");
+                            return spawnRankedMob(ctx.getSource(), type, rank);
+                        })
+                    )
+                )
+            )
         );
+    }
+
+    private static int spawnRankedMob(ServerCommandSource source, String typeName, String rankStr) {
+        ServerPlayerEntity player = source.getPlayer();
+        if (player == null) return 0;
+
+        MobRank rank = MobRank.fromString(rankStr);
+        ServerWorld world = player.getServerWorld();
+        Vec3d look = player.getRotationVector();
+        double x = player.getX() + look.x * 2.5;
+        double y = player.getY();
+        double z = player.getZ() + look.z * 2.5;
+
+        MobEntity mob = switch (typeName.toLowerCase()) {
+            case "zombie_soldier" -> new ZombieSoldierEntity(AscendEntities.ZOMBIE_SOLDIER, world);
+            case "zombie_brute" -> new ZombieBruteEntity(AscendEntities.ZOMBIE_BRUTE, world);
+            case "zombie_berserker" -> new ZombieBerserkerEntity(AscendEntities.ZOMBIE_BERSERKER, world);
+            case "zombie_spearman" -> new ZombieSpearmanEntity(AscendEntities.ZOMBIE_SPEARMAN, world);
+            case "plague_zombie" -> new PlagueZombieEntity(AscendEntities.PLAGUE_ZOMBIE, world);
+            case "zombie_necromancer" -> new ZombieNecromancerEntity(AscendEntities.ZOMBIE_NECROMANCER, world);
+            case "zombie_lord" -> new ZombieLordEntity(AscendEntities.ZOMBIE_LORD, world);
+            case "skeleton_archer" -> new SkeletonArcherEntity(AscendEntities.SKELETON_ARCHER, world);
+            case "skeleton_crossbowman" -> new SkeletonCrossbowmanEntity(AscendEntities.SKELETON_CROSSBOWMAN, world);
+            case "skeleton_swordsman" -> new SkeletonSwordsmanEntity(AscendEntities.SKELETON_SWORDSMAN, world);
+            case "bone_knight" -> new BoneKnightEntity(AscendEntities.BONE_KNIGHT, world);
+            case "skeleton_mage" -> new SkeletonMageEntity(AscendEntities.SKELETON_MAGE, world);
+            case "bone_reaper" -> new BoneReaperEntity(AscendEntities.BONE_REAPER, world);
+            case "skeleton_commander" -> new SkeletonCommanderEntity(AscendEntities.SKELETON_COMMANDER, world);
+            default -> null;
+        };
+
+        if (mob == null) {
+            source.sendError(Text.literal("Unknown mob type: " + typeName));
+            return 0;
+        }
+
+        mob.setPosition(x, y, z);
+        world.spawnEntity(mob);
+        if (mob instanceof AscendRankedMob rankedMob) {
+            rankedMob.setMobRank(rank);
+        }
+
+        source.sendFeedback(() -> Text.literal("§6[Ascend]§f Spawned §b" + typeName + " §fat §b[" + rank.getFormatting() + "Rank " + rank.getLabel() + "§b]§f!"), false);
+        return 1;
     }
 }

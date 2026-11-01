@@ -168,4 +168,17 @@ public class AscendMobRenderers {
             return TEXTURE;
         }
     }
+
+    // Step R2 Ranked Zombie & Skeleton Renderers
+    public static class AscendZombieRenderer extends ZombieEntityRenderer {
+        public AscendZombieRenderer(EntityRendererFactory.Context context) {
+            super(context);
+        }
+    }
+
+    public static class AscendSkeletonRenderer extends SkeletonEntityRenderer {
+        public AscendSkeletonRenderer(EntityRendererFactory.Context context) {
+            super(context);
+        }
+    }
 }

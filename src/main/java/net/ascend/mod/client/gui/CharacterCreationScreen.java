@@ -92,7 +92,8 @@ public class CharacterCreationScreen extends Screen {
             for (SkillInfo s : allowed) {
                 if (!validSelected.contains(s.id())) {
                     validSelected.add(s.id());
-                    if (validSelected.size() == 2) break;
+                    if (validSelected.size() == 2)
+                        break;
                 }
             }
         }
@@ -112,7 +113,7 @@ public class CharacterCreationScreen extends Screen {
     }
 
     private void initDifficultyStep(int left, int contentY) {
-        String[] diffs = {"Easy", "Normal", "Hard", "Nightmare"};
+        String[] diffs = { "Easy", "Normal", "Hard", "Nightmare" };
         for (int i = 0; i < diffs.length; i++) {
             String diff = diffs[i];
             boolean isSel = diff.equalsIgnoreCase(selectedDifficulty);
@@ -126,7 +127,7 @@ public class CharacterCreationScreen extends Screen {
     }
 
     private void initRaceStep(int left, int contentY) {
-        String[] races = {"Human", "Dragonoid", "Slime"};
+        String[] races = { "Human", "Dragonoid", "Slime" };
         for (int i = 0; i < races.length; i++) {
             String race = races[i];
             boolean isSel = race.equalsIgnoreCase(selectedRace);
@@ -140,7 +141,7 @@ public class CharacterCreationScreen extends Screen {
     }
 
     private void initClassStep(int left, int contentY) {
-        String[] classes = {"Swordsman", "Summoner", "Mage", "Archer", "Tank"};
+        String[] classes = { "Swordsman", "Summoner", "Mage", "Archer", "Tank" };
         for (int i = 0; i < classes.length; i++) {
             String cls = classes[i];
             boolean isSel = cls.equalsIgnoreCase(selectedClass);
@@ -158,8 +159,10 @@ public class CharacterCreationScreen extends Screen {
         List<SkillInfo> allowed = getStarterSkillsForClass(selectedClass);
         int pageSize = 6;
         int maxPages = Math.max(1, (int) Math.ceil((double) allowed.size() / pageSize));
-        if (skillsPage >= maxPages) skillsPage = maxPages - 1;
-        if (skillsPage < 0) skillsPage = 0;
+        if (skillsPage >= maxPages)
+            skillsPage = maxPages - 1;
+        if (skillsPage < 0)
+            skillsPage = 0;
 
         int startIndex = skillsPage * pageSize;
         int endIndex = Math.min(startIndex + pageSize, allowed.size());
@@ -187,7 +190,8 @@ public class CharacterCreationScreen extends Screen {
                 rebuildStepUI();
             }).dimensions(btnX, btnY, 140, 24).build();
 
-            btn.setTooltip(net.minecraft.client.gui.tooltip.Tooltip.of(Text.literal("§e[" + skill.tag() + " | Rank " + skill.rank().getLabel() + "] §f" + skill.description())));
+            btn.setTooltip(net.minecraft.client.gui.tooltip.Tooltip.of(Text.literal(
+                    "§e[" + skill.tag() + " | Rank " + skill.rank().getLabel() + "] §f" + skill.description())));
             addDrawableChild(btn);
         }
 
@@ -239,7 +243,8 @@ public class CharacterCreationScreen extends Screen {
             default -> "✦ ADVENTURER AWAKENING ✦";
         };
         int titleW = textRenderer.getWidth(stepTitle);
-        context.drawText(textRenderer, Text.literal("§b§l" + stepTitle), left + (WIDGET_WIDTH - titleW) / 2, top + 12, 0xFF00E5FF, true);
+        context.drawText(textRenderer, Text.literal("§b§l" + stepTitle), left + (WIDGET_WIDTH - titleW) / 2, top + 12,
+                0xFF00E5FF, true);
         context.fill(left + 16, top + 26, left + WIDGET_WIDTH - 16, top + 27, 0x8800D2FF);
 
         // Step-specific description box
@@ -251,13 +256,16 @@ public class CharacterCreationScreen extends Screen {
             case 1 -> renderRaceDesc(context, descX, descY);
             case 2 -> renderClassDesc(context, descX, descY);
             case 3 -> {
-                context.drawText(textRenderer, Text.literal("§7Selected: §a" + selectedSkills.size() + "/2 §7starter arts"), left + 18, top + WIDGET_HEIGHT - 44, 0xFFFFFFFF, false);
+                context.drawText(textRenderer,
+                        Text.literal("§7Selected: §a" + selectedSkills.size() + "/2 §7starter arts"), left + 18,
+                        top + WIDGET_HEIGHT - 44, 0xFFFFFFFF, false);
                 List<SkillInfo> allowed = getStarterSkillsForClass(selectedClass);
                 int maxPages = Math.max(1, (int) Math.ceil((double) allowed.size() / 6));
                 if (maxPages > 1) {
                     String pStr = (skillsPage + 1) + " / " + maxPages;
                     int pw = textRenderer.getWidth(pStr);
-                    context.drawText(textRenderer, Text.literal("§e" + pStr), left + (WIDGET_WIDTH - pw) / 2, top + 152, 0xFFFFFFFF, true);
+                    context.drawText(textRenderer, Text.literal("§e" + pStr), left + (WIDGET_WIDTH - pw) / 2, top + 152,
+                            0xFFFFFFFF, true);
                 }
             }
             case 4 -> renderSummary(context, left, top + 40);
@@ -270,7 +278,8 @@ public class CharacterCreationScreen extends Screen {
         String info = switch (selectedDifficulty.toLowerCase()) {
             case "easy" -> "§aEasy Mode\n§7Mob HP: 75%\n§7Damage: 75%\n§7Essence: 75%\n\n§fRelaxed adventure.";
             case "hard" -> "§cHard Mode\n§7Mob HP: 150%\n§7Damage: 125%\n§7Essence: 150%\n\n§fHigher risk & reward.";
-            case "nightmare" -> "§4§lNightmare Mode\n§7Mob HP: 250%\n§7Damage: 175%\n§7Essence: 250%\n\n§fRuthless challenge.";
+            case "nightmare" ->
+                "§4§lNightmare Mode\n§7Mob HP: 250%\n§7Damage: 175%\n§7Essence: 250%\n\n§fRuthless challenge.";
             default -> "§eNormal Mode\n§7Mob HP: 100%\n§7Damage: 100%\n§7Essence: 100%\n\n§fStandard RPG balance.";
         };
         drawMultiline(context, info, x, y);
@@ -278,8 +287,10 @@ public class CharacterCreationScreen extends Screen {
 
     private void renderRaceDesc(DrawContext context, int x, int y) {
         String info = switch (selectedRace.toLowerCase()) {
-            case "dragonoid" -> "§6Dragonoid\n§a+3 Strength\n§aFire Immunity\n§aBreath bonus\n\n§c-5% Speed\n§c+50% Cold/Water vulnerability";
-            case "slime" -> "§aSlime\n§a0 Fall Damage\n§aPassive Health Regen\n§aBouncy Jump\n\n§c-4 Max Health\n§c-2 Defense";
+            case "dragonoid" ->
+                "§6Dragonoid\n§a+3 Strength\n§aFire Immunity\n§aBreath bonus\n\n§c-5% Speed\n§c+50% Cold/Water vulnerability";
+            case "slime" ->
+                "§aSlime\n§a0 Fall Damage\n§aPassive Health Regen\n§aBouncy Jump\n\n§c-4 Max Health\n§c-2 Defense";
             default -> "§fHuman\n§a+15% Essence Gain\n§fBalanced base stats\n\n§7No inherent weaknesses.";
         };
         drawMultiline(context, info, x, y);
@@ -287,26 +298,34 @@ public class CharacterCreationScreen extends Screen {
 
     private void renderClassDesc(DrawContext context, int x, int y) {
         String info = switch (selectedClass.toLowerCase()) {
-            case "summoner" -> "§dSummoner\n§7Minions fight for you.\n§a+20 Mana\n§c-2 Health\n\n§eTags: §fsummon, support, magic";
-            case "mage" -> "§9Mage\n§7Devastating ranged spells.\n§a+30 Mana\n§c-2 Defense\n\n§eTags: §fmagic, support, mobility";
-            case "archer" -> "§eArcher\n§7Precision ranged attacks.\n§a+2 Speed, +1 Strength\n§c-2 Defense\n\n§eTags: §franged, mobility, support";
-            case "tank" -> "§6Tank\n§7Indomitable defender.\n§a+4 Defense, +4 Health\n§c-2 Speed\n\n§eTags: §fdefense, melee, support";
-            default -> "§cSwordsman\n§7Rapid combos & slashes.\n§a+2 Strength, +1 Speed\n§cUses stamina\n\n§eTags: §fmelee, mobility, defense";
+            case "summoner" ->
+                "§dSummoner\n§7Minions fight for you.\n§a+20 Mana\n§c-2 Health\n\n§eTags: §fsummon, support, magic";
+            case "mage" ->
+                "§9Mage\n§7Devastating ranged spells.\n§a+30 Mana\n§c-2 Defense\n\n§eTags: §fmagic, support, mobility";
+            case "archer" ->
+                "§eArcher\n§7Precision ranged attacks.\n§a+2 Speed, +1 Strength\n§c-2 Defense\n\n§eTags: §franged, mobility, support";
+            case "tank" ->
+                "§6Tank\n§7Indomitable defender.\n§a+4 Defense, +4 Health\n§c-2 Speed\n\n§eTags: §fdefense, melee, support";
+            default ->
+                "§cSwordsman\n§7Rapid combos & slashes.\n§a+2 Strength, +1 Speed\n§cUses stamina\n\n§eTags: §fmelee, mobility, defense";
         };
         drawMultiline(context, info, x, y);
     }
 
     private void renderSummary(DrawContext context, int left, int y) {
         int centerX = left + 20;
-        context.drawText(textRenderer, Text.literal("§7Difficulty: §e" + selectedDifficulty), centerX, y, 0xFFFFFFFF, false);
+        context.drawText(textRenderer, Text.literal("§7Difficulty: §e" + selectedDifficulty), centerX, y, 0xFFFFFFFF,
+                false);
         context.drawText(textRenderer, Text.literal("§7Race: §b" + selectedRace), centerX, y + 16, 0xFFFFFFFF, false);
         context.drawText(textRenderer, Text.literal("§7Class: §6" + selectedClass), centerX, y + 32, 0xFFFFFFFF, false);
 
         String skill1Name = selectedSkills.size() > 0 ? SkillInfo.getById(selectedSkills.get(0)).displayName() : "None";
         String skill2Name = selectedSkills.size() > 1 ? SkillInfo.getById(selectedSkills.get(1)).displayName() : "None";
-        context.drawText(textRenderer, Text.literal("§7Starting Skills: §a" + skill1Name + "§7, §a" + skill2Name), centerX, y + 48, 0xFFFFFFFF, false);
+        context.drawText(textRenderer, Text.literal("§7Starting Skills: §a" + skill1Name + "§7, §a" + skill2Name),
+                centerX, y + 48, 0xFFFFFFFF, false);
 
-        context.drawText(textRenderer, Text.literal("§fYour destiny awaits. Are you ready to awaken?"), centerX, y + 74, 0xFF00E5FF, false);
+        context.drawText(textRenderer, Text.literal("§fYour destiny awaits. Are you ready to awaken?"), centerX, y + 74,
+                0xFF00E5FF, false);
     }
 
     private void drawMultiline(DrawContext context, String text, int x, int y) {
@@ -326,4 +345,3 @@ public class CharacterCreationScreen extends Screen {
         return false; // must complete character creation
     }
 }
-

@@ -4,6 +4,8 @@ import net.ascend.mod.AscendMod;
 import net.ascend.mod.config.AscendConfig;
 import net.ascend.mod.entity.boss.*;
 import net.ascend.mod.entity.mob.*;
+import net.ascend.mod.entity.mob.zombie.*;
+import net.ascend.mod.entity.mob.skeleton.*;
 import net.ascend.mod.world.AscendBiomes;
 import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
 import net.fabricmc.fabric.api.biome.v1.BiomeSelectors;
@@ -147,6 +149,120 @@ public class AscendEntities {
                     .build()
     );
 
+    // --- Step R2 Zombie Family ---
+    public static final EntityType<ZombieSoldierEntity> ZOMBIE_SOLDIER = Registry.register(
+            Registries.ENTITY_TYPE,
+            new Identifier(AscendMod.MOD_ID, "zombie_soldier"),
+            FabricEntityTypeBuilder.create(SpawnGroup.MONSTER, ZombieSoldierEntity::new)
+                    .dimensions(EntityDimensions.fixed(0.6f, 1.95f))
+                    .build()
+    );
+
+    public static final EntityType<ZombieBruteEntity> ZOMBIE_BRUTE = Registry.register(
+            Registries.ENTITY_TYPE,
+            new Identifier(AscendMod.MOD_ID, "zombie_brute"),
+            FabricEntityTypeBuilder.create(SpawnGroup.MONSTER, ZombieBruteEntity::new)
+                    .dimensions(EntityDimensions.fixed(0.9f, 2.3f))
+                    .build()
+    );
+
+    public static final EntityType<ZombieBerserkerEntity> ZOMBIE_BERSERKER = Registry.register(
+            Registries.ENTITY_TYPE,
+            new Identifier(AscendMod.MOD_ID, "zombie_berserker"),
+            FabricEntityTypeBuilder.create(SpawnGroup.MONSTER, ZombieBerserkerEntity::new)
+                    .dimensions(EntityDimensions.fixed(0.6f, 1.95f))
+                    .build()
+    );
+
+    public static final EntityType<ZombieSpearmanEntity> ZOMBIE_SPEARMAN = Registry.register(
+            Registries.ENTITY_TYPE,
+            new Identifier(AscendMod.MOD_ID, "zombie_spearman"),
+            FabricEntityTypeBuilder.create(SpawnGroup.MONSTER, ZombieSpearmanEntity::new)
+                    .dimensions(EntityDimensions.fixed(0.6f, 1.95f))
+                    .build()
+    );
+
+    public static final EntityType<PlagueZombieEntity> PLAGUE_ZOMBIE = Registry.register(
+            Registries.ENTITY_TYPE,
+            new Identifier(AscendMod.MOD_ID, "plague_zombie"),
+            FabricEntityTypeBuilder.create(SpawnGroup.MONSTER, PlagueZombieEntity::new)
+                    .dimensions(EntityDimensions.fixed(0.6f, 1.95f))
+                    .build()
+    );
+
+    public static final EntityType<ZombieNecromancerEntity> ZOMBIE_NECROMANCER = Registry.register(
+            Registries.ENTITY_TYPE,
+            new Identifier(AscendMod.MOD_ID, "zombie_necromancer"),
+            FabricEntityTypeBuilder.create(SpawnGroup.MONSTER, ZombieNecromancerEntity::new)
+                    .dimensions(EntityDimensions.fixed(0.6f, 1.95f))
+                    .build()
+    );
+
+    public static final EntityType<ZombieLordEntity> ZOMBIE_LORD = Registry.register(
+            Registries.ENTITY_TYPE,
+            new Identifier(AscendMod.MOD_ID, "zombie_lord"),
+            FabricEntityTypeBuilder.create(SpawnGroup.MONSTER, ZombieLordEntity::new)
+                    .dimensions(EntityDimensions.fixed(0.8f, 2.4f))
+                    .build()
+    );
+
+    // --- Step R2 Skeleton Family ---
+    public static final EntityType<SkeletonArcherEntity> SKELETON_ARCHER = Registry.register(
+            Registries.ENTITY_TYPE,
+            new Identifier(AscendMod.MOD_ID, "skeleton_archer"),
+            FabricEntityTypeBuilder.create(SpawnGroup.MONSTER, SkeletonArcherEntity::new)
+                    .dimensions(EntityDimensions.fixed(0.6f, 1.99f))
+                    .build()
+    );
+
+    public static final EntityType<SkeletonCrossbowmanEntity> SKELETON_CROSSBOWMAN = Registry.register(
+            Registries.ENTITY_TYPE,
+            new Identifier(AscendMod.MOD_ID, "skeleton_crossbowman"),
+            FabricEntityTypeBuilder.create(SpawnGroup.MONSTER, SkeletonCrossbowmanEntity::new)
+                    .dimensions(EntityDimensions.fixed(0.6f, 1.99f))
+                    .build()
+    );
+
+    public static final EntityType<SkeletonSwordsmanEntity> SKELETON_SWORDSMAN = Registry.register(
+            Registries.ENTITY_TYPE,
+            new Identifier(AscendMod.MOD_ID, "skeleton_swordsman"),
+            FabricEntityTypeBuilder.create(SpawnGroup.MONSTER, SkeletonSwordsmanEntity::new)
+                    .dimensions(EntityDimensions.fixed(0.6f, 1.99f))
+                    .build()
+    );
+
+    public static final EntityType<BoneKnightEntity> BONE_KNIGHT = Registry.register(
+            Registries.ENTITY_TYPE,
+            new Identifier(AscendMod.MOD_ID, "bone_knight"),
+            FabricEntityTypeBuilder.create(SpawnGroup.MONSTER, BoneKnightEntity::new)
+                    .dimensions(EntityDimensions.fixed(0.7f, 2.1f))
+                    .build()
+    );
+
+    public static final EntityType<SkeletonMageEntity> SKELETON_MAGE = Registry.register(
+            Registries.ENTITY_TYPE,
+            new Identifier(AscendMod.MOD_ID, "skeleton_mage"),
+            FabricEntityTypeBuilder.create(SpawnGroup.MONSTER, SkeletonMageEntity::new)
+                    .dimensions(EntityDimensions.fixed(0.6f, 1.99f))
+                    .build()
+    );
+
+    public static final EntityType<BoneReaperEntity> BONE_REAPER = Registry.register(
+            Registries.ENTITY_TYPE,
+            new Identifier(AscendMod.MOD_ID, "bone_reaper"),
+            FabricEntityTypeBuilder.create(SpawnGroup.MONSTER, BoneReaperEntity::new)
+                    .dimensions(EntityDimensions.fixed(0.7f, 2.2f))
+                    .build()
+    );
+
+    public static final EntityType<SkeletonCommanderEntity> SKELETON_COMMANDER = Registry.register(
+            Registries.ENTITY_TYPE,
+            new Identifier(AscendMod.MOD_ID, "skeleton_commander"),
+            FabricEntityTypeBuilder.create(SpawnGroup.MONSTER, SkeletonCommanderEntity::new)
+                    .dimensions(EntityDimensions.fixed(0.8f, 2.4f))
+                    .build()
+    );
+
     public static void registerEntities() {
         // Boss Attributes
         FabricDefaultAttributeRegistry.register(GOBLIN_KING, HostileEntity.createHostileAttributes()
@@ -189,6 +305,24 @@ public class AscendEntities {
                 .add(EntityAttributes.GENERIC_ATTACK_DAMAGE, 10.0));
         FabricDefaultAttributeRegistry.register(DUNGEON_GOLEM, net.minecraft.entity.passive.IronGolemEntity.createIronGolemAttributes());
 
+        // Step R2 Zombie Attributes
+        FabricDefaultAttributeRegistry.register(ZOMBIE_SOLDIER, ZombieSoldierEntity.createAttributes());
+        FabricDefaultAttributeRegistry.register(ZOMBIE_BRUTE, ZombieBruteEntity.createAttributes());
+        FabricDefaultAttributeRegistry.register(ZOMBIE_BERSERKER, ZombieBerserkerEntity.createAttributes());
+        FabricDefaultAttributeRegistry.register(ZOMBIE_SPEARMAN, ZombieSpearmanEntity.createAttributes());
+        FabricDefaultAttributeRegistry.register(PLAGUE_ZOMBIE, PlagueZombieEntity.createAttributes());
+        FabricDefaultAttributeRegistry.register(ZOMBIE_NECROMANCER, ZombieNecromancerEntity.createAttributes());
+        FabricDefaultAttributeRegistry.register(ZOMBIE_LORD, ZombieLordEntity.createAttributes());
+
+        // Step R2 Skeleton Attributes
+        FabricDefaultAttributeRegistry.register(SKELETON_ARCHER, SkeletonArcherEntity.createAttributes());
+        FabricDefaultAttributeRegistry.register(SKELETON_CROSSBOWMAN, SkeletonCrossbowmanEntity.createAttributes());
+        FabricDefaultAttributeRegistry.register(SKELETON_SWORDSMAN, SkeletonSwordsmanEntity.createAttributes());
+        FabricDefaultAttributeRegistry.register(BONE_KNIGHT, BoneKnightEntity.createAttributes());
+        FabricDefaultAttributeRegistry.register(SKELETON_MAGE, SkeletonMageEntity.createAttributes());
+        FabricDefaultAttributeRegistry.register(BONE_REAPER, BoneReaperEntity.createAttributes());
+        FabricDefaultAttributeRegistry.register(SKELETON_COMMANDER, SkeletonCommanderEntity.createAttributes());
+
         // Spawn Restrictions
         SpawnRestriction.register(SPIRIT_FOX, SpawnRestriction.Location.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, AnimalEntity::isValidNaturalSpawn);
         SpawnRestriction.register(MANA_DEER, SpawnRestriction.Location.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, AnimalEntity::isValidNaturalSpawn);
@@ -201,6 +335,24 @@ public class AscendEntities {
         SpawnRestriction.register(DARK_MAGE, SpawnRestriction.Location.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, HostileEntity::canMobSpawn);
         SpawnRestriction.register(FIRE_DRAKE, SpawnRestriction.Location.NO_RESTRICTIONS, Heightmap.Type.MOTION_BLOCKING, HostileEntity::canMobSpawn);
         SpawnRestriction.register(DUNGEON_GOLEM, SpawnRestriction.Location.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, HostileEntity::canMobSpawn);
+
+        // Step R2 Zombie Spawn Restrictions
+        SpawnRestriction.register(ZOMBIE_SOLDIER, SpawnRestriction.Location.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, HostileEntity::canMobSpawn);
+        SpawnRestriction.register(ZOMBIE_BRUTE, SpawnRestriction.Location.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, HostileEntity::canMobSpawn);
+        SpawnRestriction.register(ZOMBIE_BERSERKER, SpawnRestriction.Location.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, HostileEntity::canMobSpawn);
+        SpawnRestriction.register(ZOMBIE_SPEARMAN, SpawnRestriction.Location.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, HostileEntity::canMobSpawn);
+        SpawnRestriction.register(PLAGUE_ZOMBIE, SpawnRestriction.Location.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, HostileEntity::canMobSpawn);
+        SpawnRestriction.register(ZOMBIE_NECROMANCER, SpawnRestriction.Location.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, HostileEntity::canMobSpawn);
+        SpawnRestriction.register(ZOMBIE_LORD, SpawnRestriction.Location.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, HostileEntity::canMobSpawn);
+
+        // Step R2 Skeleton Spawn Restrictions
+        SpawnRestriction.register(SKELETON_ARCHER, SpawnRestriction.Location.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, HostileEntity::canMobSpawn);
+        SpawnRestriction.register(SKELETON_CROSSBOWMAN, SpawnRestriction.Location.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, HostileEntity::canMobSpawn);
+        SpawnRestriction.register(SKELETON_SWORDSMAN, SpawnRestriction.Location.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, HostileEntity::canMobSpawn);
+        SpawnRestriction.register(BONE_KNIGHT, SpawnRestriction.Location.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, HostileEntity::canMobSpawn);
+        SpawnRestriction.register(SKELETON_MAGE, SpawnRestriction.Location.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, HostileEntity::canMobSpawn);
+        SpawnRestriction.register(BONE_REAPER, SpawnRestriction.Location.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, HostileEntity::canMobSpawn);
+        SpawnRestriction.register(SKELETON_COMMANDER, SpawnRestriction.Location.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, HostileEntity::canMobSpawn);
 
         registerSpawns();
     }

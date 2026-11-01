@@ -103,6 +103,24 @@ public class AscendClientMod implements ClientModInitializer {
                 net.ascend.mod.client.render.mob.AscendMobRenderers.DungeonGolemRenderer::new
         );
 
+        // Step R2 Zombie Renderers
+        net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry.register(net.ascend.mod.entity.AscendEntities.ZOMBIE_SOLDIER, net.ascend.mod.client.render.mob.AscendMobRenderers.AscendZombieRenderer::new);
+        net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry.register(net.ascend.mod.entity.AscendEntities.ZOMBIE_BRUTE, net.ascend.mod.client.render.mob.AscendMobRenderers.AscendZombieRenderer::new);
+        net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry.register(net.ascend.mod.entity.AscendEntities.ZOMBIE_BERSERKER, net.ascend.mod.client.render.mob.AscendMobRenderers.AscendZombieRenderer::new);
+        net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry.register(net.ascend.mod.entity.AscendEntities.ZOMBIE_SPEARMAN, net.ascend.mod.client.render.mob.AscendMobRenderers.AscendZombieRenderer::new);
+        net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry.register(net.ascend.mod.entity.AscendEntities.PLAGUE_ZOMBIE, net.ascend.mod.client.render.mob.AscendMobRenderers.AscendZombieRenderer::new);
+        net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry.register(net.ascend.mod.entity.AscendEntities.ZOMBIE_NECROMANCER, net.ascend.mod.client.render.mob.AscendMobRenderers.AscendZombieRenderer::new);
+        net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry.register(net.ascend.mod.entity.AscendEntities.ZOMBIE_LORD, net.ascend.mod.client.render.mob.AscendMobRenderers.AscendZombieRenderer::new);
+
+        // Step R2 Skeleton Renderers
+        net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry.register(net.ascend.mod.entity.AscendEntities.SKELETON_ARCHER, net.ascend.mod.client.render.mob.AscendMobRenderers.AscendSkeletonRenderer::new);
+        net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry.register(net.ascend.mod.entity.AscendEntities.SKELETON_CROSSBOWMAN, net.ascend.mod.client.render.mob.AscendMobRenderers.AscendSkeletonRenderer::new);
+        net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry.register(net.ascend.mod.entity.AscendEntities.SKELETON_SWORDSMAN, net.ascend.mod.client.render.mob.AscendMobRenderers.AscendSkeletonRenderer::new);
+        net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry.register(net.ascend.mod.entity.AscendEntities.BONE_KNIGHT, net.ascend.mod.client.render.mob.AscendMobRenderers.AscendSkeletonRenderer::new);
+        net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry.register(net.ascend.mod.entity.AscendEntities.SKELETON_MAGE, net.ascend.mod.client.render.mob.AscendMobRenderers.AscendSkeletonRenderer::new);
+        net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry.register(net.ascend.mod.entity.AscendEntities.BONE_REAPER, net.ascend.mod.client.render.mob.AscendMobRenderers.AscendSkeletonRenderer::new);
+        net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry.register(net.ascend.mod.entity.AscendEntities.SKELETON_COMMANDER, net.ascend.mod.client.render.mob.AscendMobRenderers.AscendSkeletonRenderer::new);
+
         // 3. Keybindings
         statusScreenKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
                 "key.ascend.status_screen",
