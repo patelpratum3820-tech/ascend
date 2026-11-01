@@ -62,16 +62,35 @@ public class AscendClientPackets {
         ClientPlayNetworking.send(AscendPackets.UPGRADE_STAT_ID, buf);
     }
 
-    public static void sendCompleteCreation(String difficulty, String race, String playerClass, List<String> skills) {
+    public static void sendCompleteCreation(String characterName, String difficulty, String race, String primaryClass, String secondaryClass, String allocationMode, List<String> skills) {
         PacketByteBuf buf = PacketByteBufs.create();
+        buf.writeString(characterName != null ? characterName : "Chosen Soul");
         buf.writeString(difficulty);
         buf.writeString(race);
-        buf.writeString(playerClass);
+        buf.writeString(primaryClass);
+        buf.writeString(secondaryClass);
+        buf.writeString(allocationMode != null ? allocationMode : "MANUAL");
         buf.writeInt(skills.size());
         for (String s : skills) {
             buf.writeString(s);
         }
         ClientPlayNetworking.send(AscendPackets.COMPLETE_CREATION_ID, buf);
+    }
+
+    public static void sendCompleteCreation(String difficulty, String race, String playerClass, List<String> skills) {
+        sendCompleteCreation("Chosen Soul", difficulty, race, playerClass, playerClass, "MANUAL", skills);
+    }
+
+    public static void sendSetAllocationMode(String modeName) {
+        PacketByteBuf buf = PacketByteBufs.create();
+        buf.writeString(modeName);
+        ClientPlayNetworking.send(AscendPackets.SET_ALLOCATION_MODE_ID, buf);
+    }
+
+    public static void sendSetActiveTitle(String title) {
+        PacketByteBuf buf = PacketByteBufs.create();
+        buf.writeString(title);
+        ClientPlayNetworking.send(AscendPackets.SET_ACTIVE_TITLE_ID, buf);
     }
 
     public static void sendDash(double dirX, double dirZ) {

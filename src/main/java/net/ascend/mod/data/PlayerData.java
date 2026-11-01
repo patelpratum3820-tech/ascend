@@ -22,19 +22,27 @@ public class PlayerData {
     private static final UUID SPEED_MODIFIER_UUID = UUID.fromString("c44e6594-aaeb-49ef-9022-48e561949292");
     private static final UUID STRENGTH_MODIFIER_UUID = UUID.fromString("d55f76a5-bbfa-4af0-a133-59f672a5a3a3");
 
+    // Identity & Path
+    private String characterName = "Chosen Soul";
     private String race = "Human";
-    private String playerClass = "Swordsman";
+    private String primaryClass = "Swordsman";
+    private String secondaryClass = "Swordsman";
     private String difficulty = "Normal";
+    private StatAllocationMode allocationMode = StatAllocationMode.MANUAL;
+    private String currentEvolutionTier = "Base Form";
 
+    // Level & Experience Progression
     private int level = 1;
+    private long xp = 0;
     private long essence = 0;
     private int statPoints = 0;
 
+    // Attributes (Standard RPG Schema with Backward Compatible Aliases)
     private int strength = 5;
-    private int speed = 5;
+    private int agility = 5;       // Alias: speed
     private int vitality = 20;
-    private int mana = 50;
-    private int defense = 0;
+    private int intelligence = 50; // Alias: mana
+    private int dexterity = 0;     // Alias: defense
 
     // Real-time Resources & Combat State
     private double currentMana = 50.0;
@@ -52,24 +60,35 @@ public class PlayerData {
     private final Set<String> unlockedSkills = new HashSet<>();
     private int resourceLockedTicks = 0; // Lockout for SS-tier skills (60s)
 
+    // Progression Sub-frameworks
+    private final QuestProgress questProgress = new QuestProgress();
+    private final DungeonProgress dungeonProgress = new DungeonProgress();
+    private final ArtifactProgress artifactProgress = new ArtifactProgress();
+    private final StoryProgress storyProgress = new StoryProgress();
+
     public PlayerData() {
         resetToDefaults();
     }
 
     public void resetToDefaults() {
         AscendConfig config = AscendConfig.INSTANCE;
+        this.characterName = "Chosen Soul";
         this.race = "Human";
-        this.playerClass = "Swordsman";
+        this.primaryClass = "Swordsman";
+        this.secondaryClass = "Swordsman";
         this.difficulty = "Normal";
+        this.allocationMode = StatAllocationMode.MANUAL;
+        this.currentEvolutionTier = "Base Form";
         this.level = 1;
+        this.xp = 0;
         this.essence = 0;
         this.statPoints = 0;
         this.strength = config.baseStrength;
-        this.speed = config.baseSpeed;
+        this.agility = config.baseSpeed;
         this.vitality = config.baseVitality;
-        this.mana = config.baseMana;
-        this.defense = config.baseDefense;
-        this.currentMana = this.mana;
+        this.intelligence = config.baseMana;
+        this.dexterity = config.baseDefense;
+        this.currentMana = this.intelligence;
         this.currentStamina = config.maxStamina;
         this.dashCooldownTicks = 0;
         this.invulnerableTicks = 0;
@@ -80,84 +99,127 @@ public class PlayerData {
         this.signatureCooldownTicks = 0;
         this.initialized = false;
         this.selectedSkills.clear();
-        this.selectedSkills.add("shadow_step");
+        this.selectedSkills.add("basic_step");
         this.selectedSkills.add("flame_slash");
-        this.selectedSkills.add("iron_skin");
-        this.selectedSkills.add("berserk");
     }
 
     public void initializeAwakening(String difficulty, String race, String playerClass, List<String> skills) {
+        initializeAwakening("Chosen Soul", difficulty, race, playerClass, playerClass, StatAllocationMode.MANUAL, skills);
+    }
+
+    public void initializeAwakening(String characterName, String difficulty, String race, String primaryClass, String secondaryClass, StatAllocationMode mode, List<String> skills) {
         AscendConfig cfg = AscendConfig.INSTANCE;
+        this.characterName = (characterName != null && !characterName.isBlank()) ? characterName.trim() : "Chosen Soul";
         this.difficulty = difficulty;
         this.race = race;
-        this.playerClass = playerClass;
+        this.primaryClass = primaryClass;
+        this.secondaryClass = (secondaryClass != null && !secondaryClass.isBlank()) ? secondaryClass : primaryClass;
+        this.allocationMode = mode != null ? mode : StatAllocationMode.MANUAL;
         this.selectedSkills.clear();
         this.selectedSkills.addAll(skills);
 
         int baseStr = cfg.baseStrength;
-        int baseSpd = cfg.baseSpeed;
+        int baseAgi = cfg.baseSpeed;
         int baseVit = cfg.baseVitality;
-        int baseMan = cfg.baseMana;
-        int baseDef = cfg.baseDefense;
+        int baseInt = cfg.baseMana;
+        int baseDex = cfg.baseDefense;
 
+        // Race bonuses
         if ("Dragonoid".equalsIgnoreCase(race)) {
             baseStr += cfg.dragonoidStrengthBonus;
         } else if ("Slime".equalsIgnoreCase(race)) {
             baseVit += cfg.slimeVitalityPenalty;
-            baseDef += cfg.slimeDefensePenalty;
+            baseDex += cfg.slimeDefensePenalty;
         } else if ("Elf".equalsIgnoreCase(race)) {
-            baseMan += cfg.elfManaBonus;
+            baseInt += cfg.elfManaBonus;
             baseVit += cfg.elfVitalityPenalty;
         } else if ("Beastkin".equalsIgnoreCase(race)) {
             baseStr += cfg.beastkinStrengthBonus;
-            baseMan += cfg.beastkinManaPenalty;
+            baseInt += cfg.beastkinManaPenalty;
         } else if ("Demonkin".equalsIgnoreCase(race)) {
             baseStr += cfg.demonkinStrengthBonus;
-            baseMan += cfg.demonkinManaBonus;
+            baseInt += cfg.demonkinManaBonus;
         }
 
-        switch (playerClass.toLowerCase()) {
-            case "swordsman" -> {
-                baseStr += cfg.swordsmanStrengthBonus;
-                baseSpd += cfg.swordsmanSpeedBonus;
-            }
-            case "tank" -> {
-                baseDef += cfg.tankDefenseBonus;
-                baseVit += cfg.tankVitalityBonus;
-                baseSpd += cfg.tankSpeedPenalty;
-            }
-            case "mage" -> {
-                baseMan += cfg.mageManaBonus;
-                baseDef += cfg.mageDefensePenalty;
-            }
-            case "summoner" -> {
-                baseMan += cfg.summonerManaBonus;
-                baseVit += cfg.summonerVitalityPenalty;
-            }
-            case "archer" -> {
-                baseSpd += cfg.archerSpeedBonus;
-                baseStr += cfg.archerStrengthBonus;
-                baseDef += cfg.archerDefensePenalty;
-            }
-        }
+        // Apply Primary Class bonuses
+        applyClassStatBonus(this.primaryClass, cfg, baseStr, baseAgi, baseVit, baseInt, baseDex);
+        // Apply Secondary Class bonuses (50% effectiveness for hybrid balance if different)
+        double secFactor = this.primaryClass.equalsIgnoreCase(this.secondaryClass) ? 0.5 : 0.6;
+        applySecondaryClassStatBonus(this.secondaryClass, cfg, secFactor);
 
         this.strength = Math.max(1, baseStr);
-        this.speed = Math.max(1, baseSpd);
+        this.agility = Math.max(1, baseAgi);
         this.vitality = Math.max(5, baseVit);
-        this.mana = Math.max(0, baseMan);
-        this.defense = Math.max(0, baseDef);
-        this.currentMana = this.mana;
+        this.intelligence = Math.max(0, baseInt);
+        this.dexterity = Math.max(0, baseDex);
+        this.currentMana = this.intelligence;
         this.currentStamina = cfg.maxStamina;
+        this.storyProgress.setPrologueCompleted(true);
         this.initialized = true;
+    }
+
+    private void applyClassStatBonus(String cls, AscendConfig cfg, int str, int agi, int vit, int intel, int dex) {
+        switch (cls.toLowerCase()) {
+            case "swordsman" -> {
+                this.strength += cfg.swordsmanStrengthBonus;
+                this.agility += cfg.swordsmanSpeedBonus;
+            }
+            case "tank" -> {
+                this.dexterity += cfg.tankDefenseBonus;
+                this.vitality += cfg.tankVitalityBonus;
+                this.agility += cfg.tankSpeedPenalty;
+            }
+            case "mage" -> {
+                this.intelligence += cfg.mageManaBonus;
+                this.dexterity += cfg.mageDefensePenalty;
+            }
+            case "summoner" -> {
+                this.intelligence += cfg.summonerManaBonus;
+                this.vitality += cfg.summonerVitalityPenalty;
+            }
+            case "archer" -> {
+                this.agility += cfg.archerSpeedBonus;
+                this.strength += cfg.archerStrengthBonus;
+                this.dexterity += cfg.archerDefensePenalty;
+            }
+        }
+    }
+
+    private void applySecondaryClassStatBonus(String cls, AscendConfig cfg, double factor) {
+        switch (cls.toLowerCase()) {
+            case "swordsman" -> {
+                this.strength += (int) (cfg.swordsmanStrengthBonus * factor);
+                this.agility += (int) (cfg.swordsmanSpeedBonus * factor);
+            }
+            case "tank" -> {
+                this.dexterity += (int) (cfg.tankDefenseBonus * factor);
+                this.vitality += (int) (cfg.tankVitalityBonus * factor);
+            }
+            case "mage" -> this.intelligence += (int) (cfg.mageManaBonus * factor);
+            case "summoner" -> this.intelligence += (int) (cfg.summonerManaBonus * factor);
+            case "archer" -> {
+                this.agility += (int) (cfg.archerSpeedBonus * factor);
+                this.strength += (int) (cfg.archerStrengthBonus * factor);
+            }
+        }
+    }
+
+    public boolean hasCombatClass(String className) {
+        if (className == null) return false;
+        return primaryClass.equalsIgnoreCase(className) || secondaryClass.equalsIgnoreCase(className);
+    }
+
+    public String getCombinedClassTitle() {
+        return CharacterClass.getCombinedTitle(primaryClass, secondaryClass);
     }
 
     public int getMaxUnlockedSkillSlots() {
         String r = getRank();
         return switch (r) {
-            case "S" -> 5; // +1 at S
-            case "A", "B" -> 4; // +1 at A
-            case "C" -> 3; // +1 at C
-            default -> 2; // Skill slots: start 2
+            case "S" -> 5;
+            case "A", "B" -> 4;
+            case "C" -> 3;
+            default -> 2;
         };
     }
 
@@ -204,14 +266,13 @@ public class PlayerData {
     public void tickResources() {
         AscendConfig cfg = AscendConfig.INSTANCE;
 
-        // Resource lockout (e.g. SS skill aftermath: 60 seconds)
         if (resourceLockedTicks > 0) {
             resourceLockedTicks--;
         } else {
             // Mana regen
             double manaRegenRate = "Elf".equalsIgnoreCase(race) ? (cfg.manaRegenPerSecond * cfg.elfManaRegenMultiplier) : cfg.manaRegenPerSecond;
-            if (currentMana < mana) {
-                currentMana = Math.min(mana, currentMana + (manaRegenRate / 20.0));
+            if (currentMana < intelligence) {
+                currentMana = Math.min(intelligence, currentMana + (manaRegenRate / 20.0));
             }
 
             // Stamina regen
@@ -267,12 +328,57 @@ public class PlayerData {
     }
 
     public String getRank() {
-        if (level >= 100) return "S";
-        if (level >= 75) return "A";
-        if (level >= 50) return "B";
-        if (level >= 25) return "C";
-        if (level >= 10) return "D";
-        return "E";
+        return dungeonProgress.getCurrentRank();
+    }
+
+    public long getXpRequiredForNextLevel() {
+        return (long) (100 * Math.pow(level, 1.45));
+    }
+
+    public void addXp(long amount) {
+        if (amount <= 0) return;
+        this.xp += amount;
+        while (this.xp >= getXpRequiredForNextLevel() && this.level < 100) {
+            this.xp -= getXpRequiredForNextLevel();
+            this.level++;
+            this.statPoints += 3;
+
+            // Auto-allocation if enabled
+            if (allocationMode != StatAllocationMode.MANUAL) {
+                autoAllocatePoints(3);
+            }
+        }
+    }
+
+    public void autoAllocatePoints(int points) {
+        for (int i = 0; i < points; i++) {
+            if (statPoints <= 0) break;
+            switch (allocationMode) {
+                case BALANCED -> {
+                    int mod = (strength + agility + vitality + intelligence + dexterity) % 5;
+                    switch (mod) {
+                        case 0 -> upgradeStat("strength");
+                        case 1 -> upgradeStat("agility");
+                        case 2 -> upgradeStat("vitality");
+                        case 3 -> upgradeStat("intelligence");
+                        case 4 -> upgradeStat("dexterity");
+                    }
+                }
+                case STRENGTH_FOCUSED -> {
+                    if (strength <= vitality * 2) upgradeStat("strength");
+                    else upgradeStat("vitality");
+                }
+                case INTELLIGENCE_FOCUSED -> {
+                    if (intelligence <= vitality * 3) upgradeStat("intelligence");
+                    else upgradeStat("agility");
+                }
+                case AGILITY_FOCUSED -> {
+                    if (agility <= strength) upgradeStat("agility");
+                    else upgradeStat("dexterity");
+                }
+                default -> {}
+            }
+        }
     }
 
     public long getEssenceCostForStat(int currentStatValue) {
@@ -297,13 +403,13 @@ public class PlayerData {
         return false;
     }
 
-    private int getStatValue(String statName) {
+    public int getStatValue(String statName) {
         return switch (statName.toLowerCase()) {
             case "strength" -> strength;
-            case "speed" -> speed;
+            case "speed", "agility" -> agility;
             case "vitality" -> vitality;
-            case "mana" -> mana;
-            case "defense" -> defense;
+            case "mana", "intelligence" -> intelligence;
+            case "defense", "dexterity" -> dexterity;
             default -> 0;
         };
     }
@@ -311,13 +417,13 @@ public class PlayerData {
     private void applyStatIncrement(String statName) {
         switch (statName.toLowerCase()) {
             case "strength" -> strength++;
-            case "speed" -> speed++;
+            case "speed", "agility" -> agility++;
             case "vitality" -> vitality++;
-            case "mana" -> {
-                mana += AscendConfig.INSTANCE.manaPerPoint;
+            case "mana", "intelligence" -> {
+                intelligence += AscendConfig.INSTANCE.manaPerPoint;
                 currentMana += AscendConfig.INSTANCE.manaPerPoint;
             }
-            case "defense" -> defense++;
+            case "defense", "dexterity" -> dexterity++;
         }
     }
 
@@ -339,11 +445,11 @@ public class PlayerData {
             }
         }
 
-        // Speed -> Movement Speed
+        // Agility / Speed -> Movement Speed
         EntityAttributeInstance speedAttr = player.getAttributeInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED);
         if (speedAttr != null) {
             speedAttr.removeModifier(SPEED_MODIFIER_UUID);
-            double speedMultiplier = (speed - cfg.baseSpeed) * cfg.speedPercentPerPoint;
+            double speedMultiplier = (agility - cfg.baseSpeed) * cfg.speedPercentPerPoint;
             if ("Dragonoid".equalsIgnoreCase(race)) {
                 speedMultiplier += cfg.dragonoidSpeedPenalty;
             } else if ("Elf".equalsIgnoreCase(race)) {
@@ -371,7 +477,7 @@ public class PlayerData {
 
     public double getDamageReductionMultiplier() {
         AscendConfig cfg = AscendConfig.INSTANCE;
-        double reduction = defense * cfg.defenseReductionPerPoint;
+        double reduction = dexterity * cfg.defenseReductionPerPoint;
         reduction = Math.min(reduction, cfg.defenseReductionCap);
         return 1.0 - reduction;
     }
@@ -381,20 +487,30 @@ public class PlayerData {
             amount = Math.round(amount * (1.0 + AscendConfig.INSTANCE.humanEssenceBonus));
         }
         addEssence(amount);
+        addXp(amount); // Automatically awards progression XP alongside Essence
     }
 
     public void writeToNbt(NbtCompound nbt) {
+        nbt.putString("CharacterName", characterName);
         nbt.putString("Race", race);
-        nbt.putString("Class", playerClass);
+        nbt.putString("PrimaryClass", primaryClass);
+        nbt.putString("SecondaryClass", secondaryClass);
+        nbt.putString("Class", getCombinedClassTitle()); // For legacy compatibility
         nbt.putString("Difficulty", difficulty);
+        nbt.putString("AllocationMode", allocationMode.name());
+        nbt.putString("CurrentEvolutionTier", currentEvolutionTier);
         nbt.putInt("Level", level);
+        nbt.putLong("Xp", xp);
         nbt.putLong("Essence", essence);
         nbt.putInt("StatPoints", statPoints);
         nbt.putInt("Strength", strength);
-        nbt.putInt("Speed", speed);
+        nbt.putInt("Agility", agility);
+        nbt.putInt("Speed", agility); // Legacy compatibility
         nbt.putInt("Vitality", vitality);
-        nbt.putInt("Mana", mana);
-        nbt.putInt("Defense", defense);
+        nbt.putInt("Intelligence", intelligence);
+        nbt.putInt("Mana", intelligence); // Legacy compatibility
+        nbt.putInt("Dexterity", dexterity);
+        nbt.putInt("Defense", dexterity); // Legacy compatibility
         nbt.putDouble("CurrentMana", currentMana);
         nbt.putDouble("CurrentStamina", currentStamina);
         nbt.putBoolean("Initialized", initialized);
@@ -411,20 +527,57 @@ public class PlayerData {
         }
         nbt.put("UnlockedSkills", unlockedList);
         nbt.putInt("ResourceLockedTicks", resourceLockedTicks);
+
+        // Sub-frameworks
+        NbtCompound questTag = new NbtCompound();
+        questProgress.writeToNbt(questTag);
+        nbt.put("QuestProgress", questTag);
+
+        NbtCompound dungeonTag = new NbtCompound();
+        dungeonProgress.writeToNbt(dungeonTag);
+        nbt.put("DungeonProgress", dungeonTag);
+
+        NbtCompound artifactTag = new NbtCompound();
+        artifactProgress.writeToNbt(artifactTag);
+        nbt.put("ArtifactProgress", artifactTag);
+
+        NbtCompound storyTag = new NbtCompound();
+        storyProgress.writeToNbt(storyTag);
+        nbt.put("StoryProgress", storyTag);
     }
 
     public void readFromNbt(NbtCompound nbt) {
+        if (nbt.contains("CharacterName")) characterName = nbt.getString("CharacterName");
         if (nbt.contains("Race")) race = nbt.getString("Race");
-        if (nbt.contains("Class")) playerClass = nbt.getString("Class");
+
+        if (nbt.contains("PrimaryClass")) primaryClass = nbt.getString("PrimaryClass");
+        else if (nbt.contains("Class")) primaryClass = nbt.getString("Class");
+
+        if (nbt.contains("SecondaryClass")) secondaryClass = nbt.getString("SecondaryClass");
+        else secondaryClass = primaryClass;
+
         if (nbt.contains("Difficulty")) difficulty = nbt.getString("Difficulty");
+        if (nbt.contains("AllocationMode")) {
+            allocationMode = StatAllocationMode.fromString(nbt.getString("AllocationMode"));
+        }
+        if (nbt.contains("CurrentEvolutionTier")) currentEvolutionTier = nbt.getString("CurrentEvolutionTier");
         if (nbt.contains("Level")) level = nbt.getInt("Level");
+        if (nbt.contains("Xp")) xp = nbt.getLong("Xp");
         if (nbt.contains("Essence")) essence = nbt.getLong("Essence");
         if (nbt.contains("StatPoints")) statPoints = nbt.getInt("StatPoints");
         if (nbt.contains("Strength")) strength = nbt.getInt("Strength");
-        if (nbt.contains("Speed")) speed = nbt.getInt("Speed");
+
+        if (nbt.contains("Agility")) agility = nbt.getInt("Agility");
+        else if (nbt.contains("Speed")) agility = nbt.getInt("Speed");
+
         if (nbt.contains("Vitality")) vitality = nbt.getInt("Vitality");
-        if (nbt.contains("Mana")) mana = nbt.getInt("Mana");
-        if (nbt.contains("Defense")) defense = nbt.getInt("Defense");
+
+        if (nbt.contains("Intelligence")) intelligence = nbt.getInt("Intelligence");
+        else if (nbt.contains("Mana")) intelligence = nbt.getInt("Mana");
+
+        if (nbt.contains("Dexterity")) dexterity = nbt.getInt("Dexterity");
+        else if (nbt.contains("Defense")) dexterity = nbt.getInt("Defense");
+
         if (nbt.contains("CurrentMana")) currentMana = nbt.getDouble("CurrentMana");
         if (nbt.contains("CurrentStamina")) currentStamina = nbt.getDouble("CurrentStamina");
         if (nbt.contains("Initialized")) initialized = nbt.getBoolean("Initialized");
@@ -445,20 +598,30 @@ public class PlayerData {
             }
         }
         if (nbt.contains("ResourceLockedTicks")) resourceLockedTicks = nbt.getInt("ResourceLockedTicks");
+
+        if (nbt.contains("QuestProgress")) questProgress.readFromNbt(nbt.getCompound("QuestProgress"));
+        if (nbt.contains("DungeonProgress")) dungeonProgress.readFromNbt(nbt.getCompound("DungeonProgress"));
+        if (nbt.contains("ArtifactProgress")) artifactProgress.readFromNbt(nbt.getCompound("ArtifactProgress"));
+        if (nbt.contains("StoryProgress")) storyProgress.readFromNbt(nbt.getCompound("StoryProgress"));
     }
 
     public void writeToBuffer(PacketByteBuf buf) {
+        buf.writeString(characterName);
         buf.writeString(race);
-        buf.writeString(playerClass);
+        buf.writeString(primaryClass);
+        buf.writeString(secondaryClass);
         buf.writeString(difficulty);
+        buf.writeString(allocationMode.name());
+        buf.writeString(currentEvolutionTier);
         buf.writeInt(level);
+        buf.writeLong(xp);
         buf.writeLong(essence);
         buf.writeInt(statPoints);
         buf.writeInt(strength);
-        buf.writeInt(speed);
+        buf.writeInt(agility);
         buf.writeInt(vitality);
-        buf.writeInt(mana);
-        buf.writeInt(defense);
+        buf.writeInt(intelligence);
+        buf.writeInt(dexterity);
         buf.writeDouble(currentMana);
         buf.writeDouble(currentStamina);
         buf.writeInt(dashCooldownTicks);
@@ -468,29 +631,42 @@ public class PlayerData {
         buf.writeInt(skill4CooldownTicks);
         buf.writeInt(signatureCooldownTicks);
         buf.writeBoolean(initialized);
+
         buf.writeInt(selectedSkills.size());
         for (String s : selectedSkills) {
             buf.writeString(s);
         }
+
         buf.writeInt(unlockedSkills.size());
         for (String u : unlockedSkills) {
             buf.writeString(u);
         }
         buf.writeInt(resourceLockedTicks);
+
+        // Sub-frameworks
+        questProgress.writeToBuffer(buf);
+        dungeonProgress.writeToBuffer(buf);
+        artifactProgress.writeToBuffer(buf);
+        storyProgress.writeToBuffer(buf);
     }
 
     public void readFromBuffer(PacketByteBuf buf) {
+        characterName = buf.readString();
         race = buf.readString();
-        playerClass = buf.readString();
+        primaryClass = buf.readString();
+        secondaryClass = buf.readString();
         difficulty = buf.readString();
+        allocationMode = StatAllocationMode.fromString(buf.readString());
+        currentEvolutionTier = buf.readString();
         level = buf.readInt();
+        xp = buf.readLong();
         essence = buf.readLong();
         statPoints = buf.readInt();
         strength = buf.readInt();
-        speed = buf.readInt();
+        agility = buf.readInt();
         vitality = buf.readInt();
-        mana = buf.readInt();
-        defense = buf.readInt();
+        intelligence = buf.readInt();
+        dexterity = buf.readInt();
         currentMana = buf.readDouble();
         currentStamina = buf.readDouble();
         dashCooldownTicks = buf.readInt();
@@ -513,6 +689,12 @@ public class PlayerData {
             unlockedSkills.add(buf.readString());
         }
         resourceLockedTicks = buf.readInt();
+
+        // Sub-frameworks
+        questProgress.readFromBuffer(buf);
+        dungeonProgress.readFromBuffer(buf);
+        artifactProgress.readFromBuffer(buf);
+        storyProgress.readFromBuffer(buf);
     }
 
     public boolean hasUnlockedSkill(String id) {
@@ -532,17 +714,38 @@ public class PlayerData {
     public boolean isResourceLocked() { return resourceLockedTicks > 0; }
 
     // Getters and setters
+    public String getCharacterName() { return characterName; }
+    public void setCharacterName(String name) { this.characterName = name; }
+
     public String getRace() { return race; }
     public void setRace(String race) { this.race = race; }
 
-    public String getPlayerClass() { return playerClass; }
-    public void setPlayerClass(String playerClass) { this.playerClass = playerClass; }
+    public String getPrimaryClass() { return primaryClass; }
+    public void setPrimaryClass(String primaryClass) { this.primaryClass = primaryClass; }
+
+    public String getSecondaryClass() { return secondaryClass; }
+    public void setSecondaryClass(String secondaryClass) { this.secondaryClass = secondaryClass; }
+
+    public String getPlayerClass() { return getCombinedClassTitle(); }
+    public void setPlayerClass(String playerClass) {
+        this.primaryClass = playerClass;
+        this.secondaryClass = playerClass;
+    }
 
     public String getDifficulty() { return difficulty; }
     public void setDifficulty(String difficulty) { this.difficulty = difficulty; }
 
+    public StatAllocationMode getAllocationMode() { return allocationMode; }
+    public void setAllocationMode(StatAllocationMode mode) { this.allocationMode = mode; }
+
+    public String getCurrentEvolutionTier() { return currentEvolutionTier; }
+    public void setCurrentEvolutionTier(String tier) { this.currentEvolutionTier = tier; }
+
     public int getLevel() { return level; }
     public void setLevel(int level) { this.level = level; }
+
+    public long getXp() { return xp; }
+    public void setXp(long xp) { this.xp = xp; }
 
     public long getEssence() { return essence; }
     public void setEssence(long essence) { this.essence = essence; }
@@ -555,17 +758,23 @@ public class PlayerData {
     public int getStrength() { return strength; }
     public void setStrength(int strength) { this.strength = strength; }
 
-    public int getSpeed() { return speed; }
-    public void setSpeed(int speed) { this.speed = speed; }
+    public int getAgility() { return agility; }
+    public void setAgility(int agility) { this.agility = agility; }
+    public int getSpeed() { return agility; }
+    public void setSpeed(int speed) { this.agility = speed; }
 
     public int getVitality() { return vitality; }
     public void setVitality(int vitality) { this.vitality = vitality; }
 
-    public int getMana() { return mana; }
-    public void setMana(int mana) { this.mana = mana; }
+    public int getIntelligence() { return intelligence; }
+    public void setIntelligence(int intelligence) { this.intelligence = intelligence; }
+    public int getMana() { return intelligence; }
+    public void setMana(int mana) { this.intelligence = mana; }
 
-    public int getDefense() { return defense; }
-    public void setDefense(int defense) { this.defense = defense; }
+    public int getDexterity() { return dexterity; }
+    public void setDexterity(int dexterity) { this.dexterity = dexterity; }
+    public int getDefense() { return dexterity; }
+    public void setDefense(int defense) { this.dexterity = defense; }
 
     public double getCurrentMana() { return currentMana; }
     public void setCurrentMana(double currentMana) { this.currentMana = currentMana; }
@@ -617,4 +826,9 @@ public class PlayerData {
     public void setInitialized(boolean initialized) { this.initialized = initialized; }
 
     public List<String> getSelectedSkills() { return selectedSkills; }
+
+    public QuestProgress getQuestProgress() { return questProgress; }
+    public DungeonProgress getDungeonProgress() { return dungeonProgress; }
+    public ArtifactProgress getArtifactProgress() { return artifactProgress; }
+    public StoryProgress getStoryProgress() { return storyProgress; }
 }

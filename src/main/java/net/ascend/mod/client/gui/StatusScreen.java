@@ -106,16 +106,17 @@ public class StatusScreen extends Screen {
 
             // Player Info on top right
             int infoX = left + 62;
-            context.drawText(textRenderer, Text.literal("Name: §f" + client.player.getName().getString()), infoX, top + 32, 0xFFE0E0E0, false);
-            context.drawText(textRenderer, Text.literal("Race: §b" + data.getRace() + " §7| §fClass: §6" + data.getPlayerClass()), infoX, top + 44, 0xFFE0E0E0, false);
+            context.drawText(textRenderer, Text.literal("Name: §f" + data.getCharacterName()), infoX, top + 30, 0xFFE0E0E0, false);
+            context.drawText(textRenderer, Text.literal("Race: §b" + data.getRace() + " §7(" + data.getCurrentEvolutionTier() + ")"), infoX, top + 42, 0xFFE0E0E0, false);
+            context.drawText(textRenderer, Text.literal("Class: §e" + data.getCombinedClassTitle()), infoX, top + 54, 0xFFE0E0E0, false);
 
             String rankColor = getRankColor(data.getRank());
-            context.drawText(textRenderer, Text.literal("Level: §e" + data.getLevel() + "  §fRank: " + rankColor + data.getRank()), infoX, top + 56, 0xFFE0E0E0, false);
+            context.drawText(textRenderer, Text.literal("Level: §e" + data.getLevel() + " §8| §fRank: " + rankColor + data.getRank()), infoX, top + 66, 0xFFE0E0E0, false);
 
             if (data.getStatPoints() > 0) {
-                context.drawText(textRenderer, Text.literal("Stat Points: §a" + data.getStatPoints()), infoX, top + 68, 0xFF55FF55, true);
+                context.drawText(textRenderer, Text.literal("Stat Pts: §a" + data.getStatPoints() + " §7(" + data.getAllocationMode().getDisplayName() + ")"), infoX, top + 78, 0xFF55FF55, true);
             } else {
-                context.drawText(textRenderer, Text.literal("Essence: §b" + data.getEssence()), infoX, top + 68, 0xFF55FFFF, false);
+                context.drawText(textRenderer, Text.literal("Essence: §b" + data.getEssence() + " §7(" + data.getAllocationMode().getDisplayName() + ")"), infoX, top + 78, 0xFF55FFFF, false);
             }
 
             // Stats Subheader line

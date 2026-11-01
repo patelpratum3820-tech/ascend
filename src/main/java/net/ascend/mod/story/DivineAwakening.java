@@ -83,15 +83,22 @@ public class DivineAwakening {
         player.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOW_FALLING, 200, 0, false, false));
 
         // 5. Give starter kit
-        giveStarterGear(player, data.getPlayerClass());
+        giveStarterGear(player, data.getPrimaryClass(), data.getSecondaryClass());
 
         // Surface arrival particles
         world.spawnParticles(ParticleTypes.TOTEM_OF_UNDYING, targetX + 0.5, topY + 1.5, targetZ + 0.5, 60, 1.0, 1.5, 1.0, 0.1);
         world.playSound(null, targetX + 0.5, topY + 1.0, targetZ + 0.5, SoundEvents.ITEM_TOTEM_USE, SoundCategory.PLAYERS, 1.0f, 1.2f);
     }
 
-    private static void giveStarterGear(ServerPlayerEntity player, String pClass) {
+    private static void giveStarterGear(ServerPlayerEntity player, String pClass, String sClass) {
         player.getInventory().offerOrDrop(new ItemStack(Items.BREAD, 16));
+        grantClassItems(player, pClass);
+        if (sClass != null && !sClass.equalsIgnoreCase(pClass)) {
+            grantClassItems(player, sClass);
+        }
+    }
+
+    private static void grantClassItems(ServerPlayerEntity player, String pClass) {
         switch (pClass.toLowerCase()) {
             case "swordsman" -> player.getInventory().offerOrDrop(new ItemStack(Items.IRON_SWORD));
             case "archer" -> {
@@ -99,7 +106,6 @@ public class DivineAwakening {
                 player.getInventory().offerOrDrop(new ItemStack(Items.ARROW, 64));
             }
             case "tank" -> {
-                player.getInventory().offerOrDrop(new ItemStack(Items.IRON_SWORD));
                 player.getInventory().offerOrDrop(new ItemStack(Items.SHIELD));
             }
             case "mage", "summoner" -> {

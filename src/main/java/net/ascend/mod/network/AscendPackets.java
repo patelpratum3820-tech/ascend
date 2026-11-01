@@ -30,6 +30,8 @@ public class AscendPackets {
     public static final Identifier OPEN_SKILL_UNLOCK_ID = new Identifier(AscendMod.MOD_ID, "open_skill_unlock");
     public static final Identifier LEARN_SKILL_ID = new Identifier(AscendMod.MOD_ID, "learn_skill");
     public static final Identifier EQUIP_SKILL_ID = new Identifier(AscendMod.MOD_ID, "equip_skill");
+    public static final Identifier SET_ALLOCATION_MODE_ID = new Identifier(AscendMod.MOD_ID, "set_allocation_mode");
+    public static final Identifier SET_ACTIVE_TITLE_ID = new Identifier(AscendMod.MOD_ID, "set_active_title");
 
     public static void registerServerReceivers() {
         // 1. Upgrade Stat
@@ -45,11 +47,14 @@ public class AscendPackets {
             });
         });
 
-        // 2. Complete Awakening
+        // 2. Complete Awakening (Dual Class & Identity)
         ServerPlayNetworking.registerGlobalReceiver(COMPLETE_CREATION_ID, (server, player, handler, buf, responseSender) -> {
+            String characterName = buf.readString();
             String difficulty = buf.readString();
             String race = buf.readString();
-            String playerClass = buf.readString();
+            String primaryClass = buf.readString();
+            String secondaryClass = buf.readString();
+            String allocationModeStr = buf.readString();
             int skillCount = buf.readInt();
             List<String> skills = new ArrayList<>();
             for (int i = 0; i < skillCount; i++) {
@@ -58,10 +63,31 @@ public class AscendPackets {
 
             server.execute(() -> {
                 PlayerData data = ((IPlayerDataAccessor) player).ascend$getPlayerData();
-                data.initializeAwakening(difficulty, race, playerClass, skills);
+                net.ascend.mod.data.StatAllocationMode mode = net.ascend.mod.data.StatAllocationMode.fromString(allocationModeStr);
+                data.initializeAwakening(characterName, difficulty, race, primaryClass, secondaryClass, mode, skills);
                 data.applyModifiers(player);
                 syncPlayerData(player);
                 net.ascend.mod.story.DivineAwakening.completeAwakening(player, data);
+            });
+        });
+
+        // 2b. Set Allocation Mode
+        ServerPlayNetworking.registerGlobalReceiver(SET_ALLOCATION_MODE_ID, (server, player, handler, buf, responseSender) -> {
+            String modeName = buf.readString();
+            server.execute(() -> {
+                PlayerData data = ((IPlayerDataAccessor) player).ascend$getPlayerData();
+                data.setAllocationMode(net.ascend.mod.data.StatAllocationMode.fromString(modeName));
+                syncPlayerData(player);
+            });
+        });
+
+        // 2c. Set Active Title
+        ServerPlayNetworking.registerGlobalReceiver(SET_ACTIVE_TITLE_ID, (server, player, handler, buf, responseSender) -> {
+            String title = buf.readString();
+            server.execute(() -> {
+                PlayerData data = ((IPlayerDataAccessor) player).ascend$getPlayerData();
+                data.getStoryProgress().setActiveTitle(title);
+                syncPlayerData(player);
             });
         });
 
