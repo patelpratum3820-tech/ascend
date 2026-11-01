@@ -15,8 +15,8 @@ import java.util.List;
 
 @Environment(EnvType.CLIENT)
 public class CharacterCreationScreen extends Screen {
-    private static final int WIDGET_WIDTH = 340;
-    private static final int WIDGET_HEIGHT = 240;
+    private static final int WIDGET_WIDTH = 390;
+    private static final int WIDGET_HEIGHT = 245;
 
     // 0: Prologue, 1: Race, 2: Class, 3: Difficulty, 4: Skills, 5: Confirm
     private int currentStep = 0;
@@ -288,12 +288,12 @@ public class CharacterCreationScreen extends Screen {
         context.drawText(textRenderer, Text.literal("§7Before you take physical form and descend to the mortal lands,"), cx, y + 32, 0xFFAAAAAA, false);
         context.drawText(textRenderer, Text.literal("§7I grant you the sacred gifts of rebirth:"), cx, y + 44, 0xFFAAAAAA, false);
 
-        context.drawText(textRenderer, Text.literal("§b✦ One Species §7— Choose your heritage (Human, Dragonoid, Slime)"), cx + 8, y + 62, 0xFFFFFFFF, false);
+        context.drawText(textRenderer, Text.literal("§b✦ One Species §7— Choose heritage (Human, Dragonoid, Slime)"), cx + 8, y + 62, 0xFFFFFFFF, false);
         context.drawText(textRenderer, Text.literal("§e✦ One Combat Class §7— Dictate your path of power"), cx + 8, y + 76, 0xFFFFFFFF, false);
-        context.drawText(textRenderer, Text.literal("§a✦ Two Starting Arts §7— Your initial martial & magical skills"), cx + 8, y + 90, 0xFFFFFFFF, false);
-        context.drawText(textRenderer, Text.literal("§6✦ World Fate §7— Set the difficulty of your adventure"), cx + 8, y + 104, 0xFFFFFFFF, false);
+        context.drawText(textRenderer, Text.literal("§a✦ Two Starting Arts §7— Your initial combat & magical skills"), cx + 8, y + 90, 0xFFFFFFFF, false);
+        context.drawText(textRenderer, Text.literal("§6✦ World Fate §7— Set the difficulty of your journey"), cx + 8, y + 104, 0xFFFFFFFF, false);
 
-        context.drawText(textRenderer, Text.literal("§d\"Embrace your calling, and carve your legend into eternity!\""), cx, y + 126, 0xFFFFB6C1, true);
+        context.drawText(textRenderer, Text.literal("§d\"Embrace your calling, and carve your legend into eternity!\""), cx, y + 124, 0xFFFFB6C1, true);
     }
 
     private void renderRaceDesc(DrawContext context, int x, int y) {

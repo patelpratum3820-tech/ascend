@@ -1,0 +1,12 @@
+{
+  "replace": false,
+  "values": [
+    "ascend:mythril_ore",
+    "ascend:deepslate_mythril_ore",
+    "ascend:mana_crystal_ore",
+    "ascend:deepslate_mana_crystal_ore",
+    "ascend:dragonite_ore",
+    "ascend:deepslate_dragonite_ore"
+  ]
+}
+
