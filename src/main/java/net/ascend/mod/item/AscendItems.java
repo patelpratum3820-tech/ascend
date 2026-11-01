@@ -35,6 +35,15 @@ public class AscendItems {
     public static final Item DRAGON_PENDANT = register("dragon_pendant", new AccessoryItem(new FabricItemSettings().maxCount(1), "§c✦ +15% Attack Damage", "§6✦ Fire & Lava Immunity"));
     public static final Item VOID_AMULET = register("void_amulet", new AccessoryItem(new FabricItemSettings().maxCount(1), "§d✦ 3x Faster Dash Recovery", "§d✦ +50% Dash i-Frames"));
 
+    // Skill Scrolls & Ancient Tomes
+    public static final Item SKILL_SCROLL_E = register("skill_scroll_e", new SkillScrollItem(new FabricItemSettings(), net.ascend.mod.skills.SkillRank.E));
+    public static final Item SKILL_SCROLL_D = register("skill_scroll_d", new SkillScrollItem(new FabricItemSettings(), net.ascend.mod.skills.SkillRank.D));
+    public static final Item SKILL_SCROLL_C = register("skill_scroll_c", new SkillScrollItem(new FabricItemSettings(), net.ascend.mod.skills.SkillRank.C));
+    public static final Item SKILL_TOME_B = register("skill_tome_b", new SkillTomeItem(new FabricItemSettings().rarity(net.minecraft.util.Rarity.UNCOMMON), net.ascend.mod.skills.SkillRank.B));
+    public static final Item SKILL_TOME_A = register("skill_tome_a", new SkillTomeItem(new FabricItemSettings().rarity(net.minecraft.util.Rarity.RARE), net.ascend.mod.skills.SkillRank.A));
+    public static final Item SKILL_TOME_S = register("skill_tome_s", new SkillTomeItem(new FabricItemSettings().rarity(net.minecraft.util.Rarity.EPIC), net.ascend.mod.skills.SkillRank.S));
+    public static final Item SKILL_TOME_SS = register("skill_tome_ss", new SkillTomeItem(new FabricItemSettings().rarity(net.minecraft.util.Rarity.EPIC), net.ascend.mod.skills.SkillRank.SS));
+
     // Spawn Eggs
     public static final Item SPIRIT_FOX_SPAWN_EGG = register("spirit_fox_spawn_egg", new SpawnEggItem(AscendEntities.SPIRIT_FOX, 0xebf5ff, 0x4dd8ff, new FabricItemSettings()));
     public static final Item MANA_DEER_SPAWN_EGG = register("mana_deer_spawn_egg", new SpawnEggItem(AscendEntities.MANA_DEER, 0x23375f, 0x3fc8e8, new FabricItemSettings()));
@@ -188,6 +197,15 @@ public class AscendItems {
                 entries.add(DARK_MAGE_SPAWN_EGG);
                 entries.add(FIRE_DRAKE_SPAWN_EGG);
                 entries.add(DUNGEON_GOLEM_SPAWN_EGG);
+
+                // Skill Scrolls & Ancient Tomes
+                entries.add(SKILL_SCROLL_E);
+                entries.add(SKILL_SCROLL_D);
+                entries.add(SKILL_SCROLL_C);
+                entries.add(SKILL_TOME_B);
+                entries.add(SKILL_TOME_A);
+                entries.add(SKILL_TOME_S);
+                entries.add(SKILL_TOME_SS);
             })
             .build();
 

@@ -92,10 +92,19 @@ public class AscendBossEntity extends HostileEntity {
                 }
             }
 
-            // Drop guaranteed rare materials
+            // Drop guaranteed rare materials & Skill Grimoires
             dropItem(AscendItems.VOIDSTEEL_INGOT);
             dropItem(AscendItems.DRAGON_SCALE);
             dropItem(AscendItems.DUNGEON_MAP);
+
+            int roll = this.random.nextInt(4);
+            net.minecraft.item.Item tome = switch (roll) {
+                case 0 -> AscendItems.SKILL_TOME_B;
+                case 1 -> AscendItems.SKILL_TOME_A;
+                case 2 -> AscendItems.SKILL_TOME_S;
+                default -> AscendItems.SKILL_TOME_SS;
+            };
+            dropItem(tome);
         }
     }
 }

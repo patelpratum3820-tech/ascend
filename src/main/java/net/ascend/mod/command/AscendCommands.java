@@ -154,8 +154,40 @@ public class AscendCommands {
                     .executes(ctx -> {
                         ServerPlayerEntity player = ctx.getSource().getPlayerOrThrow();
                         PlayerData data = ((IPlayerDataAccessor) player).ascend$getPlayerData();
-                        ctx.getSource().sendFeedback(() -> Text.literal("§6[Ascend Equipped Skills]§f: " + String.join(", ", data.getSelectedSkills())), false);
-                        ctx.getSource().sendFeedback(() -> Text.literal("§7Available Skills: shadow_step, flame_slash, healing_aura, summon_soldier, mana_bolt, arrow_rain, iron_skin, lightning_strike, berserk, soul_bond"), false);
+                        ctx.getSource().sendFeedback(() -> Text.literal("§6[Ascend Equipped Skills]§f (" + data.getSelectedSkills().size() + "/" + data.getMaxUnlockedSkillSlots() + "): " + String.join(", ", data.getSelectedSkills())), false);
+                        ctx.getSource().sendFeedback(() -> Text.literal("§dUnlocked Skills (" + data.getUnlockedSkills().size() + "): §7" + String.join(", ", data.getUnlockedSkills())), false);
+                        return 1;
+                    })
+                )
+                .then(literal("unlock")
+                    .then(argument("skillId", StringArgumentType.word())
+                        .suggests((c, b) -> {
+                            for (SkillInfo s : SkillInfo.ALL_SKILLS) {
+                                b.suggest(s.id());
+                            }
+                            return b.buildFuture();
+                        })
+                        .executes(ctx -> {
+                            ServerPlayerEntity player = ctx.getSource().getPlayerOrThrow();
+                            String skillId = StringArgumentType.getString(ctx, "skillId").toLowerCase();
+                            PlayerData data = ((IPlayerDataAccessor) player).ascend$getPlayerData();
+                            data.unlockSkill(skillId);
+                            AscendPackets.syncPlayerData(player);
+                            SkillInfo info = SkillInfo.getById(skillId);
+                            ctx.getSource().sendFeedback(() -> Text.literal("§6[Ascend]§f Unlocked " + info.rank().getFormatted() + " §f" + info.displayName()), false);
+                            return 1;
+                        })
+                    )
+                )
+                .then(literal("unlockall")
+                    .executes(ctx -> {
+                        ServerPlayerEntity player = ctx.getSource().getPlayerOrThrow();
+                        PlayerData data = ((IPlayerDataAccessor) player).ascend$getPlayerData();
+                        for (SkillInfo s : SkillInfo.ALL_SKILLS) {
+                            data.unlockSkill(s.id());
+                        }
+                        AscendPackets.syncPlayerData(player);
+                        ctx.getSource().sendFeedback(() -> Text.literal("§6[Ascend]§f Unlocked all " + SkillInfo.ALL_SKILLS.size() + " RPG skills!"), false);
                         return 1;
                     })
                 )
@@ -177,16 +209,66 @@ public class AscendCommands {
                                 return 0;
                             }
 
-                            if (data.getSelectedSkills().size() >= 2) {
+                            if (!data.canEquipSkill(skillId)) {
+                                ctx.getSource().sendError(Text.literal("Cannot equip " + skillId + "! Cap: 1 Rank S and 1 Rank SS equipped max."));
+                                return 0;
+                            }
+
+                            int maxSlots = data.getMaxUnlockedSkillSlots();
+                            if (data.getSelectedSkills().size() >= maxSlots) {
                                 data.getSelectedSkills().remove(0); // replace first slot
                             }
                             data.getSelectedSkills().add(skillId);
                             AscendPackets.syncPlayerData(player);
 
-                            ctx.getSource().sendFeedback(() -> Text.literal("§6[Ascend]§f Equipped skill: §a" + SkillInfo.getById(skillId).displayName()), false);
+                            SkillInfo info = SkillInfo.getById(skillId);
+                            ctx.getSource().sendFeedback(() -> Text.literal("§6[Ascend]§f Equipped " + info.rank().getFormatted() + " §f" + info.displayName()), false);
                             return 1;
                         })
                     )
+                )
+            )
+
+            // Scroll & Tome commands
+            .then(literal("scroll")
+                .then(argument("rank", StringArgumentType.word())
+                    .suggests((c, b) -> {
+                        b.suggest("E"); b.suggest("D"); b.suggest("C");
+                        return b.buildFuture();
+                    })
+                    .executes(ctx -> {
+                        ServerPlayerEntity player = ctx.getSource().getPlayerOrThrow();
+                        String r = StringArgumentType.getString(ctx, "rank").toUpperCase();
+                        net.minecraft.item.Item item = switch (r) {
+                            case "D" -> net.ascend.mod.item.AscendItems.SKILL_SCROLL_D;
+                            case "C" -> net.ascend.mod.item.AscendItems.SKILL_SCROLL_C;
+                            default -> net.ascend.mod.item.AscendItems.SKILL_SCROLL_E;
+                        };
+                        player.giveItemStack(new net.minecraft.item.ItemStack(item));
+                        ctx.getSource().sendFeedback(() -> Text.literal("§6[Ascend]§f Gave Skill Scroll (" + r + ")"), false);
+                        return 1;
+                    })
+                )
+            )
+            .then(literal("tome")
+                .then(argument("rank", StringArgumentType.word())
+                    .suggests((c, b) -> {
+                        b.suggest("B"); b.suggest("A"); b.suggest("S"); b.suggest("SS");
+                        return b.buildFuture();
+                    })
+                    .executes(ctx -> {
+                        ServerPlayerEntity player = ctx.getSource().getPlayerOrThrow();
+                        String r = StringArgumentType.getString(ctx, "rank").toUpperCase();
+                        net.minecraft.item.Item item = switch (r) {
+                            case "A" -> net.ascend.mod.item.AscendItems.SKILL_TOME_A;
+                            case "S" -> net.ascend.mod.item.AscendItems.SKILL_TOME_S;
+                            case "SS" -> net.ascend.mod.item.AscendItems.SKILL_TOME_SS;
+                            default -> net.ascend.mod.item.AscendItems.SKILL_TOME_B;
+                        };
+                        player.giveItemStack(new net.minecraft.item.ItemStack(item));
+                        ctx.getSource().sendFeedback(() -> Text.literal("§6[Ascend]§f Gave Skill Tome (" + r + ")"), false);
+                        return 1;
+                    })
                 )
             )
 

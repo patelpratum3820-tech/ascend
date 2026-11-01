@@ -2,26 +2,30 @@ package net.ascend.mod.skills;
 
 import net.ascend.mod.data.PlayerData;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LightningEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.mob.WitherSkeletonEntity;
+import net.minecraft.entity.mob.ZombieEntity;
+import net.minecraft.entity.passive.WolfEntity;
 import net.minecraft.entity.projectile.ArrowEntity;
 import net.minecraft.entity.projectile.FireballEntity;
 import net.minecraft.entity.projectile.PersistentProjectileEntity;
 import net.minecraft.entity.projectile.SmallFireballEntity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
-import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.RaycastContext;
 
 import java.util.List;
 
@@ -29,38 +33,56 @@ public class AscendSkills {
 
     public static boolean executeSkill(int slotIndex, String skillId, ServerPlayerEntity player, PlayerData data) {
         if (data.getSkillCooldown(slotIndex) > 0) return false;
+        if (data.isResourceLocked()) {
+            player.sendMessage(Text.literal("§cYour energy is locked (" + (data.getResourceLockedTicks() / 20) + "s remaining)!"), true);
+            return false;
+        }
+
         ServerWorld world = player.getServerWorld();
         Vec3d look = player.getRotationVector();
         Vec3d pos = player.getPos();
 
-        switch (skillId.toLowerCase()) {
-            case "shadow_step" -> {
-                // Mobility dash with afterimage particles
-                if (!data.consumeStamina(25.0)) return false;
-                data.setSkillCooldown(slotIndex, 60); // 3 sec cooldown
-                data.setInvulnerableTicks(10); // 0.5s i-frame
+        SkillInfo info = SkillInfo.getById(skillId);
+        int cooldownTicks = Math.max(20, info.cooldownSec() * 20);
 
+        // Deduct cost based on info
+        double cost = info.costAmount();
+        if (info.isPercent()) {
+            if ("MANA".equals(info.costType())) {
+                cost = (data.getMana() * cost) / 100.0;
+            } else if ("STAMINA".equals(info.costType())) {
+                cost = (100.0 * cost) / 100.0;
+            }
+        }
+
+        if ("MANA".equals(info.costType())) {
+            if (!data.consumeMana(cost)) return false;
+        } else if ("STAMINA".equals(info.costType())) {
+            if (!data.consumeStamina(cost)) return false;
+        }
+
+        // Set cooldown
+        data.setSkillCooldown(slotIndex, cooldownTicks);
+
+        switch (skillId.toLowerCase()) {
+            // --- E Rank Skills ---
+            case "shadow_step", "basic_step", "dash" -> {
+                data.setInvulnerableTicks(10);
                 player.setVelocity(look.x * 1.8, 0.2, look.z * 1.8);
                 player.velocityModified = true;
-
                 world.spawnParticles(ParticleTypes.PORTAL, pos.x, pos.y + 1, pos.z, 30, 0.5, 0.5, 0.5, 0.2);
                 world.playSound(null, pos.x, pos.y, pos.z, SoundEvents.ENTITY_ENDERMAN_TELEPORT, SoundCategory.PLAYERS, 1.0f, 1.2f);
                 return true;
             }
 
             case "flame_slash" -> {
-                if (!data.consumeStamina(20.0)) return false;
-                data.setSkillCooldown(slotIndex, 80); // 4 sec cooldown
-
-                // Fire wave in front
                 for (int i = 1; i <= 5; i++) {
                     Vec3d p = pos.add(look.multiply(i)).add(0, 1, 0);
                     world.spawnParticles(ParticleTypes.FLAME, p.x, p.y, p.z, 15, 0.4, 0.4, 0.4, 0.05);
                 }
-
                 Box hitBox = player.getBoundingBox().offset(look.multiply(2.5)).expand(2.5, 1.5, 2.5);
                 List<LivingEntity> targets = world.getEntitiesByClass(LivingEntity.class, hitBox, e -> e != player && e.isAlive());
-                float damage = 6.0f + (data.getStrength() * 0.5f);
+                float damage = 8.0f + (data.getStrength() * 0.6f);
                 for (LivingEntity target : targets) {
                     target.damage(player.getDamageSources().playerAttack(player), damage);
                     target.setOnFireFor(5);
@@ -69,61 +91,48 @@ public class AscendSkills {
                 return true;
             }
 
-            case "healing_aura" -> {
-                if (!data.consumeMana(30.0)) return false;
-                data.setSkillCooldown(slotIndex, 160); // 8 sec cooldown
-
-                player.heal(4.0f + (data.getVitality() * 0.1f));
-                player.addStatusEffect(new StatusEffectInstance(StatusEffects.REGENERATION, 100, 1));
-                world.spawnParticles(ParticleTypes.HAPPY_VILLAGER, pos.x, pos.y + 1, pos.z, 35, 1.0, 1.0, 1.0, 0.1);
-                world.playSound(null, pos.x, pos.y, pos.z, SoundEvents.ENTITY_PLAYER_LEVELUP, SoundCategory.PLAYERS, 0.8f, 1.4f);
-                return true;
-            }
-
-            case "summon_soldier" -> {
-                if (!data.consumeMana(40.0)) return false;
-                data.setSkillCooldown(slotIndex, 200); // 10 sec cooldown
-
-                // Spawn Shadow Soldier (Wither Skeleton ally)
-                WitherSkeletonEntity minion = EntityType.WITHER_SKELETON.create(world);
-                if (minion != null) {
-                    minion.refreshPositionAndAngles(pos.x + look.x * 2, pos.y, pos.z + look.z * 2, player.getYaw(), 0);
-                    minion.setCustomName(Text.literal("§8§lShadow Soldier"));
-                    minion.setCustomNameVisible(true);
-                    minion.addStatusEffect(new StatusEffectInstance(StatusEffects.SPEED, 1200, 1));
-                    minion.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 1200, 1));
-                    world.spawnEntity(minion);
-
-                    world.spawnParticles(ParticleTypes.SOUL_FIRE_FLAME, minion.getX(), minion.getY() + 1, minion.getZ(), 25, 0.3, 0.5, 0.3, 0.05);
-                    world.playSound(null, pos.x, pos.y, pos.z, SoundEvents.ENTITY_WITHER_SPAWN, SoundCategory.PLAYERS, 0.5f, 1.6f);
-                }
-                return true;
-            }
-
             case "mana_bolt" -> {
-                if (!data.consumeMana(15.0)) return false;
-                data.setSkillCooldown(slotIndex, 40); // 2 sec cooldown
-
                 SmallFireballEntity bolt = new SmallFireballEntity(world, player, look.x * 2.0, look.y * 2.0, look.z * 2.0);
                 bolt.setPosition(pos.x, player.getEyeY() - 0.1, pos.z);
                 world.spawnEntity(bolt);
-
                 world.spawnParticles(ParticleTypes.SOUL, pos.x + look.x, player.getEyeY(), pos.z + look.z, 15, 0.2, 0.2, 0.2, 0.1);
                 world.playSound(null, pos.x, pos.y, pos.z, SoundEvents.ENTITY_ILLUSIONER_CAST_SPELL, SoundCategory.PLAYERS, 1.0f, 1.4f);
                 return true;
             }
 
-            case "arrow_rain" -> {
-                if (!data.consumeStamina(30.0)) return false;
-                data.setSkillCooldown(slotIndex, 140); // 7 sec cooldown
+            // --- D Rank Skills ---
+            case "whirlwind" -> {
+                world.spawnParticles(ParticleTypes.SWEEP_ATTACK, pos.x, pos.y + 1, pos.z, 20, 1.5, 0.2, 1.5, 0.0);
+                Box box = player.getBoundingBox().expand(4.0, 1.5, 4.0);
+                List<LivingEntity> targets = world.getEntitiesByClass(LivingEntity.class, box, e -> e != player && e.isAlive());
+                float dmg = 10.0f + (data.getStrength() * 0.7f);
+                for (LivingEntity t : targets) {
+                    t.damage(player.getDamageSources().playerAttack(player), dmg);
+                    t.takeKnockback(1.0, player.getX() - t.getX(), player.getZ() - t.getZ());
+                }
+                world.playSound(null, pos.x, pos.y, pos.z, SoundEvents.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.PLAYERS, 1.5f, 0.9f);
+                return true;
+            }
 
+            case "frost_nova" -> {
+                world.spawnParticles(ParticleTypes.SNOWFLAKE, pos.x, pos.y + 0.5, pos.z, 50, 3.0, 0.3, 3.0, 0.1);
+                Box box = player.getBoundingBox().expand(5.0, 2.0, 5.0);
+                List<LivingEntity> targets = world.getEntitiesByClass(LivingEntity.class, box, e -> e != player && e.isAlive());
+                for (LivingEntity t : targets) {
+                    t.damage(player.getDamageSources().magic(), 8.0f);
+                    t.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 140, 2));
+                }
+                world.playSound(null, pos.x, pos.y, pos.z, SoundEvents.BLOCK_GLASS_BREAK, SoundCategory.PLAYERS, 1.5f, 1.2f);
+                return true;
+            }
+
+            case "arrow_rain" -> {
                 HitResult ray = player.raycast(30.0, 0, false);
                 Vec3d targetPos = ray.getType() != HitResult.Type.MISS ? ray.getPos() : pos.add(look.multiply(15));
-
-                for (int i = 0; i < 10; i++) {
-                    double offsetX = (world.random.nextDouble() - 0.5) * 6.0;
-                    double offsetZ = (world.random.nextDouble() - 0.5) * 6.0;
-                    ArrowEntity arrow = new ArrowEntity(world, targetPos.x + offsetX, targetPos.y + 12 + (i * 0.5), targetPos.z + offsetZ);
+                for (int i = 0; i < 12; i++) {
+                    double ox = (world.random.nextDouble() - 0.5) * 6.0;
+                    double oz = (world.random.nextDouble() - 0.5) * 6.0;
+                    ArrowEntity arrow = new ArrowEntity(world, targetPos.x + ox, targetPos.y + 12 + (i * 0.4), targetPos.z + oz);
                     arrow.setVelocity(0, -1.8, 0);
                     arrow.setOwner(player);
                     arrow.pickupType = PersistentProjectileEntity.PickupPermission.DISALLOWED;
@@ -133,24 +142,41 @@ public class AscendSkills {
                 return true;
             }
 
-            case "iron_skin" -> {
-                if (!data.consumeStamina(25.0)) return false;
-                data.setSkillCooldown(slotIndex, 240); // 12 sec cooldown
+            case "spirit_wolf" -> {
+                WolfEntity wolf = EntityType.WOLF.create(world);
+                if (wolf != null) {
+                    wolf.refreshPositionAndAngles(pos.x + look.x * 2, pos.y, pos.z + look.z * 2, player.getYaw(), 0);
+                    wolf.setOwner(player);
+                    wolf.setTamed(true);
+                    wolf.setCustomName(Text.literal("§b§lSpirit Wolf"));
+                    wolf.setCustomNameVisible(true);
+                    wolf.addStatusEffect(new StatusEffectInstance(StatusEffects.SPEED, 1200, 1));
+                    wolf.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 1200, 1));
+                    world.spawnEntity(wolf);
+                    world.spawnParticles(ParticleTypes.SOUL_FIRE_FLAME, wolf.getX(), wolf.getY() + 0.5, wolf.getZ(), 20, 0.4, 0.4, 0.4, 0.05);
+                    world.playSound(null, pos.x, pos.y, pos.z, SoundEvents.ENTITY_WOLF_HOWL, SoundCategory.PLAYERS, 1.0f, 1.2f);
+                }
+                return true;
+            }
 
-                player.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 140, 2));
-                player.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 140, 0));
-                world.spawnParticles(ParticleTypes.CRIT, pos.x, pos.y + 1, pos.z, 30, 0.5, 0.8, 0.5, 0.1);
-                world.playSound(null, pos.x, pos.y, pos.z, SoundEvents.BLOCK_ANVIL_USE, SoundCategory.PLAYERS, 0.8f, 1.2f);
+            // --- C Rank Skills ---
+            case "chain_fire" -> {
+                Box box = player.getBoundingBox().offset(look.multiply(5)).expand(8.0, 4.0, 8.0);
+                List<LivingEntity> targets = world.getEntitiesByClass(LivingEntity.class, box, e -> e != player && e.isAlive());
+                int struck = 0;
+                for (LivingEntity t : targets) {
+                    if (struck++ >= 5) break;
+                    t.damage(player.getDamageSources().magic(), 12.0f);
+                    t.setOnFireFor(6);
+                    world.spawnParticles(ParticleTypes.LAVA, t.getX(), t.getY() + 1, t.getZ(), 15, 0.3, 0.3, 0.3, 0.1);
+                }
+                world.playSound(null, pos.x, pos.y, pos.z, SoundEvents.ENTITY_BLAZE_SHOOT, SoundCategory.PLAYERS, 1.2f, 1.2f);
                 return true;
             }
 
             case "lightning_strike" -> {
-                if (!data.consumeMana(35.0)) return false;
-                data.setSkillCooldown(slotIndex, 160); // 8 sec cooldown
-
                 HitResult ray = player.raycast(25.0, 0, false);
                 Vec3d targetPos = ray.getType() != HitResult.Type.MISS ? ray.getPos() : pos.add(look.multiply(10));
-
                 LightningEntity lightning = EntityType.LIGHTNING_BOLT.create(world);
                 if (lightning != null) {
                     lightning.refreshPositionAfterTeleport(targetPos);
@@ -160,51 +186,182 @@ public class AscendSkills {
             }
 
             case "berserk" -> {
-                if (!data.consumeStamina(30.0)) return false;
-                data.setSkillCooldown(slotIndex, 300); // 15 sec cooldown
-
-                player.addStatusEffect(new StatusEffectInstance(StatusEffects.STRENGTH, 200, 1));
-                player.addStatusEffect(new StatusEffectInstance(StatusEffects.SPEED, 200, 1));
-                player.addStatusEffect(new StatusEffectInstance(StatusEffects.HASTE, 200, 1));
-                world.spawnParticles(ParticleTypes.ANGRY_VILLAGER, pos.x, pos.y + 1.2, pos.z, 20, 0.5, 0.5, 0.5, 0.1);
+                player.addStatusEffect(new StatusEffectInstance(StatusEffects.STRENGTH, 300, 2));
+                player.addStatusEffect(new StatusEffectInstance(StatusEffects.SPEED, 300, 1));
+                world.spawnParticles(ParticleTypes.ANGRY_VILLAGER, pos.x, pos.y + 1.2, pos.z, 25, 0.5, 0.5, 0.5, 0.1);
                 world.playSound(null, pos.x, pos.y, pos.z, SoundEvents.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.PLAYERS, 1.0f, 1.4f);
                 return true;
             }
 
-            case "soul_bond" -> {
-                if (!data.consumeMana(25.0)) return false;
-                data.setSkillCooldown(slotIndex, 240); // 12 sec cooldown
+            // --- B Rank Skills ---
+            case "mana_shield" -> {
+                player.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 200, 3));
+                player.addStatusEffect(new StatusEffectInstance(StatusEffects.ABSORPTION, 200, 2));
+                world.spawnParticles(ParticleTypes.END_ROD, pos.x, pos.y + 1, pos.z, 40, 0.8, 1.0, 0.8, 0.05);
+                world.playSound(null, pos.x, pos.y, pos.z, SoundEvents.BLOCK_BEACON_ACTIVATE, SoundCategory.PLAYERS, 1.2f, 1.5f);
+                return true;
+            }
 
-                player.addStatusEffect(new StatusEffectInstance(StatusEffects.ABSORPTION, 300, 2));
-                player.addStatusEffect(new StatusEffectInstance(StatusEffects.REGENERATION, 200, 0));
-                world.spawnParticles(ParticleTypes.WITCH, pos.x, pos.y + 1, pos.z, 30, 0.6, 0.8, 0.6, 0.05);
-                world.playSound(null, pos.x, pos.y, pos.z, SoundEvents.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.PLAYERS, 1.0f, 1.0f);
+            // --- A Rank Skills ---
+            case "undead_army" -> {
+                // Summons 10 armored zombies beside the player for 60s, attacking hostiles only
+                world.spawnParticles(ParticleTypes.SOUL_FIRE_FLAME, pos.x, pos.y + 0.2, pos.z, 80, 4.0, 0.5, 4.0, 0.2);
+                for (int i = 0; i < 10; i++) {
+                    ZombieEntity z = EntityType.ZOMBIE.create(world);
+                    if (z != null) {
+                        double angle = (2 * Math.PI / 10) * i;
+                        double spawnX = pos.x + Math.cos(angle) * 3.5;
+                        double spawnZ = pos.z + Math.sin(angle) * 3.5;
+                        z.refreshPositionAndAngles(spawnX, pos.y, spawnZ, (float) Math.toDegrees(angle), 0);
+                        z.setCustomName(Text.literal("§2§lUndead Soldier"));
+                        z.setCustomNameVisible(true);
+                        z.equipStack(EquipmentSlot.HEAD, new ItemStack(Items.IRON_HELMET));
+                        z.equipStack(EquipmentSlot.MAINHAND, new ItemStack(Items.IRON_SWORD));
+                        z.addStatusEffect(new StatusEffectInstance(StatusEffects.SPEED, 1200, 1));
+                        z.addStatusEffect(new StatusEffectInstance(StatusEffects.STRENGTH, 1200, 1));
+                        world.spawnEntity(z);
+                    }
+                }
+                world.playSound(null, pos.x, pos.y, pos.z, SoundEvents.ENTITY_WITHER_SPAWN, SoundCategory.PLAYERS, 1.5f, 0.7f);
+                player.sendMessage(Text.literal("§2§l[UNDEAD ARMY] §f10 Undead Soldiers arise to fight by your side!"), true);
+                return true;
+            }
+
+            case "meteor_call" -> {
+                HitResult ray = player.raycast(45.0, 0, false);
+                Vec3d targetPos = ray.getType() != HitResult.Type.MISS ? ray.getPos() : pos.add(look.multiply(20));
+                FireballEntity meteor = new FireballEntity(world, player, 0, -2.5, 0, 4);
+                meteor.setPosition(targetPos.x, targetPos.y + 25, targetPos.z);
+                world.spawnEntity(meteor);
+                world.spawnParticles(ParticleTypes.LAVA, targetPos.x, targetPos.y + 1, targetPos.z, 60, 2.5, 1.0, 2.5, 0.2);
+                world.playSound(null, targetPos.x, targetPos.y, targetPos.z, SoundEvents.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 2.0f, 0.6f);
+                return true;
+            }
+
+            // --- S Rank Skills ---
+            case "meteor_storm" -> {
+                HitResult ray = player.raycast(50.0, 0, false);
+                Vec3d targetPos = ray.getType() != HitResult.Type.MISS ? ray.getPos() : pos.add(look.multiply(25));
+                for (int i = 0; i < 6; i++) {
+                    double ox = (world.random.nextDouble() - 0.5) * 14.0;
+                    double oz = (world.random.nextDouble() - 0.5) * 14.0;
+                    FireballEntity meteor = new FireballEntity(world, player, 0, -2.5, 0, 3);
+                    meteor.setPosition(targetPos.x + ox, targetPos.y + 30 + (i * 3), targetPos.z + oz);
+                    world.spawnEntity(meteor);
+                }
+                world.playSound(null, targetPos.x, targetPos.y, targetPos.z, SoundEvents.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.PLAYERS, 2.0f, 0.5f);
+                player.sendMessage(Text.literal("§c§l[METEOR STORM] §fCataclysmic meteors rain upon the battlefield!"), true);
+                return true;
+            }
+
+            case "absolute_guard" -> {
+                data.setInvulnerableTicks(100); // 5 sec invincibility
+                player.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 100, 5));
+                world.spawnParticles(ParticleTypes.TOTEM_OF_UNDYING, pos.x, pos.y + 1, pos.z, 60, 1.0, 1.5, 1.0, 0.2);
+                world.playSound(null, pos.x, pos.y, pos.z, SoundEvents.ITEM_TOTEM_USE, SoundCategory.PLAYERS, 1.5f, 1.0f);
+                return true;
+            }
+
+            // --- SS Rank Skills ---
+            case "judgment_meteor_shower" -> {
+                // SS Skill: For 15s meteors strike all hostiles within 10 blocks. Bosses capped at 5% max HP.
+                // Locks mana for 60s, 30 min cooldown
+                data.setResourceLockedTicks(1200); // 60s lockout
+                data.setSkillCooldown(slotIndex, 36000); // 30 min
+
+                Box area = player.getBoundingBox().expand(10.0, 6.0, 10.0);
+                List<MobEntity> hostiles = world.getEntitiesByClass(MobEntity.class, area, LivingEntity::isAlive);
+
+                for (MobEntity mob : hostiles) {
+                    damageWithBossCap(mob, player, 9999.0f, 0.05f);
+                    world.spawnParticles(ParticleTypes.EXPLOSION_EMITTER, mob.getX(), mob.getY() + 1, mob.getZ(), 1, 0, 0, 0, 0);
+                    world.spawnParticles(ParticleTypes.END_ROD, mob.getX(), mob.getY() + 2, mob.getZ(), 30, 0.5, 1.0, 0.5, 0.1);
+                }
+                world.playSound(null, pos.x, pos.y, pos.z, SoundEvents.UI_TOAST_CHALLENGE_COMPLETE, SoundCategory.PLAYERS, 2.0f, 0.5f);
+                world.playSound(null, pos.x, pos.y, pos.z, SoundEvents.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 2.0f, 0.4f);
+                player.sendMessage(Text.literal("§e§l[SS JUDGMENT METEOR SHOWER] §fDivine retribution descends! Mana locked for 60s."), false);
+                return true;
+            }
+
+            case "sovereigns_domain" -> {
+                data.setResourceLockedTicks(1200); // 60s lockout
+                data.setSkillCooldown(slotIndex, 36000); // 30 min
+
+                world.spawnParticles(ParticleTypes.SQUID_INK, pos.x, pos.y + 0.1, pos.z, 200, 12.0, 0.5, 12.0, 0.1);
+                world.spawnParticles(ParticleTypes.SOUL, pos.x, pos.y + 1, pos.z, 100, 10.0, 1.5, 10.0, 0.1);
+
+                Box domain = player.getBoundingBox().expand(16.0, 8.0, 16.0);
+                List<LivingEntity> enemies = world.getEntitiesByClass(LivingEntity.class, domain, e -> e != player && e.isAlive());
+                for (LivingEntity e : enemies) {
+                    e.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 600, 4)); // 70% slow for 30s
+                    e.addStatusEffect(new StatusEffectInstance(StatusEffects.WEAKNESS, 600, 2));
+                }
+                player.addStatusEffect(new StatusEffectInstance(StatusEffects.STRENGTH, 600, 2)); // +50% stats
+                player.addStatusEffect(new StatusEffectInstance(StatusEffects.SPEED, 600, 1));
+                world.playSound(null, pos.x, pos.y, pos.z, SoundEvents.ENTITY_WITHER_SPAWN, SoundCategory.PLAYERS, 2.0f, 0.5f);
+                player.sendMessage(Text.literal("§e§l[SS SOVEREIGN'S DOMAIN] §5Shadow Monarch authority declared! Enemies crippled. Energy locked 60s."), false);
+                return true;
+            }
+
+            case "heavens_edge" -> {
+                data.setResourceLockedTicks(1200); // 60s lockout
+                data.setSkillCooldown(slotIndex, 36000); // 30 min
+
+                // 20-block cross-screen slash. Kills non-bosses, 10% max HP on bosses
+                Vec3d slashDir = look.multiply(20.0);
+                for (int i = 1; i <= 20; i++) {
+                    Vec3d p = pos.add(look.multiply(i)).add(0, 1, 0);
+                    world.spawnParticles(ParticleTypes.SWEEP_ATTACK, p.x, p.y, p.z, 5, 0.8, 0.8, 0.8, 0.0);
+                    world.spawnParticles(ParticleTypes.ELECTRIC_SPARK, p.x, p.y, p.z, 10, 0.5, 0.5, 0.5, 0.1);
+                }
+
+                Box slashBox = player.getBoundingBox().offset(look.multiply(10.0)).expand(12.0, 4.0, 12.0);
+                List<MobEntity> targets = world.getEntitiesByClass(MobEntity.class, slashBox, LivingEntity::isAlive);
+                for (MobEntity t : targets) {
+                    damageWithBossCap(t, player, 9999.0f, 0.10f);
+                }
+                world.playSound(null, pos.x, pos.y, pos.z, SoundEvents.ENTITY_PLAYER_ATTACK_CRIT, SoundCategory.PLAYERS, 2.0f, 0.5f);
+                world.playSound(null, pos.x, pos.y, pos.z, SoundEvents.ENTITY_LIGHTNING_BOLT_THUNDER, SoundCategory.PLAYERS, 1.5f, 1.2f);
+                player.sendMessage(Text.literal("§e§l[SS HEAVEN'S EDGE] §6Dimensional strike cleaved the battlefield! Stamina locked 60s."), false);
                 return true;
             }
         }
         return false;
     }
 
+    private static void damageWithBossCap(LivingEntity target, ServerPlayerEntity player, float normalDmg, float bossCapPercent) {
+        if (target instanceof net.ascend.mod.entity.boss.AscendBossEntity || target instanceof net.minecraft.entity.boss.WitherEntity || target instanceof net.minecraft.entity.boss.dragon.EnderDragonEntity) {
+            float cap = target.getMaxHealth() * bossCapPercent;
+            target.damage(player.getDamageSources().playerAttack(player), Math.min(normalDmg, cap));
+        } else {
+            target.damage(player.getDamageSources().playerAttack(player), normalDmg);
+        }
+    }
+
     public static boolean executeSignatureMove(ServerPlayerEntity player, PlayerData data) {
         if (data.getSignatureCooldownTicks() > 0) return false;
+        if (data.isResourceLocked()) {
+            player.sendMessage(Text.literal("§cYour energy is locked (" + (data.getResourceLockedTicks() / 20) + "s remaining)!"), true);
+            return false;
+        }
+
         ServerWorld world = player.getServerWorld();
         Vec3d look = player.getRotationVector();
         Vec3d pos = player.getPos();
-        String pClass = data.getPlayerClass().toLowerCase();
 
-        switch (pClass) {
+        switch (data.getPlayerClass().toLowerCase()) {
             case "swordsman" -> {
-                // Signature: Triple Slash
+                // Signature: Triple Slash Blast
                 if (!data.consumeStamina(40.0)) return false;
-                data.setSignatureCooldownTicks(300); // 15 sec
+                data.setSignatureCooldownTicks(240); // 12 sec
 
-                for (int step = 1; step <= 3; step++) {
-                    Vec3d p = pos.add(look.multiply(step * 2)).add(0, 1, 0);
-                    world.spawnParticles(ParticleTypes.SWEEP_ATTACK, p.x, p.y, p.z, 8, 0.6, 0.6, 0.6, 0.0);
-                    world.spawnParticles(ParticleTypes.CRIT, p.x, p.y, p.z, 15, 0.5, 0.5, 0.5, 0.1);
+                for (int i = 1; i <= 3; i++) {
+                    Vec3d p = pos.add(look.multiply(i * 1.5)).add(0, 1, 0);
+                    world.spawnParticles(ParticleTypes.SWEEP_ATTACK, p.x, p.y, p.z, 5, 0.5, 0.5, 0.5, 0.1);
+                    world.spawnParticles(ParticleTypes.CRIT, p.x, p.y, p.z, 20, 0.5, 0.5, 0.5, 0.2);
                 }
 
-                Box hitBox = player.getBoundingBox().offset(look.multiply(3.0)).expand(3.5, 2.0, 3.5);
+                Box hitBox = player.getBoundingBox().offset(look.multiply(3)).expand(3.0, 2.0, 3.0);
                 List<LivingEntity> targets = world.getEntitiesByClass(LivingEntity.class, hitBox, e -> e != player && e.isAlive());
                 float damage = 16.0f + (data.getStrength() * 1.2f);
                 for (LivingEntity target : targets) {

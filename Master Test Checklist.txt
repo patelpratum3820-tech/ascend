@@ -1,0 +1,25 @@
+Master Test Checklist:
+
+ Open the Creative Inventory 
+→
+→ click the "Ascend RPG" tab.
+ Equip the Dragonite Armor full set 
+→
+→ jump in lava, confirm full fire immunity!
+ Test the Magic Staffs:
+Right-click with the Flame Staff to cast fireballs.
+Right-click with the Storm Staff to summon lightning bolts.
+Right-click with the Void Staff to trigger gravity-pull shockwaves!
+ Test Dungeons:
+Right-click the Dungeon Map item (or type /ascend dungeon) 
+→
+→ generates a ranked 5-room dungeon with a boss arena!
+ Test Quests:
+Type /ascend quest in chat 
+→
+→ see your current guild objective and rewards.
+Type /ascend completequest 
+→
+→ rewards you with Essence, stat points, and dungeon maps.
+ Check your repository at github.com/patelpratum3820-tech/ascend
+ to see all your code cleanly stored!

@@ -1,33 +1,89 @@
 package net.ascend.mod.skills;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import net.ascend.mod.AscendMod;
+
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-public record SkillInfo(String id, String displayName, String tag, String description) {
+public record SkillInfo(
+        String id,
+        String displayName,
+        SkillRank rank,
+        String tag,
+        String description,
+        String costType,
+        double costAmount,
+        boolean isPercent,
+        int cooldownSec,
+        String unlockRequirement
+) {
     public static final List<SkillInfo> ALL_SKILLS = new ArrayList<>();
 
-    public static final SkillInfo SHADOW_STEP = register("shadow_step", "Shadow Step", "mobility", "Quick dash with brief invincibility and afterimage.");
-    public static final SkillInfo FLAME_SLASH = register("flame_slash", "Flame Slash", "melee", "Unleash a fiery slash wave in front of you.");
-    public static final SkillInfo HEALING_AURA = register("healing_aura", "Healing Aura", "support", "Radiate a soothing aura that regenerates health.");
-    public static final SkillInfo SUMMON_SHADOW_SOLDIER = register("summon_soldier", "Summon Shadow Soldier", "summon", "Rise! Summons loyal shadow minions to fight beside you.");
-    public static final SkillInfo MANA_BOLT = register("mana_bolt", "Mana Bolt", "magic", "Fires a fast concentrated bolt of magical energy.");
-    public static final SkillInfo ARROW_RAIN = register("arrow_rain", "Arrow Rain", "ranged", "Call down a devastating rain of arrows upon the target area.");
-    public static final SkillInfo IRON_SKIN = register("iron_skin", "Iron Skin", "defense", "Hardens your body, granting massive damage reduction for a short time.");
-    public static final SkillInfo LIGHTNING_STRIKE = register("lightning_strike", "Lightning Strike", "magic", "Calls lightning from above that shocks and chains nearby foes.");
-    public static final SkillInfo BERSERK = register("berserk", "Berserk", "melee", "Surges with feral rage, boosting strength and speed while lowering defense.");
-    public static final SkillInfo SOUL_BOND = register("soul_bond", "Soul Bond", "summon", "Forge an unyielding bond sharing damage and empowering minions.");
+    // Static fallback initialization (will be enriched/replaced by JSON loader)
+    static {
+        loadSkillsFromJson();
+    }
 
-    private static SkillInfo register(String id, String displayName, String tag, String description) {
-        SkillInfo info = new SkillInfo(id, displayName, tag, description);
-        ALL_SKILLS.add(info);
-        return info;
+    public static synchronized void loadSkillsFromJson() {
+        ALL_SKILLS.clear();
+        try {
+            InputStream is = SkillInfo.class.getResourceAsStream("/data/ascend/skills/skill_ranks.json");
+            if (is != null) {
+                try (InputStreamReader reader = new InputStreamReader(is, StandardCharsets.UTF_8)) {
+                    JsonArray arr = JsonParser.parseReader(reader).getAsJsonArray();
+                    for (JsonElement el : arr) {
+                        JsonObject obj = el.getAsJsonObject();
+                        String id = obj.get("id").getAsString();
+                        String name = obj.get("name").getAsString();
+                        SkillRank rank = SkillRank.fromString(obj.get("rank").getAsString());
+                        String tag = obj.get("tag").getAsString();
+                        String effect = obj.get("effect").getAsString();
+                        String costType = obj.get("cost_type").getAsString();
+                        double costAmount = obj.get("cost_amount").getAsDouble();
+                        boolean isPercent = obj.get("is_percent").getAsBoolean();
+                        int cooldownSec = obj.get("cooldown_sec").getAsInt();
+                        String unlock = obj.get("unlock").getAsString();
+
+                        ALL_SKILLS.add(new SkillInfo(id, name, rank, tag, effect, costType, costAmount, isPercent, cooldownSec, unlock));
+                    }
+                }
+            }
+        } catch (Exception e) {
+            AscendMod.LOGGER.error("[Ascend] Error loading skill_ranks.json, falling back to defaults", e);
+        }
+
+        if (ALL_SKILLS.isEmpty()) {
+            // Minimal safety fallback
+            ALL_SKILLS.add(new SkillInfo("shadow_step", "Shadow Step", SkillRank.E, "mobility", "Quick dash with i-frames", "STAMINA", 20.0, true, 3, "Starter"));
+            ALL_SKILLS.add(new SkillInfo("flame_slash", "Flame Slash", SkillRank.E, "melee", "Fire wave", "MANA", 10.0, false, 5, "Starter"));
+            ALL_SKILLS.add(new SkillInfo("mana_bolt", "Mana Bolt", SkillRank.E, "magic", "Magic bolt", "MANA", 8.0, false, 2, "Starter"));
+        }
+
+        AscendMod.LOGGER.info("[Ascend] Registered " + ALL_SKILLS.size() + " skills across ranks E to SS.");
     }
 
     public static SkillInfo getById(String id) {
+        if (id == null) return ALL_SKILLS.get(0);
         for (SkillInfo skill : ALL_SKILLS) {
             if (skill.id().equalsIgnoreCase(id)) return skill;
         }
-        return SHADOW_STEP;
+        return ALL_SKILLS.get(0);
+    }
+
+    public static List<SkillInfo> getSkillsByRank(SkillRank rank) {
+        List<SkillInfo> list = new ArrayList<>();
+        for (SkillInfo s : ALL_SKILLS) {
+            if (s.rank() == rank) list.add(s);
+        }
+        return list;
     }
 
     public static List<SkillInfo> getSkillsForClass(String className) {
@@ -49,8 +105,8 @@ public record SkillInfo(String id, String displayName, String tag, String descri
             case "mage" -> List.of("magic", "support", "mobility");
             case "archer" -> List.of("ranged", "mobility", "support");
             case "tank" -> List.of("defense", "melee", "support");
-            default -> List.of("melee", "mobility", "defense", "summon", "magic", "ranged", "support");
+            case "craftsman" -> List.of("craft", "defense", "summon");
+            default -> List.of("melee", "mobility", "defense", "summon", "magic", "ranged", "support", "craft", "transform");
         };
     }
 }
-

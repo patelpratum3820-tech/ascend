@@ -119,6 +119,15 @@ public class AscendHudRenderer implements HudRenderCallback {
         int keyColor = isSignature ? 0xFFFFD700 : 0xFFFFFFFF;
         context.drawText(tr, Text.literal(hotkey), x + 3, y + 2, keyColor, true);
 
+        // Rank badge (top-right)
+        if (iconId != null && !iconId.isEmpty() && !isSignature) {
+            net.ascend.mod.skills.SkillInfo sk = net.ascend.mod.skills.SkillInfo.getById(iconId);
+            String rStr = sk.rank().getLabel();
+            int rCol = sk.rank().getHexColor();
+            int rw = tr.getWidth(rStr);
+            context.drawText(tr, Text.literal(sk.rank().getColorCode() + rStr), x + size - rw - 3, y + 2, rCol, true);
+        }
+
         // Cooldown overlay
         if (cdTicks > 0) {
             context.fill(x + 1, y + 1, x + size - 1, y + size - 1, 0xCC000000);

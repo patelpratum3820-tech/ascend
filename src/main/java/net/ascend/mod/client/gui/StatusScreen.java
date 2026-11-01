@@ -125,6 +125,19 @@ public class StatusScreen extends Screen {
             drawStatRow(context, "Vitality", data.getVitality(), "§a", statsStartY + (rowHeight * 2), left, data);
             drawStatRow(context, "Mana", data.getMana(), "§9", statsStartY + (rowHeight * 3), left, data);
             drawStatRow(context, "Defense", data.getDefense(), "§e", statsStartY + (rowHeight * 4), left, data);
+
+            // Equipped Skills Section with Rank Badges
+            int skillY = statsStartY + (rowHeight * 5) + 6;
+            context.fill(left + 12, skillY - 4, left + CARD_WIDTH - 12, skillY - 3, 0x4400D2FF);
+            context.drawText(textRenderer, Text.literal("§6✦ EQUIPPED SKILLS (" + data.getSelectedSkills().size() + "/" + data.getMaxUnlockedSkillSlots() + ")"), left + 18, skillY, 0xFFFFFFFF, false);
+
+            int skCol = 0;
+            for (String sId : data.getSelectedSkills()) {
+                net.ascend.mod.skills.SkillInfo sk = net.ascend.mod.skills.SkillInfo.getById(sId);
+                String tag = "[" + sk.rank().getFormatted() + "§r] §f" + sk.displayName();
+                context.drawText(textRenderer, Text.literal(tag), left + 18, skillY + 12 + (skCol * 10), 0xFFFFFFFF, false);
+                skCol++;
+            }
         }
 
         super.render(context, mouseX, mouseY, delta);
@@ -140,9 +153,10 @@ public class StatusScreen extends Screen {
     }
 
     private String getRankColor(String rank) {
-        return switch (rank) {
-            case "S" -> "§6§l";
-            case "A" -> "§c§l";
+        return switch (rank.toUpperCase()) {
+            case "SS" -> "§e§l";
+            case "S" -> "§c§l";
+            case "A" -> "§6§l";
             case "B" -> "§5§l";
             case "C" -> "§9§l";
             case "D" -> "§a§l";

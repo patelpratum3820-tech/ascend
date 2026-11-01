@@ -124,5 +124,13 @@
   "item.ascend.skeleton_knight_spawn_egg": "Skeleton Knight Spawn Egg",
   "item.ascend.dark_mage_spawn_egg": "Dark Mage Spawn Egg",
   "item.ascend.fire_drake_spawn_egg": "Fire Drake Spawn Egg",
-  "item.ascend.dungeon_golem_spawn_egg": "Dungeon Golem Spawn Egg"
+  "item.ascend.dungeon_golem_spawn_egg": "Dungeon Golem Spawn Egg",
+
+  "item.ascend.skill_scroll_e": "Skill Scroll (Rank E)",
+  "item.ascend.skill_scroll_d": "Skill Scroll (Rank D)",
+  "item.ascend.skill_scroll_c": "Skill Scroll (Rank C)",
+  "item.ascend.skill_tome_b": "Skill Grimoire (Rank B)",
+  "item.ascend.skill_tome_a": "Ancient Tome (Rank A)",
+  "item.ascend.skill_tome_s": "Relic Grimoire (Rank S)",
+  "item.ascend.skill_tome_ss": "Forbidden Tome (Rank SS)"
 }

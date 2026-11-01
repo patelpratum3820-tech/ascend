@@ -11,7 +11,10 @@ import net.minecraft.nbt.NbtString;
 import net.minecraft.network.PacketByteBuf;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 public class PlayerData {
@@ -46,6 +49,8 @@ public class PlayerData {
 
     private boolean initialized = false;
     private final List<String> selectedSkills = new ArrayList<>();
+    private final Set<String> unlockedSkills = new HashSet<>();
+    private int resourceLockedTicks = 0; // Lockout for SS-tier skills (60s)
 
     public PlayerData() {
         resetToDefaults();
@@ -140,24 +145,44 @@ public class PlayerData {
     public int getMaxUnlockedSkillSlots() {
         String r = getRank();
         return switch (r) {
-            case "S", "A" -> 4;
-            case "B", "C" -> 3;
-            case "D" -> 2;
-            default -> 1; // Rank E starts with 1 skill slot!
+            case "S" -> 5; // +1 at S
+            case "A", "B" -> 4; // +1 at A
+            case "C" -> 3; // +1 at C
+            default -> 2; // Skill slots: start 2
         };
+    }
+
+    public boolean canEquipSkill(String skillId) {
+        net.ascend.mod.skills.SkillInfo info = net.ascend.mod.skills.SkillInfo.getById(skillId);
+        if (info.rank() == net.ascend.mod.skills.SkillRank.S) {
+            long countS = selectedSkills.stream().map(net.ascend.mod.skills.SkillInfo::getById)
+                    .filter(s -> s.rank() == net.ascend.mod.skills.SkillRank.S).count();
+            if (countS >= 1 && !selectedSkills.contains(skillId)) return false;
+        }
+        if (info.rank() == net.ascend.mod.skills.SkillRank.SS) {
+            long countSS = selectedSkills.stream().map(net.ascend.mod.skills.SkillInfo::getById)
+                    .filter(s -> s.rank() == net.ascend.mod.skills.SkillRank.SS).count();
+            if (countSS >= 1 && !selectedSkills.contains(skillId)) return false;
+        }
+        return true;
     }
 
     public void tickResources() {
         AscendConfig cfg = AscendConfig.INSTANCE;
 
-        // Mana regen
-        if (currentMana < mana) {
-            currentMana = Math.min(mana, currentMana + (cfg.manaRegenPerSecond / 20.0));
-        }
+        // Resource lockout (e.g. SS skill aftermath: 60 seconds)
+        if (resourceLockedTicks > 0) {
+            resourceLockedTicks--;
+        } else {
+            // Mana regen
+            if (currentMana < mana) {
+                currentMana = Math.min(mana, currentMana + (cfg.manaRegenPerSecond / 20.0));
+            }
 
-        // Stamina regen
-        if (currentStamina < cfg.maxStamina) {
-            currentStamina = Math.min(cfg.maxStamina, currentStamina + (cfg.staminaRegenPerSecond / 20.0));
+            // Stamina regen
+            if (currentStamina < cfg.maxStamina) {
+                currentStamina = Math.min(cfg.maxStamina, currentStamina + (cfg.staminaRegenPerSecond / 20.0));
+            }
         }
 
         // Cooldowns
@@ -339,6 +364,13 @@ public class PlayerData {
             skillsList.add(NbtString.of(skill));
         }
         nbt.put("SelectedSkills", skillsList);
+
+        NbtList unlockedList = new NbtList();
+        for (String skill : unlockedSkills) {
+            unlockedList.add(NbtString.of(skill));
+        }
+        nbt.put("UnlockedSkills", unlockedList);
+        nbt.putInt("ResourceLockedTicks", resourceLockedTicks);
     }
 
     public void readFromNbt(NbtCompound nbt) {
@@ -364,6 +396,15 @@ public class PlayerData {
                 selectedSkills.add(skillsList.getString(i));
             }
         }
+
+        unlockedSkills.clear();
+        if (nbt.contains("UnlockedSkills", 9)) {
+            NbtList unlockedList = nbt.getList("UnlockedSkills", 8);
+            for (int i = 0; i < unlockedList.size(); i++) {
+                unlockedSkills.add(unlockedList.getString(i));
+            }
+        }
+        if (nbt.contains("ResourceLockedTicks")) resourceLockedTicks = nbt.getInt("ResourceLockedTicks");
     }
 
     public void writeToBuffer(PacketByteBuf buf) {
@@ -391,6 +432,11 @@ public class PlayerData {
         for (String s : selectedSkills) {
             buf.writeString(s);
         }
+        buf.writeInt(unlockedSkills.size());
+        for (String u : unlockedSkills) {
+            buf.writeString(u);
+        }
+        buf.writeInt(resourceLockedTicks);
     }
 
     public void readFromBuffer(PacketByteBuf buf) {
@@ -420,7 +466,30 @@ public class PlayerData {
         for (int i = 0; i < skillCount; i++) {
             selectedSkills.add(buf.readString());
         }
+
+        unlockedSkills.clear();
+        int unlockedCount = buf.readInt();
+        for (int i = 0; i < unlockedCount; i++) {
+            unlockedSkills.add(buf.readString());
+        }
+        resourceLockedTicks = buf.readInt();
     }
+
+    public boolean hasUnlockedSkill(String id) {
+        return unlockedSkills.contains(id.toLowerCase());
+    }
+
+    public void unlockSkill(String id) {
+        unlockedSkills.add(id.toLowerCase());
+    }
+
+    public Set<String> getUnlockedSkills() {
+        return Collections.unmodifiableSet(unlockedSkills);
+    }
+
+    public int getResourceLockedTicks() { return resourceLockedTicks; }
+    public void setResourceLockedTicks(int ticks) { this.resourceLockedTicks = ticks; }
+    public boolean isResourceLocked() { return resourceLockedTicks > 0; }
 
     // Getters and setters
     public String getRace() { return race; }
