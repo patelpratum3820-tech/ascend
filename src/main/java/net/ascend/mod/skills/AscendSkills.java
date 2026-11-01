@@ -1,15 +1,18 @@
 package net.ascend.mod.skills;
 
 import net.ascend.mod.data.PlayerData;
+import net.minecraft.block.Blocks;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LightningEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.entity.mob.BlazeEntity;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.mob.WitherSkeletonEntity;
 import net.minecraft.entity.mob.ZombieEntity;
+import net.minecraft.entity.passive.IronGolemEntity;
 import net.minecraft.entity.passive.WolfEntity;
 import net.minecraft.entity.projectile.ArrowEntity;
 import net.minecraft.entity.projectile.FireballEntity;
@@ -65,13 +68,28 @@ public class AscendSkills {
         data.setSkillCooldown(slotIndex, cooldownTicks);
 
         switch (skillId.toLowerCase()) {
-            // --- E Rank Skills ---
+            // ==================== E RANK SKILLS ====================
             case "shadow_step", "basic_step", "dash" -> {
                 data.setInvulnerableTicks(10);
                 player.setVelocity(look.x * 1.8, 0.2, look.z * 1.8);
                 player.velocityModified = true;
                 world.spawnParticles(ParticleTypes.PORTAL, pos.x, pos.y + 1, pos.z, 30, 0.5, 0.5, 0.5, 0.2);
                 world.playSound(null, pos.x, pos.y, pos.z, SoundEvents.ENTITY_ENDERMAN_TELEPORT, SoundCategory.PLAYERS, 1.0f, 1.2f);
+                return true;
+            }
+
+            case "flash_step" -> {
+                data.setInvulnerableTicks(15);
+                Vec3d targetPos = pos.add(look.multiply(6.0));
+                HitResult hit = player.raycast(6.0, 0, false);
+                if (hit.getType() != HitResult.Type.MISS) {
+                    targetPos = hit.getPos().subtract(look.multiply(0.5));
+                }
+                player.teleport(world, targetPos.x, targetPos.y, targetPos.z, player.getYaw(), player.getPitch());
+                world.spawnParticles(ParticleTypes.SONIC_BOOM, pos.x, pos.y + 1, pos.z, 1, 0, 0, 0, 0);
+                world.spawnParticles(ParticleTypes.ELECTRIC_SPARK, targetPos.x, targetPos.y + 1, targetPos.z, 30, 0.5, 0.8, 0.5, 0.1);
+                world.playSound(null, pos.x, pos.y, pos.z, SoundEvents.ENTITY_WARDEN_SONIC_BOOM, SoundCategory.PLAYERS, 0.8f, 1.6f);
+                world.playSound(null, targetPos.x, targetPos.y, targetPos.z, SoundEvents.ENTITY_ENDERMAN_TELEPORT, SoundCategory.PLAYERS, 1.2f, 1.5f);
                 return true;
             }
 
@@ -100,7 +118,48 @@ public class AscendSkills {
                 return true;
             }
 
-            // --- D Rank Skills ---
+            case "block" -> {
+                player.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 40, 3));
+                world.spawnParticles(ParticleTypes.CRIT, pos.x + look.x, pos.y + 1, pos.z + look.z, 15, 0.3, 0.3, 0.3, 0.1);
+                world.playSound(null, pos.x, pos.y, pos.z, SoundEvents.ITEM_SHIELD_BLOCK, SoundCategory.PLAYERS, 1.5f, 1.0f);
+                return true;
+            }
+
+            case "power_strike" -> {
+                Box hitBox = player.getBoundingBox().offset(look.multiply(2.0)).expand(2.0, 1.5, 2.0);
+                List<LivingEntity> targets = world.getEntitiesByClass(LivingEntity.class, hitBox, e -> e != player && e.isAlive());
+                float damage = 14.0f + (data.getStrength() * 1.5f);
+                for (LivingEntity t : targets) {
+                    t.damage(player.getDamageSources().playerAttack(player), damage);
+                    t.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 30, 4));
+                    world.spawnParticles(ParticleTypes.CRIT, t.getX(), t.getY() + 1, t.getZ(), 25, 0.4, 0.4, 0.4, 0.2);
+                }
+                world.playSound(null, pos.x, pos.y, pos.z, SoundEvents.ENTITY_PLAYER_ATTACK_CRIT, SoundCategory.PLAYERS, 1.5f, 0.8f);
+                return true;
+            }
+
+            case "enchant" -> {
+                player.addStatusEffect(new StatusEffectInstance(StatusEffects.STRENGTH, 1200, 0));
+                player.addStatusEffect(new StatusEffectInstance(StatusEffects.HASTE, 1200, 0));
+                world.spawnParticles(ParticleTypes.ENCHANT, pos.x, pos.y + 1, pos.z, 40, 0.6, 0.8, 0.6, 0.2);
+                world.playSound(null, pos.x, pos.y, pos.z, SoundEvents.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.PLAYERS, 1.2f, 1.2f);
+                player.sendMessage(Text.literal("§b✦ Weapons & tools enchanted with +Strength & +Haste for 60s!"), true);
+                return true;
+            }
+
+            case "reinforce" -> {
+                ItemStack main = player.getMainHandStack();
+                if (main != null && main.isDamageable()) {
+                    main.setDamage(Math.max(0, main.getDamage() - 250));
+                }
+                player.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 600, 1));
+                world.spawnParticles(ParticleTypes.ELECTRIC_SPARK, pos.x, pos.y + 1, pos.z, 20, 0.5, 0.5, 0.5, 0.1);
+                world.playSound(null, pos.x, pos.y, pos.z, SoundEvents.BLOCK_ANVIL_USE, SoundCategory.PLAYERS, 1.0f, 1.4f);
+                player.sendMessage(Text.literal("§a✦ Gear reinforced and durability restored!"), true);
+                return true;
+            }
+
+            // ==================== D RANK SKILLS ====================
             case "whirlwind" -> {
                 world.spawnParticles(ParticleTypes.SWEEP_ATTACK, pos.x, pos.y + 1, pos.z, 20, 1.5, 0.2, 1.5, 0.0);
                 Box box = player.getBoundingBox().expand(4.0, 1.5, 4.0);
@@ -142,6 +201,14 @@ public class AscendSkills {
                 return true;
             }
 
+            case "stone_skin" -> {
+                player.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 300, 1));
+                player.addStatusEffect(new StatusEffectInstance(StatusEffects.ABSORPTION, 300, 1));
+                world.spawnParticles(ParticleTypes.ASH, pos.x, pos.y + 1, pos.z, 40, 0.5, 0.8, 0.5, 0.1);
+                world.playSound(null, pos.x, pos.y, pos.z, SoundEvents.BLOCK_STONE_PLACE, SoundCategory.PLAYERS, 1.5f, 0.7f);
+                return true;
+            }
+
             case "spirit_wolf" -> {
                 WolfEntity wolf = EntityType.WOLF.create(world);
                 if (wolf != null) {
@@ -159,7 +226,19 @@ public class AscendSkills {
                 return true;
             }
 
-            // --- C Rank Skills ---
+            case "grapple_shot" -> {
+                HitResult ray = player.raycast(20.0, 0, false);
+                Vec3d target = ray.getType() != HitResult.Type.MISS ? ray.getPos() : pos.add(look.multiply(12.0));
+                Vec3d pull = target.subtract(pos).normalize().multiply(1.8);
+                player.setVelocity(pull.x, Math.max(0.4, pull.y + 0.2), pull.z);
+                player.velocityModified = true;
+                data.setInvulnerableTicks(15);
+                world.spawnParticles(ParticleTypes.FISHING, pos.x, pos.y + 1, pos.z, 20, 0.3, 0.3, 0.3, 0.1);
+                world.playSound(null, pos.x, pos.y, pos.z, SoundEvents.ENTITY_FISHING_BOBBER_RETRIEVE, SoundCategory.PLAYERS, 1.5f, 1.2f);
+                return true;
+            }
+
+            // ==================== C RANK SKILLS ====================
             case "chain_fire" -> {
                 Box box = player.getBoundingBox().offset(look.multiply(5)).expand(8.0, 4.0, 8.0);
                 List<LivingEntity> targets = world.getEntitiesByClass(LivingEntity.class, box, e -> e != player && e.isAlive());
@@ -193,7 +272,73 @@ public class AscendSkills {
                 return true;
             }
 
-            // --- B Rank Skills ---
+            case "reflect" -> {
+                player.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 100, 2));
+                Box box = player.getBoundingBox().expand(3.0);
+                for (LivingEntity t : world.getEntitiesByClass(LivingEntity.class, box, e -> e != player && e.isAlive())) {
+                    t.damage(player.getDamageSources().thorns(player), 10.0f);
+                }
+                world.spawnParticles(ParticleTypes.ENCHANTED_HIT, pos.x, pos.y + 1, pos.z, 30, 0.5, 0.5, 0.5, 0.2);
+                world.playSound(null, pos.x, pos.y, pos.z, SoundEvents.ITEM_SHIELD_BLOCK, SoundCategory.PLAYERS, 1.5f, 1.5f);
+                return true;
+            }
+
+            case "explosive_arrow" -> {
+                SmallFireballEntity fb = new SmallFireballEntity(world, player, look.x * 2.5, look.y * 2.5, look.z * 2.5);
+                fb.setPosition(pos.x, player.getEyeY() - 0.1, pos.z);
+                world.spawnEntity(fb);
+                world.spawnParticles(ParticleTypes.FLAME, pos.x + look.x, player.getEyeY(), pos.z + look.z, 20, 0.2, 0.2, 0.2, 0.1);
+                world.playSound(null, pos.x, pos.y, pos.z, SoundEvents.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 1.2f, 1.4f);
+                return true;
+            }
+
+            case "blood_rush" -> {
+                player.addStatusEffect(new StatusEffectInstance(StatusEffects.REGENERATION, 200, 1));
+                player.addStatusEffect(new StatusEffectInstance(StatusEffects.STRENGTH, 200, 0));
+                world.spawnParticles(ParticleTypes.DAMAGE_INDICATOR, pos.x, pos.y + 1, pos.z, 25, 0.4, 0.4, 0.4, 0.1);
+                world.playSound(null, pos.x, pos.y, pos.z, SoundEvents.ENTITY_PLAYER_BREATH, SoundCategory.PLAYERS, 1.5f, 0.8f);
+                return true;
+            }
+
+            case "summon_shadow_soldier" -> {
+                world.spawnParticles(ParticleTypes.SOUL, pos.x, pos.y + 0.2, pos.z, 40, 2.0, 0.2, 2.0, 0.2);
+                for (int i = 0; i < 2; i++) {
+                    WitherSkeletonEntity m = EntityType.WITHER_SKELETON.create(world);
+                    if (m != null) {
+                        m.refreshPositionAndAngles(pos.x + (i == 0 ? -1.5 : 1.5), pos.y, pos.z + 1.0, player.getYaw(), 0);
+                        m.setCustomName(Text.literal("§5§lShadow Soldier"));
+                        m.setCustomNameVisible(true);
+                        m.addStatusEffect(new StatusEffectInstance(StatusEffects.SPEED, 1200, 1));
+                        world.spawnEntity(m);
+                    }
+                }
+                world.playSound(null, pos.x, pos.y, pos.z, SoundEvents.ENTITY_WITHER_SPAWN, SoundCategory.PLAYERS, 1.0f, 1.4f);
+                return true;
+            }
+
+            case "haste_aura" -> {
+                player.addStatusEffect(new StatusEffectInstance(StatusEffects.SPEED, 600, 1));
+                player.addStatusEffect(new StatusEffectInstance(StatusEffects.HASTE, 600, 1));
+                Box box = player.getBoundingBox().expand(10.0);
+                for (ServerPlayerEntity ally : world.getEntitiesByClass(ServerPlayerEntity.class, box, p -> p != player)) {
+                    ally.addStatusEffect(new StatusEffectInstance(StatusEffects.SPEED, 600, 1));
+                    ally.addStatusEffect(new StatusEffectInstance(StatusEffects.HASTE, 600, 1));
+                }
+                world.spawnParticles(ParticleTypes.ELECTRIC_SPARK, pos.x, pos.y + 1, pos.z, 40, 1.0, 0.5, 1.0, 0.1);
+                world.playSound(null, pos.x, pos.y, pos.z, SoundEvents.BLOCK_BEACON_POWER_SELECT, SoundCategory.PLAYERS, 1.5f, 1.5f);
+                return true;
+            }
+
+            case "rune_carve" -> {
+                player.addStatusEffect(new StatusEffectInstance(StatusEffects.ABSORPTION, 1200, 1));
+                player.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 1200, 0));
+                world.spawnParticles(ParticleTypes.ENCHANT, pos.x, pos.y + 1, pos.z, 50, 0.8, 1.0, 0.8, 0.3);
+                world.playSound(null, pos.x, pos.y, pos.z, SoundEvents.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.PLAYERS, 1.5f, 0.9f);
+                player.sendMessage(Text.literal("§5✦ Ancient runes carved into equipment! +Absorption & +Resistance!"), true);
+                return true;
+            }
+
+            // ==================== B RANK SKILLS ====================
             case "mana_shield" -> {
                 player.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 200, 3));
                 player.addStatusEffect(new StatusEffectInstance(StatusEffects.ABSORPTION, 200, 2));
@@ -202,9 +347,91 @@ public class AscendSkills {
                 return true;
             }
 
-            // --- A Rank Skills ---
+            case "triple_slash" -> {
+                for (int i = 1; i <= 3; i++) {
+                    Vec3d p = pos.add(look.multiply(i * 1.5)).add(0, 1, 0);
+                    world.spawnParticles(ParticleTypes.SWEEP_ATTACK, p.x, p.y, p.z, 4, 0.5, 0.5, 0.5, 0.05);
+                }
+                Box hitBox = player.getBoundingBox().offset(look.multiply(3)).expand(3.0, 2.0, 3.0);
+                List<LivingEntity> targets = world.getEntitiesByClass(LivingEntity.class, hitBox, e -> e != player && e.isAlive());
+                float dmg = 14.0f + (data.getStrength() * 1.0f);
+                for (LivingEntity t : targets) {
+                    t.damage(player.getDamageSources().playerAttack(player), dmg);
+                    t.setVelocity(look.x * 1.2, 0.3, look.z * 1.2);
+                }
+                world.playSound(null, pos.x, pos.y, pos.z, SoundEvents.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.PLAYERS, 1.5f, 0.9f);
+                return true;
+            }
+
+            case "piercing_volley" -> {
+                for (int i = -2; i <= 2; i++) {
+                    ArrowEntity arrow = new ArrowEntity(world, player);
+                    arrow.setPosition(pos.x, player.getEyeY() - 0.1, pos.z);
+                    Vec3d spreadLook = look.rotateY((float) Math.toRadians(i * 6));
+                    arrow.setVelocity(spreadLook.x, spreadLook.y, spreadLook.z, 3.2f, 1.0f);
+                    arrow.setDamage(7.0 + (data.getStrength() * 0.5));
+                    arrow.pickupType = PersistentProjectileEntity.PickupPermission.DISALLOWED;
+                    world.spawnEntity(arrow);
+                }
+                world.playSound(null, pos.x, pos.y, pos.z, SoundEvents.ENTITY_ARROW_SHOOT, SoundCategory.PLAYERS, 1.8f, 0.6f);
+                return true;
+            }
+
+            case "guardian_slam" -> {
+                world.spawnParticles(ParticleTypes.CAMPFIRE_COSY_SMOKE, pos.x, pos.y + 0.2, pos.z, 35, 3.0, 0.2, 3.0, 0.1);
+                Box box = player.getBoundingBox().expand(5.0, 2.5, 5.0);
+                List<LivingEntity> targets = world.getEntitiesByClass(LivingEntity.class, box, e -> e != player && e.isAlive());
+                float slamDmg = 10.0f + (data.getVitality() * 0.4f);
+                for (LivingEntity t : targets) {
+                    t.damage(player.getDamageSources().playerAttack(player), slamDmg);
+                    t.setVelocity(0, 0.8, 0);
+                    t.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 80, 2));
+                }
+                world.playSound(null, pos.x, pos.y, pos.z, SoundEvents.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 1.5f, 0.8f);
+                return true;
+            }
+
+            case "summon_construct" -> {
+                IronGolemEntity golem = EntityType.IRON_GOLEM.create(world);
+                if (golem != null) {
+                    golem.refreshPositionAndAngles(pos.x + look.x * 2, pos.y, pos.z + look.z * 2, player.getYaw(), 0);
+                    golem.setCustomName(Text.literal("§6§lForged Construct"));
+                    golem.setCustomNameVisible(true);
+                    golem.addStatusEffect(new StatusEffectInstance(StatusEffects.SPEED, 1600, 1));
+                    golem.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 1600, 1));
+                    world.spawnEntity(golem);
+                    world.spawnParticles(ParticleTypes.FLAME, golem.getX(), golem.getY() + 1.5, golem.getZ(), 30, 0.5, 0.5, 0.5, 0.05);
+                    world.playSound(null, pos.x, pos.y, pos.z, SoundEvents.BLOCK_ANVIL_LAND, SoundCategory.PLAYERS, 1.2f, 0.8f);
+                }
+                return true;
+            }
+
+            case "phoenix_familiar" -> {
+                BlazeEntity phoenix = EntityType.BLAZE.create(world);
+                if (phoenix != null) {
+                    phoenix.refreshPositionAndAngles(pos.x + 2, pos.y + 1, pos.z, player.getYaw(), 0);
+                    phoenix.setCustomName(Text.literal("§6§lPhoenix Familiar"));
+                    phoenix.setCustomNameVisible(true);
+                    world.spawnEntity(phoenix);
+                }
+                player.heal(12.0f);
+                player.addStatusEffect(new StatusEffectInstance(StatusEffects.FIRE_RESISTANCE, 1200, 0));
+                world.spawnParticles(ParticleTypes.FLAME, pos.x, pos.y + 1, pos.z, 50, 1.0, 1.0, 1.0, 0.1);
+                world.playSound(null, pos.x, pos.y, pos.z, SoundEvents.ENTITY_BLAZE_SHOOT, SoundCategory.PLAYERS, 1.5f, 1.2f);
+                return true;
+            }
+
+            case "forge_legend" -> {
+                player.addStatusEffect(new StatusEffectInstance(StatusEffects.STRENGTH, 900, 2));
+                player.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 900, 1));
+                world.spawnParticles(ParticleTypes.LAVA, pos.x, pos.y + 1, pos.z, 30, 0.6, 0.6, 0.6, 0.1);
+                world.playSound(null, pos.x, pos.y, pos.z, SoundEvents.BLOCK_ANVIL_USE, SoundCategory.PLAYERS, 1.5f, 0.6f);
+                player.sendMessage(Text.literal("§6✦ Divine Forge Aura ignited! Strength III & Resistance II active!"), true);
+                return true;
+            }
+
+            // ==================== A RANK SKILLS ====================
             case "undead_army" -> {
-                // Summons 10 armored zombies beside the player for 60s, attacking hostiles only
                 world.spawnParticles(ParticleTypes.SOUL_FIRE_FLAME, pos.x, pos.y + 0.2, pos.z, 80, 4.0, 0.5, 4.0, 0.2);
                 for (int i = 0; i < 10; i++) {
                     ZombieEntity z = EntityType.ZOMBIE.create(world);
@@ -238,7 +465,41 @@ public class AscendSkills {
                 return true;
             }
 
-            // --- S Rank Skills ---
+            case "soul_bond" -> {
+                player.heal(player.getMaxHealth() * 0.5f);
+                player.addStatusEffect(new StatusEffectInstance(StatusEffects.REGENERATION, 200, 2));
+                player.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 200, 1));
+                world.spawnParticles(ParticleTypes.HEART, pos.x, pos.y + 1, pos.z, 25, 0.8, 0.8, 0.8, 0.1);
+                world.playSound(null, pos.x, pos.y, pos.z, SoundEvents.ITEM_TOTEM_USE, SoundCategory.PLAYERS, 1.0f, 1.5f);
+                return true;
+            }
+
+            case "revive_token" -> {
+                player.addStatusEffect(new StatusEffectInstance(StatusEffects.ABSORPTION, 600, 4));
+                player.addStatusEffect(new StatusEffectInstance(StatusEffects.REGENERATION, 600, 2));
+                world.spawnParticles(ParticleTypes.TOTEM_OF_UNDYING, pos.x, pos.y + 1, pos.z, 60, 1.0, 1.5, 1.0, 0.2);
+                world.playSound(null, pos.x, pos.y, pos.z, SoundEvents.ITEM_TOTEM_USE, SoundCategory.PLAYERS, 1.5f, 1.0f);
+                player.sendMessage(Text.literal("§e✦ Sacred Revive Token active! High Absorption and Regeneration granted!"), true);
+                return true;
+            }
+
+            case "blade_tempest" -> {
+                for (int i = 0; i < 16; i++) {
+                    double angle = (2 * Math.PI / 16) * i;
+                    double px = pos.x + Math.cos(angle) * 3.0;
+                    double pz = pos.z + Math.sin(angle) * 3.0;
+                    world.spawnParticles(ParticleTypes.SWEEP_ATTACK, px, pos.y + 1, pz, 2, 0.2, 0.2, 0.2, 0.0);
+                }
+                Box stormBox = player.getBoundingBox().expand(5.0, 2.5, 5.0);
+                for (LivingEntity t : world.getEntitiesByClass(LivingEntity.class, stormBox, e -> e != player && e.isAlive())) {
+                    t.damage(player.getDamageSources().playerAttack(player), 22.0f + (data.getStrength() * 1.2f));
+                    t.takeKnockback(1.5, player.getX() - t.getX(), player.getZ() - t.getZ());
+                }
+                world.playSound(null, pos.x, pos.y, pos.z, SoundEvents.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.PLAYERS, 2.0f, 0.6f);
+                return true;
+            }
+
+            // ==================== S RANK SKILLS ====================
             case "meteor_storm" -> {
                 HitResult ray = player.raycast(50.0, 0, false);
                 Vec3d targetPos = ray.getType() != HitResult.Type.MISS ? ray.getPos() : pos.add(look.multiply(25));
@@ -254,20 +515,64 @@ public class AscendSkills {
                 return true;
             }
 
+            case "legion_of_shadows" -> {
+                world.spawnParticles(ParticleTypes.SQUID_INK, pos.x, pos.y + 0.2, pos.z, 100, 6.0, 0.5, 6.0, 0.2);
+                for (int i = 0; i < 15; i++) {
+                    double angle = (2 * Math.PI / 15) * i;
+                    double sx = pos.x + Math.cos(angle) * 5.0;
+                    double sz = pos.z + Math.sin(angle) * 5.0;
+                    WitherSkeletonEntity soldier = EntityType.WITHER_SKELETON.create(world);
+                    if (soldier != null) {
+                        soldier.refreshPositionAndAngles(sx, pos.y, sz, (float) Math.toDegrees(angle), 0);
+                        soldier.setCustomName(Text.literal("§5§lShadow Legion"));
+                        soldier.setCustomNameVisible(true);
+                        soldier.addStatusEffect(new StatusEffectInstance(StatusEffects.SPEED, 1800, 1));
+                        soldier.addStatusEffect(new StatusEffectInstance(StatusEffects.STRENGTH, 1800, 1));
+                        world.spawnEntity(soldier);
+                    }
+                }
+                world.playSound(null, pos.x, pos.y, pos.z, SoundEvents.ENTITY_WITHER_SPAWN, SoundCategory.PLAYERS, 2.0f, 0.7f);
+                player.sendMessage(Text.literal("§5§l[LEGION OF SHADOWS] §f15 Shadow Legionnaires rise to conquer!"), true);
+                return true;
+            }
+
             case "absolute_guard" -> {
-                data.setInvulnerableTicks(100); // 5 sec invincibility
+                data.setInvulnerableTicks(100);
                 player.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 100, 5));
                 world.spawnParticles(ParticleTypes.TOTEM_OF_UNDYING, pos.x, pos.y + 1, pos.z, 60, 1.0, 1.5, 1.0, 0.2);
                 world.playSound(null, pos.x, pos.y, pos.z, SoundEvents.ITEM_TOTEM_USE, SoundCategory.PLAYERS, 1.5f, 1.0f);
                 return true;
             }
 
-            // --- SS Rank Skills ---
+            case "phantom_barrage" -> {
+                Box area = player.getBoundingBox().expand(15.0, 6.0, 15.0);
+                List<LivingEntity> enemies = world.getEntitiesByClass(LivingEntity.class, area, e -> e != player && e.isAlive());
+                float dmg = 25.0f + (data.getStrength() * 1.5f);
+                for (LivingEntity e : enemies) {
+                    e.damage(player.getDamageSources().playerAttack(player), dmg);
+                    world.spawnParticles(ParticleTypes.SWEEP_ATTACK, e.getX(), e.getY() + 1, e.getZ(), 5, 0.3, 0.3, 0.3, 0.0);
+                    world.spawnParticles(ParticleTypes.PORTAL, e.getX(), e.getY() + 1, e.getZ(), 15, 0.3, 0.5, 0.3, 0.1);
+                }
+                world.playSound(null, pos.x, pos.y, pos.z, SoundEvents.ENTITY_PLAYER_ATTACK_CRIT, SoundCategory.PLAYERS, 2.0f, 0.5f);
+                return true;
+            }
+
+            case "dragon_awakening" -> {
+                player.addStatusEffect(new StatusEffectInstance(StatusEffects.STRENGTH, 600, 3));
+                player.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 600, 2));
+                player.addStatusEffect(new StatusEffectInstance(StatusEffects.SPEED, 600, 2));
+                player.addStatusEffect(new StatusEffectInstance(StatusEffects.FIRE_RESISTANCE, 600, 0));
+                player.addStatusEffect(new StatusEffectInstance(StatusEffects.LEVITATION, 40, 1));
+                world.spawnParticles(ParticleTypes.FLAME, pos.x, pos.y + 1, pos.z, 100, 2.0, 2.0, 2.0, 0.2);
+                world.playSound(null, pos.x, pos.y, pos.z, SoundEvents.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.PLAYERS, 2.0f, 0.7f);
+                player.sendMessage(Text.literal("§6§l[DRAGON AWAKENING] §cThe ancient dragon blood surges within you!"), true);
+                return true;
+            }
+
+            // ==================== SS RANK SKILLS ====================
             case "judgment_meteor_shower" -> {
-                // SS Skill: For 15s meteors strike all hostiles within 10 blocks. Bosses capped at 5% max HP.
-                // Locks mana for 60s, 30 min cooldown
-                data.setResourceLockedTicks(1200); // 60s lockout
-                data.setSkillCooldown(slotIndex, 36000); // 30 min
+                data.setResourceLockedTicks(1200);
+                data.setSkillCooldown(slotIndex, 36000);
 
                 Box area = player.getBoundingBox().expand(10.0, 6.0, 10.0);
                 List<MobEntity> hostiles = world.getEntitiesByClass(MobEntity.class, area, LivingEntity::isAlive);
@@ -284,8 +589,8 @@ public class AscendSkills {
             }
 
             case "sovereigns_domain" -> {
-                data.setResourceLockedTicks(1200); // 60s lockout
-                data.setSkillCooldown(slotIndex, 36000); // 30 min
+                data.setResourceLockedTicks(1200);
+                data.setSkillCooldown(slotIndex, 36000);
 
                 world.spawnParticles(ParticleTypes.SQUID_INK, pos.x, pos.y + 0.1, pos.z, 200, 12.0, 0.5, 12.0, 0.1);
                 world.spawnParticles(ParticleTypes.SOUL, pos.x, pos.y + 1, pos.z, 100, 10.0, 1.5, 10.0, 0.1);
@@ -293,10 +598,10 @@ public class AscendSkills {
                 Box domain = player.getBoundingBox().expand(16.0, 8.0, 16.0);
                 List<LivingEntity> enemies = world.getEntitiesByClass(LivingEntity.class, domain, e -> e != player && e.isAlive());
                 for (LivingEntity e : enemies) {
-                    e.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 600, 4)); // 70% slow for 30s
+                    e.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 600, 4));
                     e.addStatusEffect(new StatusEffectInstance(StatusEffects.WEAKNESS, 600, 2));
                 }
-                player.addStatusEffect(new StatusEffectInstance(StatusEffects.STRENGTH, 600, 2)); // +50% stats
+                player.addStatusEffect(new StatusEffectInstance(StatusEffects.STRENGTH, 600, 2));
                 player.addStatusEffect(new StatusEffectInstance(StatusEffects.SPEED, 600, 1));
                 world.playSound(null, pos.x, pos.y, pos.z, SoundEvents.ENTITY_WITHER_SPAWN, SoundCategory.PLAYERS, 2.0f, 0.5f);
                 player.sendMessage(Text.literal("§e§l[SS SOVEREIGN'S DOMAIN] §5Shadow Monarch authority declared! Enemies crippled. Energy locked 60s."), false);
@@ -304,11 +609,9 @@ public class AscendSkills {
             }
 
             case "heavens_edge" -> {
-                data.setResourceLockedTicks(1200); // 60s lockout
-                data.setSkillCooldown(slotIndex, 36000); // 30 min
+                data.setResourceLockedTicks(1200);
+                data.setSkillCooldown(slotIndex, 36000);
 
-                // 20-block cross-screen slash. Kills non-bosses, 10% max HP on bosses
-                Vec3d slashDir = look.multiply(20.0);
                 for (int i = 1; i <= 20; i++) {
                     Vec3d p = pos.add(look.multiply(i)).add(0, 1, 0);
                     world.spawnParticles(ParticleTypes.SWEEP_ATTACK, p.x, p.y, p.z, 5, 0.8, 0.8, 0.8, 0.0);

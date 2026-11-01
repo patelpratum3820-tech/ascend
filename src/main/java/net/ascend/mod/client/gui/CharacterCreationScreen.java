@@ -122,15 +122,20 @@ public class CharacterCreationScreen extends Screen {
         List<SkillInfo> classSkills = SkillInfo.getSkillsForClass(pClass);
         List<SkillInfo> starters = new ArrayList<>();
         for (SkillInfo s : classSkills) {
-            if (s.rank() == SkillRank.E || s.rank() == SkillRank.D) {
+            if (s.rank() == SkillRank.E) {
                 starters.add(s);
             }
         }
-        return starters.isEmpty() ? classSkills : starters;
+        if (starters.isEmpty()) {
+            for (SkillInfo s : SkillInfo.getSkillsByRank(SkillRank.E)) {
+                starters.add(s);
+            }
+        }
+        return starters;
     }
 
     private void initRaceStep(int left, int contentY) {
-        String[] races = {"Human", "Dragonoid", "Slime"};
+        String[] races = {"Human", "Elf", "Beastkin", "Demonkin", "Dragonoid", "Slime"};
         for (int i = 0; i < races.length; i++) {
             String race = races[i];
             boolean isSel = race.equalsIgnoreCase(selectedRace);
@@ -138,7 +143,7 @@ public class CharacterCreationScreen extends Screen {
             ButtonWidget btn = ButtonWidget.builder(label, button -> {
                 selectedRace = race;
                 rebuildStepUI();
-            }).dimensions(left + 24, contentY + (i * 32), 110, 24).build();
+            }).dimensions(left + 24, contentY + (i * 22), 110, 20).build();
             addDrawableChild(btn);
         }
     }
@@ -188,8 +193,8 @@ public class CharacterCreationScreen extends Screen {
 
             int col = (i - startIndex) % 2;
             int row = (i - startIndex) / 2;
-            int btnX = left + 20 + (col * 150);
-            int btnY = contentY + (row * 30);
+            int btnX = left + 18 + (col * 180);
+            int btnY = contentY + (row * 28);
 
             ButtonWidget btn = ButtonWidget.builder(label, button -> {
                 if (selectedSkills.contains(skill.id())) {
@@ -199,25 +204,25 @@ public class CharacterCreationScreen extends Screen {
                     selectedSkills.add(skill.id());
                 }
                 rebuildStepUI();
-            }).dimensions(btnX, btnY, 140, 24).tooltip(net.minecraft.client.gui.tooltip.Tooltip.of(Text.literal("§e[" + skill.tag() + "] §f" + skill.description()))).build();
+            }).dimensions(btnX, btnY, 172, 24).tooltip(net.minecraft.client.gui.tooltip.Tooltip.of(Text.literal("§e[" + skill.tag() + "] §f" + skill.description()))).build();
 
             addDrawableChild(btn);
         }
 
         // Pagination buttons
         if (maxPages > 1) {
-            int pageY = contentY + 104;
+            int pageY = contentY + 90;
             ButtonWidget prevBtn = ButtonWidget.builder(Text.literal("◀ Prev"), b -> {
                 skillsPage--;
                 rebuildStepUI();
-            }).dimensions(left + 80, pageY, 55, 20).build();
+            }).dimensions(left + 100, pageY, 60, 20).build();
             prevBtn.active = skillsPage > 0;
             addDrawableChild(prevBtn);
 
             ButtonWidget nextBtn = ButtonWidget.builder(Text.literal("Next ▶"), b -> {
                 skillsPage++;
                 rebuildStepUI();
-            }).dimensions(left + 205, pageY, 55, 20).build();
+            }).dimensions(left + 230, pageY, 60, 20).build();
             nextBtn.active = skillsPage < maxPages - 1;
             addDrawableChild(nextBtn);
         }
@@ -288,7 +293,7 @@ public class CharacterCreationScreen extends Screen {
         context.drawText(textRenderer, Text.literal("§7Before you take physical form and descend to the mortal lands,"), cx, y + 32, 0xFFAAAAAA, false);
         context.drawText(textRenderer, Text.literal("§7I grant you the sacred gifts of rebirth:"), cx, y + 44, 0xFFAAAAAA, false);
 
-        context.drawText(textRenderer, Text.literal("§b✦ One Species §7— Choose heritage (Human, Dragonoid, Slime)"), cx + 8, y + 62, 0xFFFFFFFF, false);
+        context.drawText(textRenderer, Text.literal("§b✦ One Species §7— Choose heritage (Human, Elf, Beastkin, Demonkin, Dragonoid, Slime)"), cx + 8, y + 62, 0xFFFFFFFF, false);
         context.drawText(textRenderer, Text.literal("§e✦ One Combat Class §7— Dictate your path of power"), cx + 8, y + 76, 0xFFFFFFFF, false);
         context.drawText(textRenderer, Text.literal("§a✦ Two Starting Arts §7— Your initial combat & magical skills"), cx + 8, y + 90, 0xFFFFFFFF, false);
         context.drawText(textRenderer, Text.literal("§6✦ World Fate §7— Set the difficulty of your journey"), cx + 8, y + 104, 0xFFFFFFFF, false);
@@ -298,6 +303,9 @@ public class CharacterCreationScreen extends Screen {
 
     private void renderRaceDesc(DrawContext context, int x, int y) {
         String info = switch (selectedRace.toLowerCase()) {
+            case "elf" -> "§bElf\n§a+40 Max Mana\n§a+10% Movement Speed\n§a1.5x Mana Regen\n\n§c-2 Max Health (Frail)";
+            case "beastkin" -> "§6Beastkin\n§a+3 Strength\n§a+20 Max Stamina\n§aNight Vision\n§a+10% Dash Speed\n\n§c-15 Max Mana";
+            case "demonkin" -> "§4Demonkin\n§a+4 Strength\n§a+20 Max Mana\n§aFire & Lava Immunity\n§a5% Melee Lifesteal\n\n§c+50% Holy Vulnerability";
             case "dragonoid" -> "§6Dragonoid\n§a+3 Strength\n§aFire Immunity\n§aBreath bonus\n\n§c-5% Speed\n§c+50% Cold vulnerability";
             case "slime" -> "§aSlime\n§a0 Fall Damage\n§aPassive Health Regen\n§aBouncy Jump\n\n§c-4 Max Health\n§c-2 Defense";
             default -> "§fHuman\n§a+15% Essence Gain\n§fBalanced base stats\n\n§7No inherent weaknesses.";

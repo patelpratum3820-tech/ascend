@@ -130,6 +130,21 @@ public class AscendConfig {
     // Race Balance Numbers
     public double humanEssenceBonus = 0.15;
 
+    public int elfManaBonus = 40;
+    public double elfSpeedBonus = 0.10;
+    public double elfManaRegenMultiplier = 1.5;
+    public int elfVitalityPenalty = -2;
+
+    public int beastkinStrengthBonus = 3;
+    public double beastkinStaminaBonus = 20.0;
+    public double beastkinSpeedBonus = 0.10;
+    public int beastkinManaPenalty = -15;
+
+    public int demonkinStrengthBonus = 4;
+    public int demonkinManaBonus = 20;
+    public double demonkinLifestealPercent = 0.05;
+    public double demonkinHolyVulnerability = 1.5;
+
     public int dragonoidStrengthBonus = 3;
     public double dragonoidSpeedPenalty = -0.05;
     public double dragonoidColdWaterVulnerability = 1.5;

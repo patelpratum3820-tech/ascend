@@ -7,11 +7,13 @@ import net.ascend.mod.data.PlayerData;
 import net.ascend.mod.skills.AscendSkills;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3d;
 
@@ -25,6 +27,8 @@ public class AscendPackets {
     public static final Identifier COMPLETE_CREATION_ID = new Identifier(AscendMod.MOD_ID, "complete_creation");
     public static final Identifier DASH_ID = new Identifier(AscendMod.MOD_ID, "dash");
     public static final Identifier CAST_SKILL_ID = new Identifier(AscendMod.MOD_ID, "cast_skill");
+    public static final Identifier OPEN_SKILL_UNLOCK_ID = new Identifier(AscendMod.MOD_ID, "open_skill_unlock");
+    public static final Identifier LEARN_SKILL_ID = new Identifier(AscendMod.MOD_ID, "learn_skill");
 
     public static void registerServerReceivers() {
         // 1. Upgrade Stat
@@ -111,6 +115,31 @@ public class AscendPackets {
                 }
             });
         });
+
+        // 5. Learn Skill from Scroll/Tome
+        ServerPlayNetworking.registerGlobalReceiver(LEARN_SKILL_ID, (server, player, handler, buf, responseSender) -> {
+            String skillId = buf.readString();
+            boolean isMainHand = buf.readBoolean();
+
+            server.execute(() -> {
+                ItemStack stack = isMainHand ? player.getMainHandStack() : player.getOffHandStack();
+                if (stack.getItem() instanceof net.ascend.mod.item.SkillScrollItem || stack.getItem() instanceof net.ascend.mod.item.SkillTomeItem) {
+                    PlayerData data = ((IPlayerDataAccessor) player).ascend$getPlayerData();
+                    if (!data.hasUnlockedSkill(skillId)) {
+                        data.unlockSkill(skillId);
+                        stack.decrement(1);
+                        syncPlayerData(player);
+
+                        player.getServerWorld().playSound(null, player.getX(), player.getY(), player.getZ(),
+                                SoundEvents.UI_TOAST_CHALLENGE_COMPLETE, SoundCategory.PLAYERS, 1.5f, 1.0f);
+                        player.getServerWorld().spawnParticles(ParticleTypes.ENCHANTED_HIT, player.getX(), player.getY() + 1, player.getZ(), 40, 0.5, 0.5, 0.5, 0.2);
+
+                        net.ascend.mod.skills.SkillInfo info = net.ascend.mod.skills.SkillInfo.getById(skillId);
+                        player.sendMessage(Text.literal("§6§l[SKILL MASTERED] §fYou engraved §a" + info.displayName() + " §finto your soul!"), false);
+                    }
+                }
+            });
+        });
     }
 
     public static void syncPlayerData(ServerPlayerEntity player) {
@@ -123,5 +152,12 @@ public class AscendPackets {
     public static void sendOpenCreationScreen(ServerPlayerEntity player) {
         PacketByteBuf buf = PacketByteBufs.create();
         ServerPlayNetworking.send(player, OPEN_CREATION_ID, buf);
+    }
+
+    public static void sendOpenSkillUnlock(ServerPlayerEntity player, String rankName, boolean isMainHand) {
+        PacketByteBuf buf = PacketByteBufs.create();
+        buf.writeString(rankName);
+        buf.writeBoolean(isMainHand);
+        ServerPlayNetworking.send(player, OPEN_SKILL_UNLOCK_ID, buf);
     }
 }

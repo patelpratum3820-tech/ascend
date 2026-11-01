@@ -36,34 +36,7 @@ public class SkillScrollItem extends Item {
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
         ItemStack stack = user.getStackInHand(hand);
         if (!world.isClient() && user instanceof ServerPlayerEntity player) {
-            PlayerData data = ((IPlayerDataAccessor) player).ascend$getPlayerData();
-
-            // Find a skill of this rank that is not yet unlocked
-            List<SkillInfo> available = SkillInfo.getSkillsByRank(rank);
-            SkillInfo targetSkill = null;
-            for (SkillInfo s : available) {
-                if (!data.hasUnlockedSkill(s.id())) {
-                    targetSkill = s;
-                    break;
-                }
-            }
-
-            if (targetSkill == null) {
-                player.sendMessage(Text.literal("§eYou have already mastered all known " + rank.getFormatted() + "§e rank skills!"), true);
-                return TypedActionResult.pass(stack);
-            }
-
-            // Unlock skill
-            data.unlockSkill(targetSkill.id());
-            AscendPackets.syncPlayerData(player);
-
-            player.sendMessage(Text.literal("§6§l[SKILL UNLOCKED] §fYou mastered " + rank.getFormatted() + " §f" + targetSkill.displayName() + "!"), false);
-            player.sendMessage(Text.literal("§7Tag: " + targetSkill.tag() + " | " + targetSkill.description()), false);
-            world.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.UI_TOAST_CHALLENGE_COMPLETE, SoundCategory.PLAYERS, 1.0f, 1.2f);
-
-            if (!player.isCreative()) {
-                stack.decrement(1);
-            }
+            AscendPackets.sendOpenSkillUnlock(player, rank.name(), hand == Hand.MAIN_HAND);
             return TypedActionResult.success(stack);
         }
         return TypedActionResult.consume(stack);

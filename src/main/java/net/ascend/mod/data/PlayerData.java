@@ -105,6 +105,15 @@ public class PlayerData {
         } else if ("Slime".equalsIgnoreCase(race)) {
             baseVit += cfg.slimeVitalityPenalty;
             baseDef += cfg.slimeDefensePenalty;
+        } else if ("Elf".equalsIgnoreCase(race)) {
+            baseMan += cfg.elfManaBonus;
+            baseVit += cfg.elfVitalityPenalty;
+        } else if ("Beastkin".equalsIgnoreCase(race)) {
+            baseStr += cfg.beastkinStrengthBonus;
+            baseMan += cfg.beastkinManaPenalty;
+        } else if ("Demonkin".equalsIgnoreCase(race)) {
+            baseStr += cfg.demonkinStrengthBonus;
+            baseMan += cfg.demonkinManaBonus;
         }
 
         switch (playerClass.toLowerCase()) {
@@ -175,13 +184,15 @@ public class PlayerData {
             resourceLockedTicks--;
         } else {
             // Mana regen
+            double manaRegenRate = "Elf".equalsIgnoreCase(race) ? (cfg.manaRegenPerSecond * cfg.elfManaRegenMultiplier) : cfg.manaRegenPerSecond;
             if (currentMana < mana) {
-                currentMana = Math.min(mana, currentMana + (cfg.manaRegenPerSecond / 20.0));
+                currentMana = Math.min(mana, currentMana + (manaRegenRate / 20.0));
             }
 
             // Stamina regen
-            if (currentStamina < cfg.maxStamina) {
-                currentStamina = Math.min(cfg.maxStamina, currentStamina + (cfg.staminaRegenPerSecond / 20.0));
+            double maxSta = "Beastkin".equalsIgnoreCase(race) ? (cfg.maxStamina + cfg.beastkinStaminaBonus) : cfg.maxStamina;
+            if (currentStamina < maxSta) {
+                currentStamina = Math.min(maxSta, currentStamina + (cfg.staminaRegenPerSecond / 20.0));
             }
         }
 
@@ -310,6 +321,10 @@ public class PlayerData {
             double speedMultiplier = (speed - cfg.baseSpeed) * cfg.speedPercentPerPoint;
             if ("Dragonoid".equalsIgnoreCase(race)) {
                 speedMultiplier += cfg.dragonoidSpeedPenalty;
+            } else if ("Elf".equalsIgnoreCase(race)) {
+                speedMultiplier += cfg.elfSpeedBonus;
+            } else if ("Beastkin".equalsIgnoreCase(race)) {
+                speedMultiplier += cfg.beastkinSpeedBonus;
             }
             if (speedMultiplier != 0) {
                 speedAttr.addPersistentModifier(new EntityAttributeModifier(

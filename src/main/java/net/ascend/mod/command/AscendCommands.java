@@ -22,6 +22,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec3d;
+import java.util.List;
 
 import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
@@ -34,7 +35,7 @@ public class AscendCommands {
                 .executes(ctx -> {
                     ServerCommandSource src = ctx.getSource();
                     src.sendFeedback(() -> Text.literal("§6§l========== ASCEND RPG COMMANDS =========="), false);
-                    src.sendFeedback(() -> Text.literal("§e/ascend race <Human|Dragonoid|Slime> §7- Change race"), false);
+                    src.sendFeedback(() -> Text.literal("§e/ascend race <Human|Elf|Beastkin|Demonkin|Dragonoid|Slime> §7- Change race"), false);
                     src.sendFeedback(() -> Text.literal("§e/ascend class <Swordsman|Summoner|Mage|Archer|Tank> §7- Change class"), false);
                     src.sendFeedback(() -> Text.literal("§e/ascend difficulty <Easy|Normal|Hard|Nightmare> §7- Change difficulty"), false);
                     src.sendFeedback(() -> Text.literal("§e/ascend level <amount> §7- Set player level & rank"), false);
@@ -58,6 +59,9 @@ public class AscendCommands {
                 .then(argument("name", StringArgumentType.word())
                     .suggests((c, b) -> {
                         b.suggest("Human");
+                        b.suggest("Elf");
+                        b.suggest("Beastkin");
+                        b.suggest("Demonkin");
                         b.suggest("Dragonoid");
                         b.suggest("Slime");
                         return b.buildFuture();
@@ -67,8 +71,9 @@ public class AscendCommands {
                         String name = StringArgumentType.getString(ctx, "name");
                         String formatted = Character.toUpperCase(name.charAt(0)) + name.substring(1).toLowerCase();
 
-                        if (!formatted.equals("Human") && !formatted.equals("Dragonoid") && !formatted.equals("Slime")) {
-                            ctx.getSource().sendError(Text.literal("Invalid race! Valid choices: Human, Dragonoid, Slime"));
+                        List<String> validRaces = List.of("Human", "Elf", "Beastkin", "Demonkin", "Dragonoid", "Slime");
+                        if (!validRaces.contains(formatted)) {
+                            ctx.getSource().sendError(Text.literal("Invalid race! Valid choices: Human, Elf, Beastkin, Demonkin, Dragonoid, Slime"));
                             return 0;
                         }
 

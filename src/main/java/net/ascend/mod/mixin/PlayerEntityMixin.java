@@ -64,14 +64,21 @@ public class PlayerEntityMixin implements IPlayerDataAccessor {
             return 0.0f;
         }
 
-        // 2. Dragonoid Perks & Weaknesses
-        if ("Dragonoid".equalsIgnoreCase(data.getRace())) {
+        // 2. Dragonoid & Demonkin Perks & Weaknesses
+        if ("Dragonoid".equalsIgnoreCase(data.getRace()) || "Demonkin".equalsIgnoreCase(data.getRace())) {
             if (source.isOf(DamageTypes.IN_FIRE) || source.isOf(DamageTypes.ON_FIRE) || 
                 source.isOf(DamageTypes.LAVA) || source.isOf(DamageTypes.HOT_FLOOR)) {
-                return 0.0f; // Fire immunity
+                return 0.0f; // Fire & Lava immunity
             }
+        }
+        if ("Dragonoid".equalsIgnoreCase(data.getRace())) {
             if (source.isOf(DamageTypes.FREEZE) || source.isOf(DamageTypes.DROWN)) {
                 amount *= (float) cfg.dragonoidColdWaterVulnerability; // +50% extra cold/water damage
+            }
+        }
+        if ("Demonkin".equalsIgnoreCase(data.getRace())) {
+            if (source.isOf(DamageTypes.MAGIC) || source.isOf(DamageTypes.LIGHTNING_BOLT)) {
+                amount *= (float) cfg.demonkinHolyVulnerability; // +50% holy/magic damage
             }
         }
 
@@ -108,6 +115,14 @@ public class PlayerEntityMixin implements IPlayerDataAccessor {
             if ("Slime".equalsIgnoreCase(data.getRace())) {
                 if (self.getHealth() < self.getMaxHealth() && self.getRandom().nextFloat() < AscendConfig.INSTANCE.slimeRegenChancePerTick) {
                     self.heal(1.0f);
+                }
+            }
+
+            // Beastkin passive night vision
+            if ("Beastkin".equalsIgnoreCase(data.getRace())) {
+                if (!self.hasStatusEffect(net.minecraft.entity.effect.StatusEffects.NIGHT_VISION)) {
+                    self.addStatusEffect(new net.minecraft.entity.effect.StatusEffectInstance(
+                            net.minecraft.entity.effect.StatusEffects.NIGHT_VISION, 300, 0, false, false, false));
                 }
             }
 

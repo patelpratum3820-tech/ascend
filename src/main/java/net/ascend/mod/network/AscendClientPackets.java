@@ -31,6 +31,22 @@ public class AscendClientPackets {
                 client.setScreen(new CharacterCreationScreen());
             });
         });
+
+        ClientPlayNetworking.registerGlobalReceiver(AscendPackets.OPEN_SKILL_UNLOCK_ID, (client, handler, buf, responseSender) -> {
+            String rankName = buf.readString();
+            boolean isMainHand = buf.readBoolean();
+            client.execute(() -> {
+                net.ascend.mod.skills.SkillRank rank = net.ascend.mod.skills.SkillRank.valueOf(rankName);
+                client.setScreen(new net.ascend.mod.client.gui.SkillUnlockScreen(rank, isMainHand));
+            });
+        });
+    }
+
+    public static void sendLearnSkill(String skillId, boolean isMainHand) {
+        PacketByteBuf buf = PacketByteBufs.create();
+        buf.writeString(skillId);
+        buf.writeBoolean(isMainHand);
+        ClientPlayNetworking.send(AscendPackets.LEARN_SKILL_ID, buf);
     }
 
     public static void sendStatUpgradeRequest(String statName) {
