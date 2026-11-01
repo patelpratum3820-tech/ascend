@@ -293,7 +293,7 @@ public class CharacterCreationScreen extends Screen {
         context.drawText(textRenderer, Text.literal("§7Before you take physical form and descend to the mortal lands,"), cx, y + 32, 0xFFAAAAAA, false);
         context.drawText(textRenderer, Text.literal("§7I grant you the sacred gifts of rebirth:"), cx, y + 44, 0xFFAAAAAA, false);
 
-        context.drawText(textRenderer, Text.literal("§b✦ One Species §7— Choose heritage (Human, Elf, Beastkin, Demonkin, Dragonoid, Slime)"), cx + 8, y + 62, 0xFFFFFFFF, false);
+        context.drawText(textRenderer, Text.literal("§b✦ One Species §7— Choose from 6 unique fantasy races"), cx + 8, y + 62, 0xFFFFFFFF, false);
         context.drawText(textRenderer, Text.literal("§e✦ One Combat Class §7— Dictate your path of power"), cx + 8, y + 76, 0xFFFFFFFF, false);
         context.drawText(textRenderer, Text.literal("§a✦ Two Starting Arts §7— Your initial combat & magical skills"), cx + 8, y + 90, 0xFFFFFFFF, false);
         context.drawText(textRenderer, Text.literal("§6✦ World Fate §7— Set the difficulty of your journey"), cx + 8, y + 104, 0xFFFFFFFF, false);

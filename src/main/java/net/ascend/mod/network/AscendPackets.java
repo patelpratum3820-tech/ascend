@@ -29,6 +29,7 @@ public class AscendPackets {
     public static final Identifier CAST_SKILL_ID = new Identifier(AscendMod.MOD_ID, "cast_skill");
     public static final Identifier OPEN_SKILL_UNLOCK_ID = new Identifier(AscendMod.MOD_ID, "open_skill_unlock");
     public static final Identifier LEARN_SKILL_ID = new Identifier(AscendMod.MOD_ID, "learn_skill");
+    public static final Identifier EQUIP_SKILL_ID = new Identifier(AscendMod.MOD_ID, "equip_skill");
 
     public static void registerServerReceivers() {
         // 1. Upgrade Stat
@@ -137,6 +138,22 @@ public class AscendPackets {
                         net.ascend.mod.skills.SkillInfo info = net.ascend.mod.skills.SkillInfo.getById(skillId);
                         player.sendMessage(Text.literal("§6§l[SKILL MASTERED] §fYou engraved §a" + info.displayName() + " §finto your soul!"), false);
                     }
+                }
+            });
+        });
+
+        // 6. Equip Skill to Slot from Grimoire
+        ServerPlayNetworking.registerGlobalReceiver(EQUIP_SKILL_ID, (server, player, handler, buf, responseSender) -> {
+            int slot = buf.readInt();
+            String skillId = buf.readString();
+
+            server.execute(() -> {
+                PlayerData data = ((IPlayerDataAccessor) player).ascend$getPlayerData();
+                boolean success = data.equipSkillToSlot(slot, skillId);
+                if (success) {
+                    syncPlayerData(player);
+                    player.getServerWorld().playSound(null, player.getX(), player.getY(), player.getZ(),
+                            SoundEvents.UI_BUTTON_CLICK.value(), SoundCategory.PLAYERS, 1.0f, 1.2f);
                 }
             });
         });

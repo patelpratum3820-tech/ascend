@@ -1,5 +1,6 @@
 package net.ascend.mod.client.hud;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.ascend.mod.AscendMod;
 import net.ascend.mod.data.IPlayerDataAccessor;
 import net.ascend.mod.data.PlayerData;
@@ -112,23 +113,26 @@ public class AscendHudRenderer implements HudRenderCallback {
         if (iconId != null && !iconId.isEmpty()) {
             Identifier texture = new Identifier(AscendMod.MOD_ID, "textures/skill/" + iconId + ".png");
             try {
+                RenderSystem.enableBlend();
+                RenderSystem.defaultBlendFunc();
                 context.drawTexture(texture, x + 5, y + 5, 0f, 0f, 16, 16, 16, 16);
+                RenderSystem.disableBlend();
             } catch (Exception ignored) {
             }
         }
 
         // Hotkey badge (top-left)
         int keyColor = isSignature ? 0xFFFFD700 : 0xFFFFFFFF;
-        context.drawText(tr, Text.literal(hotkey), x + 3, y + 2, keyColor, true);
+        context.drawText(tr, Text.literal(hotkey), x + 2, y + 1, keyColor, true);
 
-        // Rank badge (top-right)
+        // Rank badge (bottom-right)
         if (iconId != null && !iconId.isEmpty() && !isSignature) {
             SkillInfo sk = SkillInfo.getById(iconId);
             if (sk != null && sk.rank() != null) {
                 String rStr = sk.rank().getLabel();
                 int rCol = sk.rank().getHexColor();
                 int rw = tr.getWidth(rStr);
-                context.drawText(tr, Text.literal(sk.rank().getColorCode() + rStr), x + size - rw - 3, y + 2, rCol, true);
+                context.drawText(tr, Text.literal(sk.rank().getColorCode() + rStr), x + size - rw - 2, y + size - 9, rCol, true);
             }
         }
 

@@ -176,6 +176,31 @@ public class PlayerData {
         return true;
     }
 
+    public boolean equipSkillToSlot(int slotIndex, String skillId) {
+        if (slotIndex < 0 || slotIndex >= getMaxUnlockedSkillSlots()) return false;
+        if (!hasUnlockedSkill(skillId)) return false;
+        if (!canEquipSkill(skillId)) return false;
+
+        while (selectedSkills.size() <= slotIndex) {
+            selectedSkills.add("");
+        }
+
+        int existingIdx = selectedSkills.indexOf(skillId);
+        if (existingIdx != -1 && existingIdx != slotIndex) {
+            String currentInTarget = selectedSkills.get(slotIndex);
+            selectedSkills.set(existingIdx, currentInTarget);
+        }
+
+        selectedSkills.set(slotIndex, skillId);
+        return true;
+    }
+
+    public void unequipSlot(int slotIndex) {
+        if (slotIndex >= 0 && slotIndex < selectedSkills.size()) {
+            selectedSkills.set(slotIndex, "");
+        }
+    }
+
     public void tickResources() {
         AscendConfig cfg = AscendConfig.INSTANCE;
 

@@ -498,7 +498,7 @@
     "tag": "magic",
     "effect": "For 15 s meteors automatically strike and kill every hostile mob within 10 blocks. Players and pets are safe. Bosses take 5% max HP per meteor",
     "cost_type": "MANA",
-    "cost_amount": 10060.0,
+    "cost_amount": 60.0,
     "is_percent": true,
     "cooldown_sec": 120,
     "unlock": "Level 100 + both final bosses + SS Rune"
@@ -510,7 +510,7 @@
     "tag": "support",
     "effect": "Dark domain for 30 s: enemies slowed 70%, allies +50% stats, every kill raises a shadow soldier",
     "cost_type": "MANA",
-    "cost_amount": 10060.0,
+    "cost_amount": 60.0,
     "is_percent": true,
     "cooldown_sec": 1800,
     "unlock": "Level 100 + both final bosses + SS Rune"
@@ -522,7 +522,7 @@
     "tag": "melee",
     "effect": "One cross-screen slash that kills everything non-boss within 20 blocks; bosses take 10% max HP",
     "cost_type": "STAMINA",
-    "cost_amount": 10060.0,
+    "cost_amount": 60.0,
     "is_percent": true,
     "cooldown_sec": 1800,
     "unlock": "Level 100 + both final bosses + SS Rune"

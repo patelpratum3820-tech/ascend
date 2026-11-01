@@ -112,10 +112,35 @@ public class DivineAwakening {
 
     private static void buildCelestialPlatform(ServerWorld world) {
         StructureTemplateManager manager = world.getStructureTemplateManager();
+        StructureTemplate template = null;
         Optional<StructureTemplate> templateOpt = manager.getTemplate(new Identifier("ascend", "temple_of_the_chosen"));
         if (templateOpt.isPresent()) {
-            StructureTemplate template = templateOpt.get();
-            // Origin centered at SHRINE_X, SHRINE_Z, with courtyard level at SHRINE_Y
+            template = templateOpt.get();
+        } else {
+            // Fallback direct classpath load
+            try (java.io.InputStream is = DivineAwakening.class.getResourceAsStream("/data/ascend/structures/temple_of_the_chosen.nbt")) {
+                if (is != null) {
+                    net.minecraft.nbt.NbtCompound nbt = net.minecraft.nbt.NbtIo.readCompressed(is);
+                    template = manager.createTemplate(nbt);
+                }
+            } catch (Exception e) {
+                net.ascend.mod.AscendMod.LOGGER.error("[Ascend] Error loading temple_of_the_chosen NBT directly", e);
+            }
+        }
+
+        if (template != null) {
+            // Clear old blocks from legacy test platforms around spawn
+            for (int x = -20; x <= 20; x++) {
+                for (int z = -20; z <= 20; z++) {
+                    for (int y = SHRINE_Y - 12; y <= SHRINE_Y + 25; y++) {
+                        BlockPos p = new BlockPos(x, y, z);
+                        if (!world.getBlockState(p).isAir()) {
+                            world.setBlockState(p, Blocks.AIR.getDefaultState(), 2);
+                        }
+                    }
+                }
+            }
+
             BlockPos origin = new BlockPos(
                     SHRINE_X - template.getSize().getX() / 2,
                     SHRINE_Y - 10,
@@ -123,6 +148,9 @@ public class DivineAwakening {
             );
             StructurePlacementData placementData = new StructurePlacementData();
             template.place(world, origin, origin, placementData, world.getRandom(), 2);
+            net.ascend.mod.AscendMod.LOGGER.info("[Ascend] Successfully placed Temple of the Chosen NBT structure at " + origin);
+        } else {
+            net.ascend.mod.AscendMod.LOGGER.error("[Ascend] Failed to load temple_of_the_chosen.nbt!");
         }
     }
 }

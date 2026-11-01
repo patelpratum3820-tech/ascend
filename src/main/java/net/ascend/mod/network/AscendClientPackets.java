@@ -49,6 +49,13 @@ public class AscendClientPackets {
         ClientPlayNetworking.send(AscendPackets.LEARN_SKILL_ID, buf);
     }
 
+    public static void sendEquipSkill(int slot, String skillId) {
+        PacketByteBuf buf = PacketByteBufs.create();
+        buf.writeInt(slot);
+        buf.writeString(skillId);
+        ClientPlayNetworking.send(AscendPackets.EQUIP_SKILL_ID, buf);
+    }
+
     public static void sendStatUpgradeRequest(String statName) {
         PacketByteBuf buf = PacketByteBufs.create();
         buf.writeString(statName);

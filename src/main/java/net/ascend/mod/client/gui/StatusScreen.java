@@ -65,9 +65,14 @@ public class StatusScreen extends Screen {
             addDrawableChild(btn);
         }
 
-        // Close button at bottom
+        // Grimoire & Close buttons at bottom
+        ButtonWidget grimoireBtn = ButtonWidget.builder(Text.literal("§b✦ Grimoire"), button -> {
+            if (client != null) client.setScreen(new SkillManagerScreen());
+        }).dimensions(left + 18, top + CARD_HEIGHT - 24, 90, 18).build();
+        addDrawableChild(grimoireBtn);
+
         ButtonWidget closeBtn = ButtonWidget.builder(Text.literal("Close"), button -> close())
-                .dimensions(left + (CARD_WIDTH - 60) / 2, top + CARD_HEIGHT - 24, 60, 18)
+                .dimensions(left + CARD_WIDTH - 75, top + CARD_HEIGHT - 24, 58, 18)
                 .build();
         addDrawableChild(closeBtn);
     }
