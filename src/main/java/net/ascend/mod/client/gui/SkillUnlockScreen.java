@@ -96,9 +96,9 @@ public class SkillUnlockScreen extends Screen {
         int top = (height - CARD_HEIGHT) / 2;
 
         // Background card & border
-        context.fill(left, top, left + CARD_WIDTH, top + CARD_HEIGHT, 0xEE090E1B);
+        context.fill(left, top, left + CARD_WIDTH, top + CARD_HEIGHT, net.ascend.mod.client.gui.components.RpgTheme.BG_DARK);
         context.drawBorder(left, top, CARD_WIDTH, CARD_HEIGHT, rank.getHexColor());
-        context.drawBorder(left + 2, top + 2, CARD_WIDTH - 4, CARD_HEIGHT - 4, 0x44FFFFFF);
+        context.drawBorder(left + 2, top + 2, CARD_WIDTH - 4, CARD_HEIGHT - 4, net.ascend.mod.client.gui.components.RpgTheme.BORDER_MUTED);
 
         // Header
         String title = "✦ ANCIENT GRIMOIRE: " + rank.getFormatted() + " ART ✦";

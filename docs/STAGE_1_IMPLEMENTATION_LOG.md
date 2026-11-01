@@ -35,10 +35,27 @@
 * **Tests Performed:**
   * Clean compile with Fabric Loom (`gradlew compileJava`).
   * Full distribution build (`gradlew build -x test`). Standalone JAR assembled at `ascend-0.1.0-alpha.jar` (572,527 bytes).
-* **Bugs Discovered & Resolved:**
-  * Ensured complete backwards compatibility by mapping legacy attribute names (`speed` -> `agility`, `mana` -> `intelligence`, `defense` -> `dexterity`) and legacy class getter `getPlayerClass()` to `getCombinedClassTitle()`.
+
+---
+
+## Phase 3: Unified UI Component Framework & Core Screens
+* **Completed:** November 1, 2026
+* **Files Created:**
+  * `src/main/java/net/ascend/mod/client/gui/components/RpgTheme.java`: Central color palette, standardized card backgrounds, headers, progress bars, and badge rendering utilities.
+  * `src/main/java/net/ascend/mod/client/gui/components/RpgTabBar.java`: Equal-width multi-tab bar selector.
+  * `src/main/java/net/ascend/mod/client/gui/CharacterProfileScreen.java`: Comprehensive 4-tab RPG interface (Overview, Attributes, Heritage, Titles) with 3D player entity rendering.
+  * `docs/UI_DESIGN_GUIDE.md`: Full design documentation for colors, cards, typography, and screen layouts.
+* **Files Modified:**
+  * `src/main/java/net/ascend/mod/client/gui/StatusScreen.java`: Extended `CharacterProfileScreen` to maintain backwards compatibility while opening the rich profile interface.
+  * `src/main/java/net/ascend/mod/client/hud/AscendHudRenderer.java`: Added compact Top-Left Ascender Banner (Name, Title, Level, Rank, XP bar), resource meters (STA, MP), and mana affordability dimming on skill slots.
+  * `src/main/java/net/ascend/mod/client/gui/SkillManagerScreen.java`: Enhanced with unified `RpgTheme` cards and headers.
+  * `src/main/java/net/ascend/mod/client/gui/SkillUnlockScreen.java`: Enhanced with unified `RpgTheme` cards and rank-accented borders.
+  * `src/main/java/net/ascend/mod/network/AscendClientPackets.java`: Added import and handler for `CharacterProfileScreen`.
+* **Tests Performed:**
+  * Clean compilation verified (`gradlew compileJava` - 0 errors).
+  * Production JAR built at `ascend-0.1.0-alpha.jar` (581,956 bytes).
 * **Remaining Work for Stage 1:**
-  * Phase 3: Unified UI Component Framework & Core Screens overhaul.
-  * Phase 4: RPG Interface Suite (Grimoire overhaul, Quest Journal, Dungeon Rank Screen, Artifact Showcase Screen, RPG Equipment in Inventory).
+  * Phase 4: RPG Interfaces Suite (Quest Journal Screen, Dungeon & Rank Screen, Artifact Progression Showcase, Inventory Equipment View).
   * Phase 5: Story Progression & Difficulty Integration.
   * Phase 6: Polish, Testing & Documentation.
+

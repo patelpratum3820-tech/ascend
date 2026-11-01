@@ -1,6 +1,7 @@
 package net.ascend.mod.network;
 
 import net.ascend.mod.client.gui.CharacterCreationScreen;
+import net.ascend.mod.client.gui.CharacterProfileScreen;
 import net.ascend.mod.client.gui.StatusScreen;
 import net.ascend.mod.data.IPlayerDataAccessor;
 import net.fabricmc.api.EnvType;
@@ -19,8 +20,8 @@ public class AscendClientPackets {
             client.execute(() -> {
                 if (client.player != null) {
                     ((IPlayerDataAccessor) client.player).ascend$getPlayerData().readFromBuffer(copiedBuf);
-                    if (client.currentScreen instanceof StatusScreen statusScreen) {
-                        statusScreen.refreshData();
+                    if (client.currentScreen instanceof CharacterProfileScreen profileScreen) {
+                        profileScreen.refreshData();
                     }
                 }
             });

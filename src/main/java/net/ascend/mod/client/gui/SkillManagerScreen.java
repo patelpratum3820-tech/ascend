@@ -161,14 +161,11 @@ public class SkillManagerScreen extends Screen {
         int top = (height - CARD_HEIGHT) / 2;
 
         // Dark RPG card background
-        context.fill(left, top, left + CARD_WIDTH, top + CARD_HEIGHT, 0xEE090E1B);
-        context.drawBorder(left, top, CARD_WIDTH, CARD_HEIGHT, 0xFF00D2FF);
-        context.drawBorder(left + 2, top + 2, CARD_WIDTH - 4, CARD_HEIGHT - 4, 0x44FFFFFF);
+        net.ascend.mod.client.gui.components.RpgTheme.drawCard(context, left, top, CARD_WIDTH, CARD_HEIGHT, true);
 
         // Header
         String title = "✦ ASCENDER'S GRIMOIRE — ACTIVE ARTS ✦";
-        int tw = textRenderer.getWidth(title);
-        context.drawText(textRenderer, Text.literal("§l" + title), left + (CARD_WIDTH - tw) / 2, top + 10, 0xFFFFD700, true);
+        net.ascend.mod.client.gui.components.RpgTheme.drawHeader(context, textRenderer, title, left, top + 8, CARD_WIDTH, true);
 
         // Highlight selected slot
         int highlightX = left + 20 + (selectedSlot * 85);

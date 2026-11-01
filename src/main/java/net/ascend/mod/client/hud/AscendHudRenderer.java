@@ -2,6 +2,7 @@ package net.ascend.mod.client.hud;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.ascend.mod.AscendMod;
+import net.ascend.mod.client.gui.components.RpgTheme;
 import net.ascend.mod.data.IPlayerDataAccessor;
 import net.ascend.mod.data.PlayerData;
 import net.ascend.mod.skills.SkillInfo;
@@ -35,13 +36,58 @@ public class AscendHudRenderer implements HudRenderCallback {
         int screenHeight = client.getWindow().getScaledHeight();
         TextRenderer tr = client.textRenderer;
 
-        // 1. Draw RPG Resource Bars (Bottom Left)
+        // 1. Top-Left Ascender Banner (Minimal & Clean)
+        renderPlayerBanner(context, tr, data);
+
+        // 2. Bottom-Left RPG Resource Bars (Stamina & Mana)
+        renderResourceBars(context, tr, screenHeight, data);
+
+        // 3. Bottom-Right RPG Skill & Signature Action Slots
+        renderSkillSlots(context, tr, screenWidth, screenHeight, data);
+    }
+
+    private void renderPlayerBanner(DrawContext context, TextRenderer tr, PlayerData data) {
+        int x = 10;
+        int y = 10;
+        int bannerW = 150;
+        int bannerH = 46;
+
+        // Subtle dark backdrop
+        context.fill(x, y, x + bannerW, y + bannerH, 0xAA080D1A);
+        context.drawBorder(x, y, bannerW, bannerH, 0x6600D2FF);
+
+        // Name & Title
+        String nameStr = "§f§l" + data.getCharacterName();
+        context.drawText(tr, Text.literal(nameStr), x + 6, y + 5, 0xFFFFFFFF, true);
+
+        // Race & Dual-Class Discipline
+        String classStr = "§b" + data.getRace() + " §7| §e" + data.getCombinedClassTitle();
+        if (classStr.length() > 28) classStr = classStr.substring(0, 27) + "...";
+        context.drawText(tr, Text.literal(classStr), x + 6, y + 17, 0xFFE0E0E0, false);
+
+        // Level & Rank badge
+        String lvlStr = "§7Lv.§e" + data.getLevel() + " §8| §fRank: §6§l" + data.getRank();
+        context.drawText(tr, Text.literal(lvlStr), x + 6, y + 28, 0xFFFFFFFF, false);
+
+        // XP Bar
+        long curXp = data.getXp();
+        long reqXp = data.getXpRequiredForNextLevel();
+        double xpPct = reqXp > 0 ? (double) curXp / reqXp : 0.0;
+        RpgTheme.drawProgressBar(context, x + 6, y + 38, bannerW - 12, 4, xpPct, RpgTheme.BAR_XP, 0xFF554400);
+
+        // Available Stat Points Alert
+        if (data.getStatPoints() > 0) {
+            context.drawText(tr, Text.literal("§a✦ " + data.getStatPoints() + " Pts [K]"), x + bannerW + 6, y + 6, 0xFF55FF55, true);
+        }
+    }
+
+    private void renderResourceBars(DrawContext context, TextRenderer tr, int screenHeight, PlayerData data) {
         int barX = 12;
         int barY = screenHeight - 52;
         int barWidth = 110;
         int barHeight = 8;
 
-        // Stamina Bar (Vibrant emerald green with dark cyber border)
+        // Stamina Bar (Emerald green)
         double staminaPercent = Math.max(0.0, Math.min(1.0, data.getCurrentStamina() / 100.0));
         int staFillWidth = (int) (staminaPercent * (barWidth - 2));
 
@@ -52,21 +98,22 @@ public class AscendHudRenderer implements HudRenderCallback {
 
         // Mana Bar (Vibrant anime cyan)
         int manaBarY = barY + 12;
-        double manaPercent = data.getMana() > 0 ? Math.max(0.0, Math.min(1.0, data.getCurrentMana() / data.getMana())) : 0.0;
+        double manaPercent = data.getIntelligence() > 0 ? Math.max(0.0, Math.min(1.0, data.getCurrentMana() / data.getIntelligence())) : 0.0;
         int manaFillWidth = (int) (manaPercent * (barWidth - 2));
 
         context.fill(barX, manaBarY, barX + barWidth, manaBarY + barHeight, 0xDD111726);
         context.fill(barX + 1, manaBarY + 1, barX + 1 + manaFillWidth, manaBarY + barHeight - 1, 0xFF00D2FF);
         context.drawBorder(barX, manaBarY, barWidth, barHeight, 0xFF005E82);
-        context.drawText(tr, Text.literal("§bMP  §f" + (int) data.getCurrentMana() + "/" + data.getMana()), barX + 4, manaBarY - 1, 0xFFFFFFFF, true);
+        context.drawText(tr, Text.literal("§bMP  §f" + (int) data.getCurrentMana() + "/" + data.getIntelligence()), barX + 4, manaBarY - 1, 0xFFFFFFFF, true);
 
         // Dash & Rank Indicator
         int dashY = manaBarY + 12;
         int dashCd = data.getDashCooldownTicks();
         String dashText = dashCd > 0 ? "§c[ALT] Dash (" + (dashCd / 20 + 1) + "s)" : "§a[ALT] Dash READY";
-        context.drawText(tr, Text.literal(dashText + "  §8|  §eRank §l" + data.getRank()), barX, dashY, 0xFFFFFFFF, true);
+        context.drawText(tr, Text.literal(dashText), barX, dashY, 0xFFFFFFFF, true);
+    }
 
-        // 2. Draw RPG Skill & Signature Action Slots (Bottom Right)
+    private void renderSkillSlots(DrawContext context, TextRenderer tr, int screenWidth, int screenHeight, PlayerData data) {
         List<String> skills = data.getSelectedSkills();
         int maxUnlocked = data.getMaxUnlockedSkillSlots();
         int slotSize = 26;
@@ -75,35 +122,43 @@ public class AscendHudRenderer implements HudRenderCallback {
         int startX = screenWidth - totalWidth - 14;
         int slotY = screenHeight - slotSize - 12;
 
-        // Render 4 Regular Skill Slots + 1 Signature Move Slot
+        // Render 4 Regular Skill Slots
         for (int i = 0; i < 4; i++) {
             int x = startX + i * (slotSize + slotSpacing);
             boolean isUnlocked = (i < maxUnlocked);
             String skillId = (isUnlocked && i < skills.size()) ? skills.get(i) : null;
             int cdTicks = data.getSkillCooldown(i);
 
-            drawSkillSlot(context, tr, x, slotY, slotSize, HOTKEYS[i], skillId, cdTicks, isUnlocked, RANK_REQ[i], false);
+            boolean hasMana = true;
+            if (skillId != null && !skillId.isEmpty()) {
+                SkillInfo sk = SkillInfo.getById(skillId);
+                double cost = sk.costAmount();
+                if (sk.isPercent()) cost = (data.getIntelligence() * cost) / 100.0;
+                if ("MANA".equalsIgnoreCase(sk.costType()) && data.getCurrentMana() < cost) {
+                    hasMana = false;
+                }
+            }
+
+            drawSkillSlot(context, tr, x, slotY, slotSize, HOTKEYS[i], skillId, cdTicks, isUnlocked, RANK_REQ[i], false, hasMana);
         }
 
         // Slot 5: Signature Move [V]
         int sigX = startX + 4 * (slotSize + slotSpacing);
-        String sigIcon = getSignatureIcon(data.getPlayerClass());
-        drawSkillSlot(context, tr, sigX, slotY, slotSize, "V", sigIcon, data.getSignatureCooldownTicks(), true, "Awakened", true);
+        String sigIcon = getSignatureIcon(data.getPrimaryClass());
+        drawSkillSlot(context, tr, sigX, slotY, slotSize, "V", sigIcon, data.getSignatureCooldownTicks(), true, "Awakened", true, true);
     }
 
     private void drawSkillSlot(DrawContext context, TextRenderer tr, int x, int y, int size,
-                               String hotkey, String iconId, int cdTicks, boolean unlocked, String reqRank, boolean isSignature) {
+                               String hotkey, String iconId, int cdTicks, boolean unlocked, String reqRank, boolean isSignature, boolean hasResource) {
         int borderColor = isSignature ? 0xFFFFD700 : (unlocked ? 0xFF00D2FF : 0xFF444455);
-        int bgColor = unlocked ? 0xDD0D1322 : 0xDD18181F;
+        int bgColor = unlocked ? (hasResource ? 0xDD0D1322 : 0xDD2A1015) : 0xDD18181F;
 
         // Background box & border
         context.fill(x, y, x + size, y + size, bgColor);
         context.drawBorder(x, y, size, size, borderColor);
 
         if (!unlocked) {
-            // Locked Slot Overlay with Required Rank indicator
             context.fill(x + 1, y + 1, x + size - 1, y + size - 1, 0xAA111111);
-            int rw = tr.getWidth(reqRank);
             context.drawText(tr, Text.literal("🔒"), x + (size - 8) / 2, y + 4, 0xFFAAAAAA, false);
             context.drawText(tr, Text.literal("§7" + reqRank.replace("Rank ", "")), x + (size - 8) / 2, y + 14, 0xFF888888, false);
             return;
@@ -115,7 +170,11 @@ public class AscendHudRenderer implements HudRenderCallback {
             try {
                 RenderSystem.enableBlend();
                 RenderSystem.defaultBlendFunc();
+                if (!hasResource) {
+                    RenderSystem.setShaderColor(0.5f, 0.5f, 0.6f, 0.7f);
+                }
                 context.drawTexture(texture, x + 5, y + 5, 0f, 0f, 16, 16, 16, 16);
+                RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
                 RenderSystem.disableBlend();
             } catch (Exception ignored) {
             }
