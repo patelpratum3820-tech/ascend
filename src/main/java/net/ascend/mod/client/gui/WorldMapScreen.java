@@ -10,6 +10,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.RotationAxis;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
@@ -21,7 +22,6 @@ public class WorldMapScreen extends Screen {
     private static final Identifier CONTINENT_MAP = new Identifier("ascend", "textures/gui/continent_map.png");
     private static final Identifier PLAYER_ARROW = new Identifier("ascend", "textures/gui/player_arrow.png");
 
-    private static final int MAP_DISPLAY_SIZE = 200; // 200x200 pixels on screen
     private static final int WIDGET_WIDTH = 340;
     private static final int WIDGET_HEIGHT = 230;
 
@@ -163,11 +163,17 @@ public class WorldMapScreen extends Screen {
             int px = mapOriginX + (int) (nX * fullMapPx);
             int pz = mapOriginY + (int) (nZ * fullMapPx);
 
-            // Pulsating ring
+            // Pulsating beacon ring
             long time = System.currentTimeMillis();
             int pulse = (int) (4 + 2 * Math.sin(time / 200.0));
             context.drawBorder(px - pulse, pz - pulse, pulse * 2, pulse * 2, 0xFFFFD700);
-            context.fill(px - 2, pz - 2, px + 2, pz + 2, 0xFFFF5555);
+
+            // Player arrow heading
+            context.getMatrices().push();
+            context.getMatrices().translate(px, pz, 0);
+            context.getMatrices().multiply(RotationAxis.POSITIVE_Z.rotationDegrees(client.player.getYaw() + 180f));
+            context.drawTexture(PLAYER_ARROW, -4, -4, 0f, 0f, 8, 8, 16, 16);
+            context.getMatrices().pop();
         }
 
         context.disableScissor();
@@ -202,10 +208,17 @@ public class WorldMapScreen extends Screen {
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         if (keyCode == GLFW.GLFW_KEY_M || keyCode == GLFW.GLFW_KEY_ESCAPE) {
-            close();
+            this.close();
             return true;
         }
         return super.keyPressed(keyCode, scanCode, modifiers);
+    }
+
+    @Override
+    public void close() {
+        if (this.client != null) {
+            this.client.setScreen(null);
+        }
     }
 
     @Override
