@@ -31,6 +31,8 @@ public class AscendClientMod implements ClientModInitializer {
     public static KeyBinding grimoireKey;
     public static KeyBinding questJournalKey;
     public static KeyBinding dungeonRankKey;
+    public static KeyBinding worldMapKey;
+    public static KeyBinding minimapZoomKey;
 
     @Override
     public void onInitializeClient() {
@@ -202,9 +204,36 @@ public class AscendClientMod implements ClientModInitializer {
                 "category.ascend.general"
         ));
 
+        worldMapKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+                "key.ascend.world_map",
+                InputUtil.Type.KEYSYM,
+                GLFW.GLFW_KEY_M,
+                "category.ascend.general"
+        ));
+
+        minimapZoomKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+                "key.ascend.minimap_zoom",
+                InputUtil.Type.KEYSYM,
+                GLFW.GLFW_KEY_N,
+                "category.ascend.general"
+        ));
+
         // 4. Tick Listener for Key inputs
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             if (client.player == null) return;
+
+            // World Map Window [M]
+            while (worldMapKey.wasPressed()) {
+                if (client.currentScreen == null) {
+                    client.setScreen(new net.ascend.mod.client.gui.WorldMapScreen());
+                }
+            }
+
+            // Cycle Minimap Zoom [N]
+            while (minimapZoomKey.wasPressed()) {
+                net.ascend.mod.client.hud.AscendHudRenderer.cycleMinimapZoom();
+                client.player.sendMessage(net.minecraft.text.Text.literal("§6✦ [Minimap] §7Zoom: §e" + net.ascend.mod.client.hud.AscendHudRenderer.getMinimapZoomLabel()), true);
+            }
 
             // Quest Journal Window [J]
             while (questJournalKey.wasPressed()) {

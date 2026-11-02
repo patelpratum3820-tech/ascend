@@ -110,3 +110,4 @@ Selected at character creation and persisted in `PlayerData`:
   - `DEMON`: *Path of the Demon King* (unlocked upon defeating Lake Sovereign).
 - `netherSovereignDefeated`: Nether citadel cleared.
 - `chosenOneAchieved`: Ascension to the God's Realm complete.
+

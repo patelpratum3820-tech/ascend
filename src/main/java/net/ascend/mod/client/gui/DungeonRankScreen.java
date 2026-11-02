@@ -149,3 +149,4 @@ public class DungeonRankScreen extends Screen {
         }
     }
 }
+

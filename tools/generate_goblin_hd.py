@@ -160,3 +160,4 @@ def create_goblin_texture():
     print(f"Generated high quality shaded {out_file}")
 
 create_goblin_texture()
+

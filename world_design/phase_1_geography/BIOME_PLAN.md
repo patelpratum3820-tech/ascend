@@ -46,3 +46,4 @@ $$\text{Heartland (Plains)} \xrightarrow[X=1,000]{150\text{m}} \text{Rolling Gre
 ### 4. Westward Enchanted Transition
 $$\text{Heartland (Plains)} \xrightarrow[X=-800]{150\text{m}} \text{Deciduous Forest} \xrightarrow[X=-1,400]{250\text{m}} \text{Dark Forest} \xrightarrow[X=-1,900]{300\text{m}} \text{Ancient Enchanted Forest}$$
 - *Canopy Coverage:* Tree density increases from 15% $\rightarrow$ 45% $\rightarrow$ 85% closed sky canopy.
+

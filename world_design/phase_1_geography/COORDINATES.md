@@ -51,3 +51,4 @@ To prevent geographical features (such as steep cliffs or deep water) from obstr
 | `SITE_BEAST_HORDE` | Beastkin Great Encampment | `-900, 2,500` | `Y = 88` | 450 × 450 blocks | Defensible savanna plateau crowned by natural sandstone ramparts |
 | `SITE_DRACONIS_AERIE` | Draconis Great Spire | `2,500, -900` | `Y = 160` | 400 × 400 blocks | Massive flat-topped cliff mesa flanked by 100-block deep ravines |
 | `SITE_INFERNO_KEEP` | Archdemon Citadel | `2,600, 1,800` | `Y = 145` | 400 × 400 blocks | Solid basalt plateau positioned inside the northern caldera rim |
+

@@ -70,3 +70,4 @@ Rivers in ASCEND strictly follow downhill gravity and geographical realism. Wate
    - Base level: $Y = 63$ (Uniform water surface level at lake and ocean entry).
 2. **Carved Valleys:** Rivers must flow within natural V-shaped or U-shaped carved channels, never raised unnaturally above surrounding fields.
 3. **Shoreline Variation:** Riverbanks feature organic gravel bars, sandy beaches, reeds, and clay deposits rather than sheer vertical block cuts.
+

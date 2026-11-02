@@ -195,3 +195,4 @@ public class QuestJournalScreen extends Screen {
         }
     }
 }
+

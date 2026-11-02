@@ -268,3 +268,4 @@ for mat, pal in PALETTES.items():
     make_katana(mat, pal)
     make_dagger(mat, pal)
     make_greatsword(mat, pal)
+

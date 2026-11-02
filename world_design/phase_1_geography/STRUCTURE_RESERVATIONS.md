@@ -37,3 +37,4 @@ While **no actual buildings, walls, or NPCs are placed in Phase 1**, the terrain
 1. **Clearance Envelopes:** Within the footprint of each reservation ID, slope variations are constrained to within $\pm 1.5$ blocks to allow natural, clean foundation seating for future buildings.
 2. **Natural Vegetation Borders:** Surrounding each reserved clearing, natural trees and stone outcroppings are placed as organic frame borders so that the reserved areas appear as natural glades rather than artificial clear-cuts.
 3. **No Structure Generation in Phase 1:** No stone bricks, wooden planks, walls, or chests are generated during this phase; only the bedrock, stone, dirt, grass, sand, gravel, and water foundations are prepared.
+

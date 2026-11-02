@@ -64,3 +64,4 @@ Included in this mod repository under `world_design/phase_1_geography/terrain_ge
    - Generates a lightweight, playable 512 × 512 block terrain prototype centered at `(0, 0)`.
    - Features the floating Temple of the Chosen at $Y = 220$, rolling green plains down below at $Y = 74$, the northern shoreline of Lake Veyra, and smooth river grading.
    - Generates directly into `.minecraft/saves/ASCEND_Geography_Prototype` for instant in-game testing.
+

@@ -12,6 +12,10 @@
   "key.ascend.signature": "Cast Signature Move",
   "key.ascend.rpg_camera": "Toggle RPG Camera (1st/3rd Person)",
   "key.ascend.grimoire": "Open Grimoire (Manage Skills)",
+  "key.ascend.quest_journal": "Open Quest Journal",
+  "key.ascend.dungeon_rank": "Open Dungeon & Rank Ladder",
+  "key.ascend.world_map": "Open Continental World Map",
+  "key.ascend.minimap_zoom": "Cycle Minimap Zoom Level",
 
   "text.ascend.status_title": "STATUS SYSTEM",
   "text.ascend.level": "Level",

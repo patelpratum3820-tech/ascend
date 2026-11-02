@@ -71,3 +71,4 @@ Where:
 - $M(x, z)$ is the regional elevation multiplier (highest in northern mountains and volcanic rims).
 - $N_{\text{macro}}$ is 4-octave Perlin noise ($\lambda = 800\text{m}$) for macroscopic mountain ridges and plateaus.
 - $N_{\text{detail}}$ is 3-octave Simplex noise ($\lambda = 60\text{m}$) for organic slopes, gullies, and riverbeds.
+

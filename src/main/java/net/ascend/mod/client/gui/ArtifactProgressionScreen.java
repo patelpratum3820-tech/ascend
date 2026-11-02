@@ -133,3 +133,4 @@ public class ArtifactProgressionScreen extends Screen {
         }
     }
 }
+

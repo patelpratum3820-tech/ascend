@@ -30,3 +30,4 @@
    If key conflicts occur with other mods, players can customize bindings in Minecraft's standard Options $\rightarrow$ Controls menu or use the in-inventory shortcut buttons (`✦ Status`, `✦ Gear`).
 3. **Stage 2 Content Boundaries:**
    World generation structures (Temple of the Chosen sky palace, Goblin Cave Gate, Guild Hall, Capital City) and custom bosses are reserved for Stage 2. Stage 1 provides the foundational progression, rank ladders, artifact registries, and quest data.
+

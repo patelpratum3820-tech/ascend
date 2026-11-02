@@ -24,6 +24,59 @@ public class AscendHudRenderer implements HudRenderCallback {
     private static final String[] HOTKEYS = {"R", "F", "C", "X", "V"};
     private static final String[] RANK_REQ = {"Rank E", "Rank D", "Rank C", "Rank A", "Awakened"};
 
+    private static final Identifier CONTINENT_MAP = new Identifier("ascend", "textures/gui/continent_map.png");
+    private static final Identifier PLAYER_ARROW = new Identifier("ascend", "textures/gui/player_arrow.png");
+
+    public static int minimapZoomLevel = 2; // 0: 1x (All), 1: 2x (Region), 2: 4x (District), 3: 8x (Local)
+    public static boolean minimapVisible = true;
+
+    public static String getMinimapZoomLabel() {
+        return switch (minimapZoomLevel) {
+            case 0 -> "1x (All World)";
+            case 1 -> "2x (Region)";
+            case 2 -> "4x (District)";
+            default -> "8x (Local)";
+        };
+    }
+
+    public static void cycleMinimapZoom() {
+        minimapZoomLevel = (minimapZoomLevel + 1) % 4;
+    }
+
+    public static String getRegionName(int x, int z) {
+        if (Math.abs(x) < 200 && Math.abs(z) < 200) {
+            return "✦ Temple of the Chosen";
+        }
+        if (z < -1800) {
+            return "✦ Frozen Mountains (Frostspire)";
+        }
+        if (z >= -1400 && z <= -300 && Math.abs(x) < 700) {
+            return "✦ Lake Veyra (Great Lake)";
+        }
+        if (x >= -1200 && x <= 1200 && z >= 0 && z <= 1800) {
+            return "✦ Aurelia Province (Heartland)";
+        }
+        if (x < -1500 && z < 400) {
+            return "✦ Elven Forest (Elarion)";
+        }
+        if (x < -1500 && z >= 400) {
+            return "✦ Prism Pools (Slime Realm)";
+        }
+        if (x > 1400 && z < 400) {
+            return "✦ Draconis Ravines";
+        }
+        if (x > 1400 && z >= 400) {
+            return "✦ Inferno Keep (Caldera)";
+        }
+        if (z > 1800 && x < 500) {
+            return "✦ Beastkin Territory";
+        }
+        if (z > 2800) {
+            return "✦ Shattered Frontier";
+        }
+        return "✦ Continental Frontier";
+    }
+
     @Override
     public void onHudRender(DrawContext context, float tickDelta) {
         MinecraftClient client = MinecraftClient.getInstance();
@@ -44,6 +97,9 @@ public class AscendHudRenderer implements HudRenderCallback {
 
         // 3. Bottom-Right RPG Skill & Signature Action Slots
         renderSkillSlots(context, tr, screenWidth, screenHeight, data);
+
+        // 4. Top-Right RPG Minimap (Live Continent Radar)
+        renderMinimap(context, tr, screenWidth, client.player);
     }
 
     private void renderPlayerBanner(DrawContext context, TextRenderer tr, PlayerData data) {
@@ -214,5 +270,71 @@ public class AscendHudRenderer implements HudRenderCallback {
             case "tank" -> "sig_guardian_slam";
             default -> "sig_triple_slash";
         };
+    }
+
+    private void renderMinimap(DrawContext context, TextRenderer tr, int screenWidth, net.minecraft.entity.player.PlayerEntity player) {
+        if (!minimapVisible || player == null) return;
+
+        int mapSize = 74;
+        int mapX = screenWidth - mapSize - 10;
+        int mapY = 14;
+
+        // Current Region Header
+        String regName = getRegionName((int) player.getX(), (int) player.getZ());
+        int regW = tr.getWidth(regName);
+        context.drawText(tr, Text.literal(regName), mapX + mapSize - regW, mapY - 10, 0xFFFFD700, true);
+
+        // Minimap background card
+        context.fill(mapX, mapY, mapX + mapSize, mapY + mapSize, 0xCC090E1B);
+
+        // Scissor viewport for inner map
+        context.enableScissor(mapX + 2, mapY + 2, mapX + mapSize - 2, mapY + mapSize - 2);
+
+        float zoom = switch (minimapZoomLevel) {
+            case 0 -> 1.0f;
+            case 1 -> 2.0f;
+            case 2 -> 4.0f;
+            default -> 8.0f;
+        };
+
+        int innerSize = mapSize - 4;
+        int fullMapPx = (int) (innerSize * zoom);
+
+        double normX = (player.getX() + 4000.0) / 8000.0;
+        double normZ = (player.getZ() + 4000.0) / 8000.0;
+
+        int centerScreenX = mapX + mapSize / 2;
+        int centerScreenY = mapY + mapSize / 2;
+
+        int mapDrawX = centerScreenX - (int) (normX * fullMapPx);
+        int mapDrawY = centerScreenY - (int) (normZ * fullMapPx);
+
+        RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
+        context.drawTexture(CONTINENT_MAP, mapDrawX, mapDrawY, 0f, 0f, fullMapPx, fullMapPx, 512, 512);
+
+        // Draw Player Direction Arrow in center
+        context.getMatrices().push();
+        context.getMatrices().translate(centerScreenX, centerScreenY, 0);
+        context.getMatrices().multiply(net.minecraft.util.math.RotationAxis.POSITIVE_Z.rotationDegrees(player.getYaw() + 180f));
+        context.drawTexture(PLAYER_ARROW, -4, -4, 0f, 0f, 8, 8, 16, 16);
+        context.getMatrices().pop();
+
+        context.disableScissor();
+
+        // Cyan border
+        context.drawBorder(mapX, mapY, mapSize, mapSize, 0xFF00D2FF);
+
+        // Compass Indicators (N, S, E, W)
+        context.drawText(tr, Text.literal("§c§lN"), mapX + (mapSize / 2) - 3, mapY + 3, 0xFFFF5555, true);
+        context.drawText(tr, Text.literal("§7S"), mapX + (mapSize / 2) - 3, mapY + mapSize - 9, 0xFFAAAAAA, true);
+        context.drawText(tr, Text.literal("§7W"), mapX + 3, mapY + (mapSize / 2) - 4, 0xFFAAAAAA, true);
+        context.drawText(tr, Text.literal("§7E"), mapX + mapSize - 8, mapY + (mapSize / 2) - 4, 0xFFAAAAAA, true);
+
+        // Coordinates & Zoom Badge Below
+        int px = (int) player.getX();
+        int pz = (int) player.getZ();
+        String coordStr = "§7" + px + ", " + pz + " §e[" + (minimapZoomLevel == 0 ? "All" : (int)zoom + "x") + "]";
+        int coordW = tr.getWidth(coordStr);
+        context.drawText(tr, Text.literal(coordStr), mapX + (mapSize - coordW) / 2, mapY + mapSize + 3, 0xFFFFFFFF, true);
     }
 }

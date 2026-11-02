@@ -159,3 +159,4 @@ public class RpgEquipmentScreen extends Screen {
         return id.getNamespace().equals("ascend") && id.getPath().startsWith(prefix);
     }
 }
+

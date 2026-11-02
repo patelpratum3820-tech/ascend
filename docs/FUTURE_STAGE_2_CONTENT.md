@@ -55,3 +55,4 @@ Stage 2 structures will be built using NBT structure templates (`.nbt`) placed v
    - **Dragon Ravines:** High-tier volcanic dimension accessed via Dragonite portal.
    - **Floating Islands (Skylands):** Low-gravity celestial dimension accessed via *Astral Key of the Skies*.
    - **God's Realm:** Final endgame dimension for transcendent Chosen Ascenders.
+

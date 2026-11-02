@@ -97,3 +97,4 @@ The world of ASCEND is not an infinite procedural noise-scape, but a **deliberat
 
 ### I. The Shattered Frontier (Center: 500, 3,500 | Radius ~800)
 - **Topography:** A fractured tectonic rift zone on the southern coast where the continent splits into sea trenches, jagged needle islets, and shattered basalt columns, marking the boundary of the unknown.
+
