@@ -29,4 +29,9 @@ temp_extracted/
 # Private Reference materials
 art_reference/
 
+# World region files
+*.mca
+prototype_world/
+
+
 
